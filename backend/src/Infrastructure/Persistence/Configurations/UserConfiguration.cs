@@ -14,7 +14,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
 		// Configuraciones de campos de la tabla Users
 		builder.HasKey(u => u.Id);
-		builder.Property(u => u.Id).HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(u => u.Name).IsRequired().HasColumnName("name").HasMaxLength(255);
 

@@ -13,7 +13,7 @@ public class PasswordResetLogsConfiguration : IEntityTypeConfiguration<PasswordR
 
 		// Configuraciones de los campos de la tabla
 		builder.HasKey(p => p.Id);
-		builder.Property(p => p.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(p => p.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(p => p.UserId).HasColumnName("user_id").IsRequired();
 		builder.HasIndex(p => p.UserId);

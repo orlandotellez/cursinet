@@ -13,7 +13,7 @@ public class VerificationConfiguration : IEntityTypeConfiguration<Verification>
 
 		// Configuraciones de los campos de la tabla verifications
 		builder.HasKey(v => v.Id);
-		builder.Property(v => v.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(v => v.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(v => v.Identifier).IsRequired().HasColumnName("identifier");
 		builder.HasIndex(v => v.Identifier);
