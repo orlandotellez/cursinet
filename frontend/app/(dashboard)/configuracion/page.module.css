@@ -1,5 +1,6 @@
 .page {
-  max-width: 640px;
+  max-width: 700px;
+  margin: auto;
 }
 
 .title {
