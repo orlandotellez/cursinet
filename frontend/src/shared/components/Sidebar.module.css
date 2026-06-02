@@ -1,0 +1,199 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  border-right: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.expanded {
+  width: 260px;
+}
+
+.collapsed {
+  width: 80px;
+}
+
+/* ===== Logo ===== */
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  width: 100%;
+  border-bottom: 1px solid var(--border);
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logoLetter {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  font-family: var(--font-mono);
+}
+
+.logoText h1 {
+  font-size: 16px;
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.logoText p {
+  font-size: 12px;
+  margin: 2px 0 0;
+  color: var(--text-muted);
+}
+
+/* ===== Navigation ===== */
+.nav {
+  flex: 1;
+  width: 100%;
+  padding: 12px 8px;
+  overflow-y: auto;
+}
+
+.navItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.navItem:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.active {
+  background: var(--accent-light);
+  color: var(--accent-text);
+}
+
+.isCollapsedIcon {
+  justify-content: center;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ===== User Info ===== */
+.userInfo {
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+
+.userAvatar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.userEmail {
+  flex: 1;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+}
+
+/* ===== Collapse ===== */
+.collapseContainer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+
+.collapseButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collapseButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.collapseText {
+  font-size: 14px;
+}
+
+/* ===== Logout ===== */
+.logoutContainer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+
+.logoutButton {
+  color: var(--danger);
+}
+
+.logoutButton:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .expanded {
+    transform: translateX(0);
+    width: 260px;
+  }
+
+  .collapsed {
+    transform: translateX(-100%);
+  }
+}
