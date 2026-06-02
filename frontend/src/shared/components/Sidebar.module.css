@@ -12,7 +12,7 @@
 }
 
 .expanded {
-  width: 260px;
+  width: 300px;
 }
 
 .collapsed {
@@ -114,15 +114,22 @@
   padding: 12px 8px;
   border-top: 1px solid var(--border);
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  background: var(--bg-hover);
 }
 
 .userAvatar {
+  width: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
+  text-align: center;
   gap: 12px;
   padding: 12px;
   border-radius: 6px;
-  background: var(--bg-hover);
   color: var(--text-secondary);
 }
 

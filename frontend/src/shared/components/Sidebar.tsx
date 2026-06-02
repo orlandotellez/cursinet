@@ -69,11 +69,21 @@ export function Sidebar({ title, items }: SidebarProps) {
       </nav>
 
       {/* User Info */}
-      {user && !collapsed && (
+      {user && (
         <div className={styles.userInfo}>
           <div className={styles.userAvatar}>
-            <User size={18} />
-            <span className={styles.userEmail}>{user.name || user.email}</span>
+            {
+              collapsed ? (
+
+                <User size={18} />
+              ) : (
+                <>
+                  <User size={18} />
+                  <span className={styles.userEmail}>{user.name || user.email}</span>
+
+                </>
+              )
+            }
           </div>
         </div>
       )}
