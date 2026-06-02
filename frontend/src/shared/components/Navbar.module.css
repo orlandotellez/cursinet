@@ -124,6 +124,33 @@
   }
 }
 
+/* Panel educativo button (authenticated) */
+
+.dashboardBtn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: var(--accent);
+  padding: 8px 20px;
+  border-radius: var(--radius-input);
+  transition: background var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.dashboardBtn:hover {
+  background: var(--accent-hover);
+}
+
+@media (min-width: 768px) {
+  .dashboardBtn {
+    display: inline-flex;
+  }
+}
+
 .menuBtn {
   display: flex;
   align-items: center;
@@ -211,6 +238,21 @@
   padding: 12px;
   font-size: 16px;
   font-weight: 500;
+  color: white;
+  background: var(--accent);
+  border-radius: var(--radius-input);
+  text-decoration: none;
+}
+
+.mobileDashboardBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
   color: white;
   background: var(--accent);
   border-radius: var(--radius-input);
