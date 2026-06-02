@@ -2,39 +2,35 @@
 
 Estrategia de testing.
 
-## Backend (xUnit)
+## Current Status
+
+**No test projects exist yet.** The backend has no unit, integration, or E2E tests.
+
+The test infrastructure should be added following this strategy:
+
+## Proposed Structure
 
 ```
 tests/
-├── Nexora.UnitTests/
+├── Cursinet.UnitTests/
 │   ├── Domain/            # entity business logic
-│   ├── Application/       # handlers (mocked deps)
-│   └── Services/          # service unit tests
-├── Nexora.IntegrationTests/
+│   └── Application/       # services (mocked deps)
+├── Cursinet.IntegrationTests/
 │   ├── Api/               # full API with test DB
 │   │   ├── AuthTests.cs
-│   │   ├── CoursesTests.cs
-│   │   └── PaymentsTests.cs
+│   │   └── CoursesTests.cs
 │   └── TestFixtures/      # WebApplicationFactory
 ```
 
-## Frontend (Vitest + React Testing Library)
+## Proposed Tools
 
-```
-tests/
-├── components/
-│   ├── CourseCard.test.tsx
-│   ├── VideoPlayer.test.tsx
-│   └── QuizPlayer.test.tsx
-├── hooks/
-│   ├── useAuth.test.ts
-│   └── useProgress.test.ts
-└── api/
-    └── auth.test.ts
-```
+- **xUnit** — test framework (.NET standard)
+- **Testcontainers** — PostgreSQL container for integration tests
+- **Moq / NSubstitute** — mocking in unit tests
+- **FluentAssertions** — readable assertions
 
-## Goals
+## Proposed Goals
 
-- Unit tests: 80%+ on Domain/Application
-- Integration: critical flows (auth, enroll, checkout)
-- Frontend: critical components and hooks
+- Unit tests: 80%+ coverage on Domain/Application
+- Integration: critical flows (register, login, create course)
+- E2E: full auth flow with real DB + cookies
