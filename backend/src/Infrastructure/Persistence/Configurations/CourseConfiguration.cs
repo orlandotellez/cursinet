@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Cursinet.Domain.Entities;
+using NpgsqlTypes;
 
 namespace Cursinet.Infrastructure.Persistence.Configurations;
 
@@ -72,7 +74,15 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
 		builder.Property(c => c.LearningObjectives).HasColumnName("learning_objectives");
 
-		builder.Property(c => c.SearchVector).HasColumnName("search_vector").HasColumnType("tsvector");
+		builder.Property(c => c.SearchVector)
+			.HasColumnName("search_vector")
+			.HasColumnType("tsvector")
+			.HasConversion(
+				new ValueConverter<string?, NpgsqlTsVector?>(
+					v => v == null ? null : NpgsqlTsVector.Parse(v),
+					v => v == null ? null : v.ToString()
+				)
+			);
 
 		builder.Property(c => c.PublishedAt).HasColumnName("published_at");
 

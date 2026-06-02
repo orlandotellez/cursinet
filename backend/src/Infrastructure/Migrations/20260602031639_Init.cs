@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NpgsqlTypes;
 
 #nullable disable
 
@@ -128,6 +129,55 @@ namespace Cursinet.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Courses",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    instructor_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    category_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    slug = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    short_description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    thumbnail_url = table.Column<string>(type: "text", nullable: true),
+                    preview_video_url = table.Column<string>(type: "text", nullable: true),
+                    level = table.Column<int>(type: "integer", nullable: false),
+                    language = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false, defaultValue: "es"),
+                    duration_minutes = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    students_count = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    average_rating = table.Column<decimal>(type: "numeric(3,2)", nullable: false, defaultValue: 0m),
+                    reviews_count = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    price = table.Column<decimal>(type: "numeric(10,2)", nullable: false, defaultValue: 0m),
+                    original_price = table.Column<decimal>(type: "numeric(10,2)", nullable: true),
+                    is_free = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    is_published = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    is_featured = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    requirements = table.Column<string[]>(type: "text[]", nullable: true),
+                    learning_objectives = table.Column<string[]>(type: "text[]", nullable: true),
+                    search_vector = table.Column<NpgsqlTsVector>(type: "tsvector", nullable: true),
+                    published_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Courses", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Courses_Categories_category_id",
+                        column: x => x.category_id,
+                        principalTable: "Categories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Courses_Users_instructor_id",
+                        column: x => x.instructor_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -282,6 +332,37 @@ namespace Cursinet.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "idx_courses_search",
+                table: "Courses",
+                column: "search_vector");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_category_id",
+                table: "Courses",
+                column: "category_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_instructor_id",
+                table: "Courses",
+                column: "instructor_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_is_featured",
+                table: "Courses",
+                column: "is_featured");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_is_published",
+                table: "Courses",
+                column: "is_published");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_slug",
+                table: "Courses",
+                column: "slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmailVerificationLogs_user_id",
                 table: "EmailVerificationLogs",
                 column: "user_id");
@@ -398,7 +479,7 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "Account");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Courses");
 
             migrationBuilder.DropTable(
                 name: "EmailVerificationLogs");
@@ -420,6 +501,9 @@ namespace Cursinet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Verification");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Users");
