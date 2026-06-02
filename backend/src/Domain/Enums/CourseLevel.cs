@@ -1,4 +1,4 @@
-namespace Curisnet.test.Domain.Enums;
+namespace Cursinet.Domain.Enums;
 
 // Creación de enum para los niveles del curso
 public enum CourseLevel
