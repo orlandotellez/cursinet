@@ -1,131 +1,201 @@
 # API Endpoints & Authentication
 
-API REST y autenticación.
+API REST de Cursinet.
 
 ## Base URL
+
 ```
-/api/v1
+http://localhost:5000/api/v1
 ```
 
 ## Auth Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /auth/register | Register new user |
-| POST | /auth/login | Returns JWT + sets refresh token cookie |
-| POST | /auth/logout | Revokes refresh token |
-| POST | /auth/refresh | Exchange refresh token for new JWT |
-| POST | /auth/verify-email | Verify email with token |
-| POST | /auth/resend-verification | Resend verification email |
-| POST | /auth/forgot-password | Request password reset |
-| POST | /auth/reset-password | Reset password with token |
-| GET | /auth/me | Current user profile |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/auth/register` | No (solo si no hay sesión) | Registrar nuevo usuario |
+| POST | `/auth/login` | No | Iniciar sesión |
+| POST | `/auth/refresh` | No (requiere refresh token) | Renovar tokens |
+| POST | `/auth/logout` | Sí | Cerrar sesión |
 
-## Users
+### Respuestas
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /users/{username} | Public profile |
-| PUT | /users/me | Update own profile |
-| PUT | /users/me/password | Change password |
-| PUT | /users/me/avatar | Upload avatar |
-| GET | /users/me/certificates | User's certificates |
-| GET | /users/me/enrollments | User's enrollments |
-| DELETE | /users/me/account | Soft delete account |
+**Register / Login** — la API **NO devuelve tokens en el body** por seguridad:
+```json
+{
+  "message": "User registered successfully",
+  "user": { "id": "...", "name": "...", "email": "...", "role": "Student" }
+}
+```
+
+Los tokens se envían únicamente como **HttpOnly cookies**:
+- `accessToken` — 15 min de vida
+- `refreshToken` — 7 días de vida
+
+### Register
+
+```json
+POST /api/v1/auth/register
+{
+  "name": "Sofía García",
+  "email": "sofia@email.com",
+  "password": "123456"
+}
+```
+
+Validation:
+- Name: required, max 255 chars
+- Email: required, valid email format, unique
+- Password: required, min 6 chars
+
+### Login
+
+```json
+POST /api/v1/auth/login
+{
+  "email": "sofia@email.com",
+  "password": "123456"
+}
+```
+
+### Refresh
+
+```json
+POST /api/v1/auth/refresh
+// body opcional — si no se envía, busca refreshToken en cookies
+{ "refreshToken": "..." }
+```
+
+### Logout
+
+```json
+POST /api/v1/auth/logout
+// Sin body — lee refreshToken de la cookie y la limpia
+```
+
+### Auth Flow
+
+```
+1. POST /auth/login → backend valida credenciales
+2. → Crea session en DB
+3. → Setea cookies HttpOnly: accessToken (15min) + refreshToken (7d)
+4. → Response: { message, user } — SIN tokens en body
+5. Frontend: cada request → cookie accessToken se envía automáticamente
+6. 401 → frontend llama POST /auth/refresh → renueva cookies
+7. POST /auth/logout → revoca session + limpia cookies
+```
+
+## Categories
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/categories` | No | Listar categorías activas |
 
 ## Courses
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /courses | List (paginated, searchable) |
-| GET | /courses/featured | Featured courses |
-| GET | /courses/search | Search with filters |
-| GET | /courses/{slug} | Course detail |
-| GET | /courses/{slug}/reviews | Course reviews |
-| POST | /courses/{slug}/reviews | Create review |
+### Public
 
-### Instructor
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /instructor/courses | Create course |
-| GET | /instructor/courses | List courses |
-| PUT | /instructor/courses/{id} | Update course |
-| DELETE | /instructor/courses/{id} | Delete course |
-| POST | /instructor/courses/{id}/publish | Publish |
-| GET | /instructor/courses/{id}/students | Students |
-| GET | /instructor/courses/{id}/analytics | Analytics |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/courses` | `courses:read` | Listar cursos (con filtros) |
+| GET | `/courses/{id}` | `courses:read` | Curso por ID |
+| GET | `/courses/by-slug/{slug}` | `courses:read` | Curso por slug |
 
-## Modules & Lessons
+Query params para `GET /courses`:
+- `categoryId` (Guid) — filtrar por categoría
+- `level` (All | Beginner | Intermediate | Advanced) — filtrar por nivel
+- `isPublished` (bool) — filtrar por estado
+- `isFeatured` (bool) — filtrar por destacado
+- `search` (string) — búsqueda textual
 
-### Instructor
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /instructor/courses/{courseId}/modules | Create module |
-| PUT | /instructor/modules/{id} | Update module |
-| DELETE | /instructor/modules/{id} | Delete module |
-| POST | /instructor/modules/{moduleId}/lessons | Create lesson |
-| POST | /instructor/lessons/{id}/upload-video | Upload video |
+### Instructor / Admin
 
-### Student
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /lessons/{lessonId} | Get lesson |
-| POST | /lessons/{lessonId}/progress | Update progress |
-| POST | /lessons/{lessonId}/complete | Mark complete |
-| GET/POST/PUT/DELETE | /lessons/{lessonId}/notes | Notes CRUD |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/courses` | `courses:create` | Crear curso |
+| PUT | `/courses/{id}` | `courses:update` | Actualizar curso |
+| DELETE | `/courses/{id}` | `courses:delete` | Soft-delete |
+| POST | `/courses/{id}/publish` | `courses:publish` | Publicar curso |
 
-## Payments
+### Course Create
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /payments/checkout/course | One-time purchase |
-| POST | /payments/checkout/subscription | Subscription |
-| POST | /payments/webhook | Stripe webhook |
-| GET | /payments/history | Payment history |
-| GET | /subscriptions/current | Current subscription |
-| POST | /subscriptions/cancel | Cancel subscription |
+```json
+POST /api/v1/courses
+{
+  "title": "Curso de Angular",
+  "slug": "curso-de-angular",
+  "shortDescription": "Aprende Angular desde cero",
+  "description": "Contenido extenso...",
+  "level": "Beginner",
+  "language": "es",
+  "price": 49.99,
+  "categoryId": "guid-de-categoria"
+}
+```
 
-## Admin
+## RBAC Permissions
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /admin/users | List users |
-| PUT | /admin/users/{id}/role | Change role |
-| PUT | /admin/users/{id}/status | Activate/deactivate |
-| GET | /admin/courses?status=pending | Pending courses |
-| PUT | /admin/courses/{id}/approve | Approve |
-| PUT | /admin/courses/{id}/reject | Reject |
-| GET | /admin/analytics/overview | Dashboard |
+| Permission | Admin | Instructor | Moderator | Student |
+|------------|-------|------------|-----------|---------|
+| `courses:create` | ✅ | ✅ | ❌ | ❌ |
+| `courses:read` | ✅ | ✅ | ✅ | ✅ |
+| `courses:update` | ✅ | ✅ | ❌ | ❌ |
+| `courses:delete` | ✅ | ✅ | ❌ | ❌ |
+| `courses:publish` | ✅ | ✅ | ❌ | ❌ |
+| `users:read` | ✅ | ✅ | ✅ | ❌ |
+| `users:update` | ✅ | ❌ | ✅ | ❌ |
+| `users:delete` | ✅ | ❌ | ❌ | ❌ |
+| `categories:create` | ✅ | ❌ | ❌ | ❌ |
+| `categories:read` | ✅ | ✅ | ✅ | ❌ |
+| `categories:update` | ✅ | ❌ | ❌ | ❌ |
+| `categories:delete` | ✅ | ❌ | ❌ | ❌ |
+| `admin:panel` | ✅ | ❌ | ✅ | ❌ |
+| `system:config` | ✅ | ❌ | ❌ | ❌ |
 
----
+## Roles
+
+```csharp
+public enum UserRole { Student, Instructor, Admin, Moderator }
+```
+
+Uso en controllers:
+```csharp
+[RequirePermission(Permissions.CourseCreate)]
+public async Task<ActionResult> Create(...)
+```
 
 ## JWT Configuration
 
 ```json
 {
+  "Jwt:Secret": "your-super-secret-jwt-key-min-32-chars-long",
   "accessTokenExpiryMinutes": 15,
-  "refreshTokenExpiryDays": 30,
-  "algorithm": "HS256",
-  "issuer": "nexora-api",
-  "audience": "nexora-web"
+  "refreshTokenExpiryDays": 7
 }
 ```
 
-## Authentication Flow
+Los tokens se leen desde cookies HttpOnly via `JwtBearerEvents.OnMessageReceived`.
 
-1. **Login**: POST /auth/login → JWT (15 min) + httpOnly cookie (refresh)
-2. **Use**: Frontend stores JWT in memory (Zustand) — never localStorage
-3. **Refresh**: React Query interceptor on 401 → /auth/refresh → retry
-4. **Logout**: POST /auth/logout → revoke token + clear cookie
+## Security Notes
 
-## Roles
+- La API **nunca devuelve tokens en el body** de login/register/refresh
+- Los tokens se transmiten exclusivamente por cookies HttpOnly, Secure, SameSite=Strict
+- El refresh token se revoca en DB al hacer logout (se elimina la session)
+- Todas las rutas protegidas requieren el permiso específico via `[RequirePermission]`
 
-- STUDENT
-- INSTRUCTOR
-- ADMIN
-- MODERATOR
+---
 
-```csharp
-[Authorize(Roles = "INSTRUCTOR")]
-[Authorize(Policy = "CanManageCourses")]
-```
+## Planned / Future Endpoints
+
+Estos endpoints están definidos en el diseño conceptual pero aún no implementados:
+
+| Feature | Endpoints |
+|---------|-----------|
+| **Email verification** | POST `/auth/verify-email`, `/auth/resend-verification` |
+| **Password recovery** | POST `/auth/forgot-password`, `/auth/reset-password` |
+| **User profile** | GET/PUT `/users/me`, GET `/users/{username}` |
+| **Modules & Lessons** | POST `/courses/{id}/modules`, POST `/modules/{id}/lessons` |
+| **Enrollments** | GET `/courses/{id}/enroll`, POST `/enrollments` |
+| **Progress** | POST `/lessons/{id}/progress` |
+| **Payments (Stripe)** | POST `/payments/checkout`, webhooks |
+| **Certificates** | GET `/certificates/{number}` |
+| **Admin panel** | GET `/admin/users`, `/admin/analytics` |

@@ -1,0 +1,131 @@
+# API Endpoints & Authentication
+
+API REST y autenticación.
+
+## Base URL
+```
+/api/v1
+```
+
+## Auth Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /auth/register | Register new user |
+| POST | /auth/login | Returns JWT + sets refresh token cookie |
+| POST | /auth/logout | Revokes refresh token |
+| POST | /auth/refresh | Exchange refresh token for new JWT |
+| POST | /auth/verify-email | Verify email with token |
+| POST | /auth/resend-verification | Resend verification email |
+| POST | /auth/forgot-password | Request password reset |
+| POST | /auth/reset-password | Reset password with token |
+| GET | /auth/me | Current user profile |
+
+## Users
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /users/{username} | Public profile |
+| PUT | /users/me | Update own profile |
+| PUT | /users/me/password | Change password |
+| PUT | /users/me/avatar | Upload avatar |
+| GET | /users/me/certificates | User's certificates |
+| GET | /users/me/enrollments | User's enrollments |
+| DELETE | /users/me/account | Soft delete account |
+
+## Courses
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /courses | List (paginated, searchable) |
+| GET | /courses/featured | Featured courses |
+| GET | /courses/search | Search with filters |
+| GET | /courses/{slug} | Course detail |
+| GET | /courses/{slug}/reviews | Course reviews |
+| POST | /courses/{slug}/reviews | Create review |
+
+### Instructor
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /instructor/courses | Create course |
+| GET | /instructor/courses | List courses |
+| PUT | /instructor/courses/{id} | Update course |
+| DELETE | /instructor/courses/{id} | Delete course |
+| POST | /instructor/courses/{id}/publish | Publish |
+| GET | /instructor/courses/{id}/students | Students |
+| GET | /instructor/courses/{id}/analytics | Analytics |
+
+## Modules & Lessons
+
+### Instructor
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /instructor/courses/{courseId}/modules | Create module |
+| PUT | /instructor/modules/{id} | Update module |
+| DELETE | /instructor/modules/{id} | Delete module |
+| POST | /instructor/modules/{moduleId}/lessons | Create lesson |
+| POST | /instructor/lessons/{id}/upload-video | Upload video |
+
+### Student
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /lessons/{lessonId} | Get lesson |
+| POST | /lessons/{lessonId}/progress | Update progress |
+| POST | /lessons/{lessonId}/complete | Mark complete |
+| GET/POST/PUT/DELETE | /lessons/{lessonId}/notes | Notes CRUD |
+
+## Payments
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /payments/checkout/course | One-time purchase |
+| POST | /payments/checkout/subscription | Subscription |
+| POST | /payments/webhook | Stripe webhook |
+| GET | /payments/history | Payment history |
+| GET | /subscriptions/current | Current subscription |
+| POST | /subscriptions/cancel | Cancel subscription |
+
+## Admin
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /admin/users | List users |
+| PUT | /admin/users/{id}/role | Change role |
+| PUT | /admin/users/{id}/status | Activate/deactivate |
+| GET | /admin/courses?status=pending | Pending courses |
+| PUT | /admin/courses/{id}/approve | Approve |
+| PUT | /admin/courses/{id}/reject | Reject |
+| GET | /admin/analytics/overview | Dashboard |
+
+---
+
+## JWT Configuration
+
+```json
+{
+  "accessTokenExpiryMinutes": 15,
+  "refreshTokenExpiryDays": 30,
+  "algorithm": "HS256",
+  "issuer": "nexora-api",
+  "audience": "nexora-web"
+}
+```
+
+## Authentication Flow
+
+1. **Login**: POST /auth/login → JWT (15 min) + httpOnly cookie (refresh)
+2. **Use**: Frontend stores JWT in memory (Zustand) — never localStorage
+3. **Refresh**: React Query interceptor on 401 → /auth/refresh → retry
+4. **Logout**: POST /auth/logout → revoke token + clear cookie
+
+## Roles
+
+- STUDENT
+- INSTRUCTOR
+- ADMIN
+- MODERATOR
+
+```csharp
+[Authorize(Roles = "INSTRUCTOR")]
+[Authorize(Policy = "CanManageCourses")]
+```

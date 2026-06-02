@@ -1,71 +1,139 @@
 # Backend Architecture
 
-Arquitectura del backend ASP.NET Core.
+Arquitectura del backend Cursinet API.
 
 ## Project Structure
 
 ```
-Nexora.Api/
+Cursinet.sln
 ├── src/
-│   ├── Nexora.Domain/
-│   │   ├── Entities/        # User, Course, Lesson, Enrollment, etc.
-│   │   ├── Enums/          # Role, Level, CourseStatus
-│   │   ├── Events/
-│   │   ├── Exceptions/
-│   │   └── ValueObjects/
-│   ├── Nexora.Application/
+│   ├── Domain/
+│   │   ├── Entities/
+│   │   │   ├── User.cs
+│   │   │   ├── Account.cs
+│   │   │   ├── Session.cs
+│   │   │   ├── Verification.cs
+│   │   │   ├── Category.cs
+│   │   │   ├── Course.cs
+│   │   │   ├── Tag.cs
+│   │   │   ├── EmailVerificationLogs.cs
+│   │   │   ├── LoginLogs.cs
+│   │   │   ├── PasswordResetLogs.cs
+│   │   │   └── UserTwoFactor.cs
+│   │   ├── Enums/
+│   │   │   ├── UserRole.cs          # Student, Instructor, Admin, Moderator
+│   │   │   ├── CourseLevel.cs       # All, Beginner, Intermediate, Advanced
+│   │   │   ├── LessonType.cs        # Video, Article, Quiz, Exercise
+│   │   │   ├── PaymentStatus.cs     # Pending, Completed, Failed, Refunded
+│   │   │   ├── SubcriptionPlan.cs   # Monthly, Annual, Lifetime
+│   │   │   └── Permissions.cs       # Granular permission strings
+│   │   └── Exceptions/
+│   │       └── AppException.cs      # Base exception with status code
+│   │
+│   ├── Application/
 │   │   ├── Common/
-│   │   │   ├── Behaviors/  # MediatR pipeline
-│   │   │   ├── Interfaces/
-│   │   │   ├── Mappings/
-│   │   │   └── Exceptions/
+│   │   │   ├── Interfaces/          # Repository & service interfaces
+│   │   │   │   ├── IUserRepository.cs
+│   │   │   │   ├── IAccountRepository.cs
+│   │   │   │   ├── ISessionRepository.cs
+│   │   │   │   ├── IVerificationRepository.cs
+│   │   │   │   ├── ICourseRepository.cs
+│   │   │   │   ├── ICategoryRepository.cs
+│   │   │   │   ├── IAuthService.cs
+│   │   │   │   ├── ICourseService.cs
+│   │   │   │   ├── IPasswordService.cs
+│   │   │   │   └── ITokenService.cs
+│   │   │   ├── Mapping/
+│   │   │   │   ├── MappingUser.cs     # Extension methods: MapToDto()
+│   │   │   │   └── MappingCourse.cs   # Extension methods: MapToDto()
+│   │   │   ├── Models/
+│   │   │   │   ├── UserDto.cs
+│   │   │   │   ├── CourseResponse.cs
+│   │   │   │   ├── CourseRequest.cs
+│   │   │   │   ├── AuthResult.cs      # AuthResponse, RefreshResponse, etc.
+│   │   │   │   └── AuthRequest.cs
+│   │   │   └── Authorization/
+│   │   │       └── RolePermissions.cs # Permission definitions per role
 │   │   └── Features/
-│   │       ├── Auth/       # Commands/Queries
-│   │       ├── Courses/
-│   │       ├── Lessons/
-│   │       ├── Progress/
-│   │       ├── Payments/
-│   │       ├── Certificates/
-│   │       ├── Comments/
-│   │       └── Admin/
-│   ├── Nexora.Infrastructure/
+│   │       ├── Auth/
+│   │       │   └── AuthService.cs     # register, login, logout, refresh, me
+│   │       └── Courses/
+│   │           └── CourseService.cs   # create, list, get by slug
+│   │
+│   ├── Infrastructure/
 │   │   ├── Persistence/
 │   │   │   ├── ApplicationDbContext.cs
-│   │   │   ├── Configurations/  # EF Fluent API
-│   │   │   └── Migrations/
-│   │   ├── Services/
-│   │   ├── Caching/
-│   │   └── BackgroundJobs/
-│   └── Nexora.Api/
+│   │   │   ├── Configurations/       # IEntityTypeConfiguration<T> (Fluent API)
+│   │   │   │   ├── UserConfiguration.cs
+│   │   │   │   ├── AccountConfiguration.cs
+│   │   │   │   ├── SessionConfiguration.cs
+│   │   │   │   ├── VerificationConfiguration.cs
+│   │   │   │   ├── CourseConfiguration.cs
+│   │   │   │   ├── CategoryConfiguration.cs
+│   │   │   │   ├── TagConfiguration.cs
+│   │   │   │   ├── EmailVerificationLogsConfiguration.cs
+│   │   │   │   ├── LoginLogsConfiguration.cs
+│   │   │   │   ├── PasswordResetLogsConfiguration.cs
+│   │   │   │   └── UserTwoFactorConfiguration.cs
+│   │   │   ├── Repositories/
+│   │   │   │   ├── UserRepository.cs
+│   │   │   │   ├── AccountRepository.cs
+│   │   │   │   ├── SessionRepository.cs
+│   │   │   │   ├── VerificationRepository.cs
+│   │   │   │   ├── CourseRepository.cs
+│   │   │   │   └── CategoryRepository.cs
+│   │   │   ├── DataSeeder.cs         # Seeds default users on startup
+│   │   │   └── Migrations/           # EF Core migrations (auto-generated)
+│   │   └── Services/
+│   │       ├── TokenService.cs       # JWT generation & validation
+│   │       └── PasswordService.cs    # BCrypt hashing
+│   │
+│   └── Api/
 │       ├── Controllers/
+│       │   ├── AuthController.cs     # /api/auth/*
+│       │   ├── CourseController.cs   # /api/courses/*
+│       │   ├── CategoryController.cs # /api/categories/*
+│       │   └── TestController.cs     # /api/test/seed (dev only)
+│       ├── DTOs/
+│       │   ├── LoginRequest.cs
+│       │   ├── RegisterRequest.cs
+│       │   └── AuthResponse.cs
 │       ├── Middleware/
-│       ├── Filters/
-│       └── Extensions/
-└── tests/
-    ├── Nexora.UnitTests/
-    ├── Nexora.IntegrationTests/
-    └── Nexora.ApiTests/
+│       │   └── ErrorHandlingMiddleware.cs
+│       ├── Helpers/
+│       │   ├── AuthHelper.cs         # Extracts user from HttpContext
+│       │   ├── CookieHelper.cs       # Sets/clears auth cookies
+│       │   └── TokenHelper.cs        # Token utilities
+│       ├── Authorization/
+│       │   ├── PermissionHandler.cs
+│       │   ├── PermissionRequirement.cs
+│       │   └── RequirePermissionAttribute.cs
+│       └── Program.cs                # Startup & DI registration
+└── *.slnx                            # Solution file (new .NET 10 format)
 ```
-
-## MediatR Pipeline (order matters)
-
-1. **LoggingBehavior** — structured logging per request
-2. **ValidationBehavior** — FluentValidation, throws ValidationException
-3. **CachingBehavior** — for queries with ICacheable interface
-4. **TransactionBehavior** — wraps commands in DB transaction
 
 ## Error Handling
 
-### Custom Exceptions
+### AppException (single class, factory methods)
+
 ```csharp
-public class NotFoundException : Exception { }    // 404
-public class ForbiddenException : Exception { }  // 403
-public class ConflictException : Exception { }    // 409
-public class ValidationException : Exception { }  // 400
-public class DomainException : Exception { }      // 400
+public class AppException : Exception
+{
+    public int StatusCode { get; }
+    public string Code { get; }
+
+    // Factory methods via static class:
+    // AppExceptions.NotFound("msg")     → 404
+    // AppExceptions.BadRequest("msg")   → 400
+    // AppExceptions.Unauthorized("msg") → 401
+    // AppExceptions.Forbidden("msg")    → 403
+    // AppExceptions.Conflict("msg")     → 409
+    // AppExceptions.Unprocessable("msg")→ 422
+}
 ```
 
 ### Global Exception Middleware
+
 Returns **ProblemDetails** (RFC 7807):
 
 ```json
@@ -73,7 +141,7 @@ Returns **ProblemDetails** (RFC 7807):
   "type": "https://tools.ietf.org/html/rfc7807",
   "title": "Not Found",
   "status": 404,
-  "detail": "Course with id 'abc-123' not found",
+  "detail": "Course with slug 'curso-falso' not found",
   "errors": null
 }
 ```
@@ -82,7 +150,21 @@ Returns **ProblemDetails** (RFC 7807):
 
 | Layer | Responsibility |
 |-------|---------------|
-| **Domain** | Entities, Enums, Events, ValueObjects |
-| **Application** | CQRS, Behaviors, Interfaces, DTOs |
-| **Infrastructure** | EF Core, Services, Caching, Jobs |
-| **API** | Controllers, Middleware, Filters |
+| **Domain** | Entities, Enums, Exceptions — zero dependencies |
+| **Application** | Services, Interfaces, DTOs, Mapping — depends only on Domain |
+| **Infrastructure** | EF Core, Repositories, External Services — depends on Application + Domain |
+| **API** | Controllers, Middleware, DI registration — depends on Infrastructure + Application |
+
+## Services Layer (replaces CQRS)
+
+Instead of MediatR commands/queries, the backend uses direct service injection:
+
+```
+Controller → IService → Service → IRepository → Repository → DbContext
+```
+
+Each service method is a self-contained operation:
+- `AuthService.RegisterAsync()` — validates, creates user, generates tokens
+- `AuthService.LoginAsync()` — validates credentials, creates session, sets cookies
+- `CourseService.CreateAsync()` — validates, creates course (instructor only)
+- `CourseService.GetBySlugAsync()` — reads course with includes

@@ -1,48 +1,77 @@
 # Backend Stack
 
-Stack tecnológico del backend para NEXORA.
+Stack tecnológico del backend — Cursinet API.
 
 ## Core Technologies
 
-- **ASP.NET Core 9** Web API
+- **.NET 10 SDK** (net10.0)
 - **C# 13**
-- **.NET 9 SDK**
+- **ASP.NET Core 10** Web API
+- **PostgreSQL 16+**
+- **Entity Framework Core 10**
 
 ## Architecture
 
 - **Clean Architecture** (Domain / Application / Infrastructure / API layers)
-- **Vertical Slice Architecture** within Application layer
-- **CQRS pattern** with MediatR v12
+- **Service Layer pattern** in Application layer (no CQRS / MediatR)
+- **Repository Pattern** with EF Core
+- **Global Exception Middleware** with ProblemDetails (RFC 7807)
 
 ## Dependencies
 
+### Api.csproj
 ```xml
-<PackageReference Include="MediatR" Version="12.0.0" />
-<PackageReference Include="FluentValidation" Version="11.0.0" />
-<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
-<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
-<PackageReference Include="FluentValidation.AspNetCore" Version="11.0.0" />
-<PackageReference Include="StackExchange.Redis" Version="2.0.0" />
-<PackageReference Include="Hangfire.Core" Version="1.8.0" />
-<PackageReference Include="Hangfire.AspNetCore" Version="1.8.0" />
-<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-<PackageReference Include="QuestPDF" Version="2024.0.0" />
-<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8" />
+<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+<PackageReference Include="StackExchange.Redis" Version="2.7.10" /> <!-- installed, not yet configured -->
 ```
+
+### Infrastructure.csproj
+```xml
+<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.0" />
+```
+
+### Application.csproj
+```xml
+<ProjectReference Include="../Domain/Domain.csproj" />
+```
+
+### Domain.csproj
+- No external dependencies — pure C# POCOs and enums.
 
 ## Key Patterns
 
-- **MediatR** for CQRS (Commands/Queries)
-- **FluentValidation** for all input validation
-- **Repository Pattern** via EF Core
-- **Unit of Work** for transactions
-- **AutoMapper** for DTOs
+| Pattern | Implementation |
+|---------|---------------|
+| **Service Layer** | `IAuthService` / `AuthService`, `ICourseService` / `CourseService` |
+| **Repository** | `IUserRepository` / `UserRepository`, etc. |
+| **Mapping** | Manual extension methods (`MappingUser.cs`, `MappingCourse.cs`) |
+| **Validation** | FluentValidation (configured, usage: when implemented) |
+| **Error handling** | `AppException` → `ErrorHandlingMiddleware` → ProblemDetails |
+| **Auth** | JWT in HttpOnly cookies, RBAC with PermissionHandler |
+
+## Notable Absences (vs. typical .NET template)
+
+| Feature | Status |
+|---------|--------|
+| **CQRS / MediatR** | Not used — direct service injection instead |
+| **AutoMapper** | Not used — manual extension methods |
+| **Hangfire** | Not installed |
+| **QuestPDF** | Not installed |
+| **SignalR** | Not installed |
+| **Redis** | Package installed, not yet configured/used |
+| **Testing** | No test projects yet |
 
 ## Infrastructure Services
 
-- **Redis** — caching, refresh token store, rate limiting
-- **Stripe** — payments
-- **Email** — SMTP or Resend
-- **Storage** — S3-compatible (AWS S3, Cloudflare R2, local)
-- **Hangfire** — background jobs
+- **PostgreSQL** — primary database via EF Core
+- **BCrypt** — password hashing
+- **JWT** — authentication tokens (stored in HttpOnly cookies)
+- **Serilog** — structured logging to console
+- **OpenAPI** — `/openapi/v1.json` in development mode

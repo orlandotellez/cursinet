@@ -1,32 +1,36 @@
-# Certificates
+# Certificates ⏳ Planned
 
-Sistema de certificados PDF.
+Sistema de certificados PDF — aún no implementado.
 
-## Generation
+## Status
 
-- **QuestPDF** (C# library) generates PDFs
-- **Hangfire** background job triggers after course completion
-- PDF stored in file storage (S3 or local volume)
-- Public URL stored in Certificates table
+**⏳ Planned / Future feature.** No hay código de certificados en el backend actual.
 
-## Design
+## Diseño Propuesto
 
 Dark premium certificate with:
-- NEXORA logo and branding (top)
+- Cursinet logo and branding (top)
 - "CERTIFICADO DE FINALIZACIÓN" heading
 - Student full name (large, serif-like font)
 - "Ha completado satisfactoriamente el curso:" label
 - Course title (bold)
 - Date of completion
 - Instructor name + signature line
-- Certificate number: NXR-{YEAR}-{6-char-alphanumeric}
-- QR code → nexora.dev/verificar/{certificateNumber}
+- Certificate number: CUR-{YEAR}-{6-char-alphanumeric}
+- QR code → cursinet.dev/verificar/{certificateNumber}
 - Decorative border / geometric pattern
 
-## API
+## Stack Propuesto
+
+- **QuestPDF** (C# library) for PDF generation
+- **Hangfire** or similar for background job after course completion
+- PDF stored in file storage (S3 or local)
+- Public URL stored in Certificates table
+
+## API Propuesta
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | /certificates/{certificateNumber} | Public verification page |
+| GET | /certificates/{number} | Public verification page |
 | GET | /certificates/verify/{number} | Verify authenticity |
 | POST | /certificates/generate/{enrollmentId} | Trigger generation |
