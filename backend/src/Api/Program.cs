@@ -89,8 +89,18 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 
+// DATA SEEDER
+builder.Services.AddScoped<DataSeeder>();
+
 // CONSTRUCCIÓN DE LA APLICACIÓN
 var app = builder.Build();
+
+// EJECUTAR SEED AL INICIAR
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    await seeder.SeedAsync();
+}
 
 // CONFIGURACIÓN DEL PIPELINE (Middlewares)
 if (app.Environment.IsDevelopment())

@@ -1,29 +1,19 @@
 ### ─── 🟢 RBAC: FLUJO ADMIN ───────────────────────────────────────────
 ### El rol Admin tiene TODOS los permisos.
 ### Todos los endpoints deberían responder 200.
+###
+### Usuario del seed: admin@cursinet.com / password123
 ### ─────────────────────────────────────────────────────────────────────
 
 @Api_HostAddress = {{Api_HostAddress}}
 
 
-### 1. Register (ejecutar UNA SOLA VEZ para crear el usuario)
-POST {{Api_HostAddress}}/auth/register
-Content-Type: application/json
-
-{
-  "email": "admin@test.com",
-  "name": "Admin User",
-  "password": "password123",
-  "role": "admin"
-}
-
-
-### 2. Login (setea cookies accessToken + refreshToken)
+### 1. Login (el usuario ya existe por el seed)
 POST {{Api_HostAddress}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@test.com",
+  "email": "admin@cursinet.com",
   "password": "password123"
 }
 
@@ -88,7 +78,7 @@ GET {{Api_HostAddress}}/test/admin/panel
 GET {{Api_HostAddress}}/test/system/config
 
 
-### 3. Logout
+### 2. Logout
 POST {{Api_HostAddress}}/auth/logout
 Content-Type: application/json
 

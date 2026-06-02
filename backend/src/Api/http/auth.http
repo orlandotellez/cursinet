@@ -1,83 +1,114 @@
 ### ─── AUTH: Register, Login, Refresh, Logout ─────────────────────────
 
-
 ### Requiere http-client.env.json en http/ o en la raíz del proyecto
-
-
 ### Variables: Api_HostAddress = http://localhost:5000/api/v1
+###
+### USUARIOS PRE-SEMILLADOS (password: password123):
+###   admin@cursinet.com      → Admin
+###   instructor@cursinet.com  → Instructor
+###   moderator@cursinet.com   → Moderator
+###   student@cursinet.com     → Student
 
 
 ### Health check
-
-GET http://localhost:5000/health HTTP/1.1
+GET http://localhost:5000/health
 Accept: application/json
 
 
-### Register (default: student)
+### ─── LOGIN (usuarios del seed, no requiere register) ───────────
 
-POST {{Api_HostAddress}}/auth/register HTTP/1.1
+### Login como Admin
+POST {{Api_HostAddress}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@test.com",
-  "name": "Test User",
+  "email": "admin@cursinet.com",
   "password": "password123"
 }
 
 
-### Register como admin
-
-POST {{Api_HostAddress}}/auth/register HTTP/1.1
+### Login como Instructor
+POST {{Api_HostAddress}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "admin@test.com",
-  "name": "Admin User",
+  "email": "instructor@cursinet.com",
+  "password": "password123"
+}
+
+
+### Login como Moderator
+POST {{Api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "moderator@cursinet.com",
+  "password": "password123"
+}
+
+
+### Login como Student
+POST {{Api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "student@cursinet.com",
+  "password": "password123"
+}
+
+
+### ─── REGISTER (solo si necesitás usuarios extra) ──────────────
+
+### Register como admin
+POST {{Api_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "otro-admin@test.com",
+  "name": "Otro Admin",
   "password": "password123",
   "role": "admin"
 }
 
 
 ### Register como instructor
-
-POST {{Api_HostAddress}}/auth/register HTTP/1.1
+POST {{Api_HostAddress}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "instructor@test.com",
-  "name": "Instructor User",
+  "email": "otro-instructor@test.com",
+  "name": "Otro Instructor",
   "password": "password123",
   "role": "instructor"
 }
 
 
 ### Register como moderator
-
-POST {{Api_HostAddress}}/auth/register HTTP/1.1
+POST {{Api_HostAddress}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "moderator@test.com",
-  "name": "Moderator User",
+  "email": "otro-moderator@test.com",
+  "name": "Otro Moderator",
   "password": "password123",
   "role": "moderator"
 }
 
 
-### Login
-
-POST {{Api_HostAddress}}/auth/login HTTP/1.1
+### Register como student (default, sin role)
+POST {{Api_HostAddress}}/auth/register
 Content-Type: application/json
 
 {
-  "email": "admin@test.com",
+  "email": "otro-student@test.com",
+  "name": "Otro Student",
   "password": "password123"
 }
 
 
-### Refresh (requiere cookie refreshToken)
+### ─── REFRESH (requiere cookie refreshToken) ─────────────────────
 
-POST {{Api_HostAddress}}/auth/refresh HTTP/1.1
+POST {{Api_HostAddress}}/auth/refresh
 Content-Type: application/json
 
 {
@@ -85,9 +116,10 @@ Content-Type: application/json
 }
 
 
-### Logout
+### ─── LOGOUT ──────────────────────────────────────────────────────
 
-POST {{Api_HostAddress}}/auth/logout HTTP/1.1
+POST {{Api_HostAddress}}/auth/logout
 Content-Type: application/json
 
 {}
+
