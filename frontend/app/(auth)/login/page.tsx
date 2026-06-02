@@ -1,17 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './page.module.css';
+import { UserRole } from '@/src/shared/types';
+import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
+
+// ─── Demo credentials ─────────────────────────────────────────────
+
+interface DemoCredential {
+  role: string;
+  label: string;
+  email: string;
+  password: string;
+}
+
+const DEMO_CREDENTIALS: DemoCredential[] = [
+  { role: 'Estudiante', label: 'student', email: 'sofia@email.com', password: '123456' },
+  { role: 'Instructor', label: 'instructor', email: 'martin@cursinet.com', password: '123456' },
+  { role: 'Admin', label: 'admin', email: 'admin@cursinet.com', password: '123456' },
+];
+
+// ─── Page ─────────────────────────────────────────────────────────
 
 export default function IniciarSesionPage() {
   const router = useRouter();
+  const { isAuthenticated, login, isLoading, error, clearError, tryDemoCredentials } = useAuthStore();
+
+  // Si ya tiene sesión, redirigir al dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, router]);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
-    {},
-  );
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   function validate() {
     const next: typeof errors = {};
@@ -21,34 +49,55 @@ export default function IniciarSesionPage() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
+    clearError();
 
-    // Mock login: save token and role
-    localStorage.setItem('access_token', 'mock-token-cursinet-2026');
+    try {
+      // Intentar login vía API real
+      await login({ email: email.trim(), password });
 
-    // Derive role from email for demo purposes
-    let redirectTo = '/dashboard';
-    if (email.includes('admin')) {
-      localStorage.setItem('user_role', 'admin');
-      redirectTo = '/admin/dashboard';
-    } else if (email.includes('martin') || email.includes('laura') || email.includes('carlos') || email.includes('ana')) {
-      localStorage.setItem('user_role', 'instructor');
-      redirectTo = '/instructor/dashboard';
-    } else {
-      localStorage.setItem('user_role', 'student');
+      // Si llegamos acá, el login fue exitoso
+      redirectAfterLogin();
+    } catch {
+      // Si falla la API, ofrecer demo mode como fallback
+      // tryDemoCredentials buscará en la lista de usuarios demo offline
+      const matched = tryDemoCredentials(email.trim(), password);
+      if (matched) {
+        redirectAfterLogin();
+      }
+      // Si no matcheó ningún demo user, el error ya está en el store
     }
+  }
 
-    router.push(redirectTo);
+  function redirectAfterLogin() {
+    router.push('/dashboard');
+  }
+
+  /** Loguea directo con demo mode sin llamar a la API */
+  function handleDemoLogin(cred: DemoCredential) {
+    clearError();
+    const { login: _l } = useAuthStore.getState();
+    useAuthStore.getState().demoLogin(cred.label as UserRole);
+    router.push('/dashboard');
+  }
+
+  /** Rellena los campos con la credencial demo */
+  function fillDemoCredentials(cred: DemoCredential) {
+    clearError();
+    setEmail(cred.email);
+    setPassword(cred.password);
+    setErrors({});
   }
 
   return (
     <div className={styles.card}>
       <h1 className={styles.title}>Iniciar sesión</h1>
-      <p className={styles.subtitle}>
-        Ingresá tus credenciales para continuar
-      </p>
+      <p className={styles.subtitle}>Ingresá tus credenciales para continuar</p>
+
+      {/* ── Error banner ── */}
+      {error && <ErrorBanner error={error} clearError={clearError} />}
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
@@ -63,6 +112,7 @@ export default function IniciarSesionPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            disabled={isLoading}
           />
           {errors.email && (
             <span className={styles.errorText}>{errors.email}</span>
@@ -81,6 +131,7 @@ export default function IniciarSesionPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            disabled={isLoading}
           />
           {errors.password && (
             <span className={styles.errorText}>{errors.password}</span>
@@ -93,26 +144,52 @@ export default function IniciarSesionPage() {
           </Link>
         </div>
 
-        <button className={styles.submitBtn} type="submit">
-          Iniciar sesión
+        <button className={styles.submitBtn} type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <span className={styles.btnLoading}>
+              <Loader2 size={18} className={styles.spinner} />
+              Iniciando sesión…
+            </span>
+          ) : (
+            'Iniciar sesión'
+          )}
         </button>
       </form>
 
       {/* ── Demo Credentials ── */}
       <div className={styles.demoBox}>
-        <span className={styles.demoLabel}>🧪 Credenciales demo</span>
-        <div className={styles.demoRow}>
-          <span className={styles.demoRole}>Estudiante:</span>
-          <code className={styles.demoCode}>sofia@email.com / 123456</code>
-        </div>
-        <div className={styles.demoRow}>
-          <span className={styles.demoRole}>Instructor:</span>
-          <code className={styles.demoCode}>martin@cursinet.com / 123456</code>
-        </div>
-        <div className={styles.demoRow}>
-          <span className={styles.demoRole}>Admin:</span>
-          <code className={styles.demoCode}>admin@cursinet.com / 123456</code>
-        </div>
+        <span className={styles.demoLabel}>
+          🧪 Credenciales demo
+          <span className={styles.demoHint}> — hacé clic para acceder al instante</span>
+        </span>
+        {DEMO_CREDENTIALS.map((cred) => (
+          <div key={cred.label} className={styles.demoRow}>
+            <span className={styles.demoRole}>{cred.role}:</span>
+            <button
+              type="button"
+              className={styles.demoCta}
+              onClick={() => handleDemoLogin(cred)}
+              title="Ingresar como demo"
+            >
+              <code className={styles.demoCode}>
+                {cred.email} / {cred.password}
+              </code>
+              <span className={styles.demoArrow}>→</span>
+            </button>
+          </div>
+        ))}
+        <p className={styles.demoNote}>
+          ¿Tenés el backend corriendo? Usá el formulario de arriba con{' '}
+          <button
+            type="button"
+            className={styles.demoLink}
+            onClick={() => fillDemoCredentials(DEMO_CREDENTIALS[1])}
+          >
+            instructor@cursinet.com
+          </button>
+          {' / '}
+          <strong>password123</strong> (seed por defecto).
+        </p>
       </div>
 
       <p className={styles.footer}>

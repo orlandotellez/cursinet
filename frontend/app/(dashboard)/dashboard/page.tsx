@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { enrollments, certificates, studentStats } from '@/src/features/courses/data';
 import { DashboardHeader } from '@/src/features/dashboard/components/DashboardHeader';
 import { ContinueLearning } from '@/src/features/dashboard/components/ContinueLearning';
@@ -9,12 +9,8 @@ import { RecentCertificates } from '@/src/features/dashboard/components/RecentCe
 import styles from './page.module.css';
 
 export default function DashboardPage() {
-  const [name, setName] = useState('Estudiante');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('userName');
-    if (stored) setName(stored);
-  }, []);
+  const user = useAuthStore((s) => s.user);
+  const name = user?.name ?? 'Estudiante';
 
   return (
     <div className={styles.page}>
