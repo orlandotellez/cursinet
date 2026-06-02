@@ -5,7 +5,7 @@ using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Features.Auth;
 using Cursinet.Application.Features.Courses;
 using Cursinet.Domain.Enums;
-using Cursinet.Infrastructure.Persistence; 
+using Cursinet.Infrastructure.Persistence;
 using Cursinet.Infrastructure.Persistence.Repositories;
 using Cursinet.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +14,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// CORS 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // necesario para cookies HttpOnly
+    });
+});
 
 // REGISTRO DE SERVICIOS (Antes de builder.Build)
 builder.Services.AddControllers()
@@ -30,14 +44,14 @@ builder.Services.AddScoped<CookieHelper>();
 builder.Services.AddScoped<TokenHelper>();
 
 // CONFIGURACIÓN DE ENTITY FRAMEWORK CORE
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Database=cursinet_db;Username=dev-espada;Password=espadaPOSTGRES";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Infrastructure")));
 
 // CONFIGURACIÓN DE JWT AUTHENTICATION
-var jwtSecret = builder.Configuration["Jwt:Secret"] 
+var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("JWT Secret is not configured");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -113,6 +127,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
