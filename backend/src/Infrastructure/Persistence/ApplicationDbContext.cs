@@ -19,6 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<LoginLogs> LoginLogs => Set<LoginLogs>();
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Tag> Tags => Set<Tag>();
+    public DbSet<Course> Courses => Set<Course>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
