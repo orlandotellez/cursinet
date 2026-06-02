@@ -175,6 +175,8 @@
 
 .logoutButton {
   color: var(--danger);
+  display: flex;
+  justify-content: center;
 }
 
 .logoutButton:hover {
