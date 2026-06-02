@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-base);
+}
+
+.content {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.collapsed {
+  padding: 20px 20px 20px 100px;
+}
+
+.expanded {
+  padding: 20px 20px 20px 280px;
+}
+
+@media (max-width: 768px) {
+  .collapsed,
+  .expanded {
+    padding: 16px;
+  }
+}

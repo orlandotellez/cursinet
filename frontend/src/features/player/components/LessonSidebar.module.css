@@ -1,0 +1,142 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.courseTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.progressLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.curriculum {
+  display: flex;
+  flex-direction: column;
+}
+
+.moduleGroup {
+  border-bottom: 1px solid var(--border);
+}
+
+.moduleGroup:last-child {
+  border-bottom: none;
+}
+
+.moduleHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.moduleHeader:hover {
+  background: var(--bg-hover);
+}
+
+.moduleTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+.moduleLessons {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  padding: 2px 6px;
+  border-radius: var(--radius-badge);
+}
+
+.lessonList {
+  display: flex;
+  flex-direction: column;
+}
+
+.lessonItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px 10px 40px;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.lessonItem:hover {
+  background: var(--bg-hover);
+}
+
+.lessonActive {
+  background: rgba(37, 99, 235, 0.06);
+  border-left: 2px solid var(--accent);
+}
+
+.lessonDone {
+  opacity: 0.7;
+}
+
+.doneIcon {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.bullet {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.lessonName {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-secondary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lessonDuration {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
