@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Cursinet.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Nombre : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,6 +40,21 @@ namespace Cursinet.Infrastructure.Migrations
                         principalTable: "Categories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    slug = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -323,6 +338,12 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tags_slug",
+                table: "Tags",
+                column: "slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_user_two_factor_user_id",
                 table: "user_two_factor",
                 column: "user_id");
@@ -390,6 +411,9 @@ namespace Cursinet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "user_two_factor");
