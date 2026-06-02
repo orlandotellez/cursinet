@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
@@ -138,6 +139,58 @@ public class AuthService : IAuthService
         };
 
         return response;
+    }
+
+    public async Task<RefreshResponse> RefreshAsync(string refreshToken)
+    {
+        // Validar el refresh token JWT
+        var principal = _tokenService.ValidateRefreshToken(refreshToken);
+        if (principal == null)
+            throw AppExceptions.Unauthorized("Invalid or expired refresh token");
+
+        // Extraer userId del token
+        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            throw AppExceptions.Unauthorized("Invalid refresh token");
+
+        // Buscar la sesión activa con este refresh token
+        var existingSession = await _sessionRepository.GetByTokenAsync(refreshToken);
+        if (existingSession == null)
+            throw AppExceptions.Unauthorized("Session not found");
+
+        // Verificar que la sesión no haya expirado
+        if (existingSession.ExpiresAt < DateTime.UtcNow)
+            throw AppExceptions.Unauthorized("Session expired");
+
+        // Buscar usuario y verificar que esté activo
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null || user.DeletedAt != null)
+            throw AppExceptions.Unauthorized("User not found or deactivated");
+
+        // Generar NUEVOS tokens (rotación completa)
+        var (newAccessToken, newRefreshToken) = _tokenService.GenerateTokens(user.Id, user.Email, user.Role);
+
+        // Eliminar la sesión vieja (invalida el refresh token anterior)
+        await _sessionRepository.DeleteAsync(refreshToken);
+
+        // Crear nueva sesión con el nuevo refresh token
+        var newSession = new Session
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = newRefreshToken,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await _sessionRepository.CreateAsync(newSession);
+
+        return new RefreshResponse
+        {
+            Message = "Tokens refreshed successfully",
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
     }
 
     public async Task LogoutAsync(string refreshToken)
