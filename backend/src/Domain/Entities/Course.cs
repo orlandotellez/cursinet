@@ -1,4 +1,3 @@
-using Cursinet.Domain.Entities;
 using Cursinet.Domain.Enums;
 
 namespace Cursinet.Domain.Entities;
