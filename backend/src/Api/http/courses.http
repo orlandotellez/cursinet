@@ -1,0 +1,231 @@
+### ─── 📚 COURSES: CRUD + Publish ──────────────────────────────
+### Requiere http-client.env.json en http/ o en la raíz del proyecto
+### Variables: Api_HostAddress = http://localhost:5000/api/v1
+###
+### FLUJO SUGERIDO:
+###   1. Login como Admin
+###   2. GET /categories → copiar un id de categoría REAL
+###   3. Pegar ese id en @categoryId (más abajo)
+###   4. CREATE course
+###   5. GET by ID / all
+###   6. UPDATE course
+###   7. PUBLISH course
+###   8. DELETE course
+###
+### Los endpoints reales usan cookies HttpOnly (se setean en login).
+### Si usás REST Client, las cookies se persisten automáticamente.
+### ─────────────────────────────────────────────────────────────────────
+
+@Api_HostAddress = {{Api_HostAddress}}
+@courseId = 00000000-0000-0000-0000-000000000000
+@categoryId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 0. LOGIN ─────────────────────────────────────────────────
+
+
+### Login como Admin (tiene todos los permisos)
+
+POST {{Api_HostAddress}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "admin@cursinet.com",
+  "password": "password123"
+}
+
+
+### ─── 1. GET ALL (con filtros opcionales) ──────────────────────
+
+
+### Sin filtros
+
+GET {{Api_HostAddress}}/courses HTTP/1.1
+Accept: application/json
+
+
+### Filtrar por nivel
+
+GET {{Api_HostAddress}}/courses?level=Begginer HTTP/1.1
+Accept: application/json
+
+
+### Filtrar por categoría (reemplazar categoryId)
+
+GET {{Api_HostAddress}}/courses?categoryId={{categoryId}} HTTP/1.1
+Accept: application/json
+
+
+### Filtrar publicados
+
+GET {{Api_HostAddress}}/courses?isPublished=true HTTP/1.1
+Accept: application/json
+
+
+### Filtrar destacados
+
+GET {{Api_HostAddress}}/courses?isFeatured=true HTTP/1.1
+Accept: application/json
+
+
+### Búsqueda por texto
+
+GET {{Api_HostAddress}}/courses?search=javascript HTTP/1.1
+Accept: application/json
+
+
+### ─── 2. GET BY ID ─────────────────────────────────────────────
+
+
+### Reemplazar courseId con un GUID real
+
+GET {{Api_HostAddress}}/courses/{{courseId}} HTTP/1.1
+Accept: application/json
+
+
+### ─── 3. GET BY SLUG ───────────────────────────────────────────
+
+GET {{Api_HostAddress}}/courses/by-slug/mi-curso-de-ejemplo HTTP/1.1
+Accept: application/json
+
+
+### ─── 4. CREATE ────────────────────────────────────────────────
+
+
+### Crear un curso (requiere cookie de sesión activa)
+
+
+### Reemplazar categoryId con un GUID real de la DB
+
+POST {{Api_HostAddress}}/courses HTTP/1.1
+Content-Type: application/json
+
+{
+  "categoryId": "{{categoryId}}",
+  "description": "Curso completo de JavaScript que cubre variables, funciones, objetos, arrays, closures, prototipos, async/await, y proyectos prácticos.",
+  "durationMinutes": 480,
+  "isFree": false,
+  "language": "es",
+  "learningObjectives": [
+    "Entender los fundamentos de JavaScript",
+    "Escribir funciones y manejar eventos",
+    "Trabajar con el DOM",
+    "Consumir APIs REST"
+  ],
+  "level": "Begginer",
+  "originalPrice": 49.99,
+  "price": 29.99,
+  "requirements": [
+    "Ganas de aprender",
+    "Una computadora con navegador web"
+  ],
+  "shortDescription": "Aprendé JavaScript desde cero, sin conocimientos previos.",
+  "title": "Fundamentos de Programación en JavaScript"
+}
+
+
+### ─── 5. UPDATE ────────────────────────────────────────────────
+
+
+### Reemplazar courseId con un GUID real
+
+PUT {{Api_HostAddress}}/courses/{{courseId}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "durationMinutes": 540,
+  "learningObjectives": [
+    "Entender los fundamentos de JavaScript",
+    "Escribir funciones y manejar eventos",
+    "Trabajar con el DOM",
+    "Consumir APIs REST",
+    "Usar módulos ES6"
+  ],
+  "price": 34.99,
+  "shortDescription": "Versión actualizada con contenido nuevo.",
+  "title": "Fundamentos de Programación en JavaScript - Edición 2025"
+}
+
+
+### ─── 6. PUBLISH ───────────────────────────────────────────────
+
+
+### Publicar un curso (requiere ser el dueño o Admin)
+
+POST {{Api_HostAddress}}/courses/{{courseId}}/publish HTTP/1.1
+Content-Type: application/json
+
+{}
+
+
+### ─── 7. DELETE (soft-delete) ──────────────────────────────────
+
+
+### Eliminar un curso (requiere ser el dueño o Admin)
+
+DELETE {{Api_HostAddress}}/courses/{{courseId}} HTTP/1.1
+Content-Type: application/json
+
+{}
+
+
+### ─── FLUJO COMPLETO (alternativo: correr requests en orden) ──
+
+
+### Si querés testear sin reemplazar GUIDs, usá este flujo
+
+
+### secuencial con variables dinámicas (REST Client las soporta).
+
+
+### 
+
+
+### Atención: primero hacé LOGIN arriba, después corré estos
+
+
+### requests en orden y copiá los IDs de los responses.
+
+
+### Create y guardar ID
+
+# POST {{Api_HostAddress}}/courses
+# Content-Type: application/json
+# # {
+# "title": "Curso de prueba para flujo completo",
+# "categoryId": "{{categoryId}}",
+# "level": "Intermediate"
+# }
+# # ### luego copiar el id del response y pegarlo en {{courseId}}
+
+
+### Get by ID
+
+# GET {{Api_HostAddress}}/courses/{{courseId}}
+
+
+### Update
+
+# PUT {{Api_HostAddress}}/courses/{{courseId}}
+# Content-Type: application/json
+# # {
+# "title": "Curso de prueba - Actualizado"
+# }
+
+
+### Publish
+
+# POST {{Api_HostAddress}}/courses/{{courseId}}/publish
+
+
+### Delete
+
+# DELETE {{Api_HostAddress}}/courses/{{courseId}}
+
+
+### ─── LOGOUT ───────────────────────────────────────────────────
+
+POST {{Api_HostAddress}}/auth/logout HTTP/1.1
+Content-Type: application/json
+
+{}

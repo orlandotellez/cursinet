@@ -3,6 +3,7 @@ using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Features.Auth;
+using Cursinet.Application.Features.Courses;
 using Cursinet.Domain.Enums;
 using Cursinet.Infrastructure.Persistence; 
 using Cursinet.Infrastructure.Persistence.Repositories;
@@ -80,11 +81,14 @@ builder.Services.AddAuthorization(options =>
 
 // SERVICIOS DE APLICACIÓN E INFRAESTRUCTURA
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 // REPOSITORIOS
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
