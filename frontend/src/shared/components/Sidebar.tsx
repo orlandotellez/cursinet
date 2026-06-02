@@ -1,9 +1,10 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, LogOut, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, LogOut, User, X } from 'lucide-react';
+import { useState } from 'react';
 import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './Sidebar.module.css';
 
 interface SidebarItem {
@@ -19,26 +20,15 @@ interface SidebarProps {
 
 export function Sidebar({ title, items }: SidebarProps) {
   const { collapsed, setCollapsed } = useSideBarStore();
+  const { user, logout } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const [userName, setUserName] = useState<string>('');
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  useEffect(() => {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        setUserName(user.name || user.email || 'Usuario');
-      } catch {
-        // ignore
-      }
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    router.push('/login');
+  const handleLogout = async () => {
+    await logout();
+    setShowConfirm(false);
+    router.push('/');
   };
 
   return (
@@ -79,11 +69,11 @@ export function Sidebar({ title, items }: SidebarProps) {
       </nav>
 
       {/* User Info */}
-      {userName && !collapsed && (
+      {user && !collapsed && (
         <div className={styles.userInfo}>
           <div className={styles.userAvatar}>
             <User size={18} />
-            <span className={styles.userEmail}>{userName}</span>
+            <span className={styles.userEmail}>{user.name || user.email}</span>
           </div>
         </div>
       )}
@@ -105,14 +95,52 @@ export function Sidebar({ title, items }: SidebarProps) {
       {/* Logout */}
       <div className={styles.logoutContainer}>
         <button
-          onClick={handleLogout}
+          onClick={() => setShowConfirm(true)}
           className={`${styles.navItem} ${styles.logoutButton} ${collapsed ? styles.isCollapsedIcon : ''}`}
           title="Cerrar sesión"
         >
-          <LogOut />
+          <LogOut size={20} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>
       </div>
+
+      {/* ── Confirmación de cierre de sesión ── */}
+      {showConfirm && (
+        <div className={styles.overlay} onClick={() => setShowConfirm(false)}>
+          <div
+            className={styles.confirmModal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.confirmHeader}>
+              <h3 className={styles.confirmTitle}>Cerrar sesión</h3>
+              <button
+                className={styles.confirmClose}
+                onClick={() => setShowConfirm(false)}
+                aria-label="Cancelar"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p className={styles.confirmBody}>
+              ¿Estás seguro de que querés cerrar sesión?
+            </p>
+            <div className={styles.confirmActions}>
+              <button
+                className={styles.confirmCancel}
+                onClick={() => setShowConfirm(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className={styles.confirmAccept}
+                onClick={handleLogout}
+              >
+                Sí, cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

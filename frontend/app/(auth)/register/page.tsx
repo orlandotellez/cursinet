@@ -1,12 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './page.module.css';
+import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 
 export default function RegistrarsePage() {
   const router = useRouter();
+  const { isAuthenticated, register, isLoading, error, clearError } = useAuthStore();
+
+  // Si ya tiene sesión, redirigir al dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/dashboard');
+    }
+  }, [isAuthenticated, router]);
+
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -19,6 +31,7 @@ export default function RegistrarsePage() {
 
   function setField<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
   function validate() {
@@ -33,14 +46,22 @@ export default function RegistrarsePage() {
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
+    clearError();
 
-    // Mock register: save token, default to student role
-    localStorage.setItem('access_token', 'mock-token-cursinet-2026');
-    localStorage.setItem('user_role', 'student');
-    router.push('/dashboard');
+    try {
+      await register({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      });
+
+      router.push('/dashboard');
+    } catch {
+      // error ya está en el store
+    }
   }
 
   return (
@@ -49,6 +70,9 @@ export default function RegistrarsePage() {
       <p className={styles.subtitle}>
         Completá tus datos para registrarte
       </p>
+
+      {/* ── Error banner ── */}
+      {error && <ErrorBanner error={error} clearError={clearError} />}
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
@@ -63,6 +87,7 @@ export default function RegistrarsePage() {
             value={form.name}
             onChange={(e) => setField('name', e.target.value)}
             autoComplete="name"
+            disabled={isLoading}
           />
           {errors.name && (
             <span className={styles.errorText}>{errors.name}</span>
@@ -81,6 +106,7 @@ export default function RegistrarsePage() {
             value={form.email}
             onChange={(e) => setField('email', e.target.value)}
             autoComplete="email"
+            disabled={isLoading}
           />
           {errors.email && (
             <span className={styles.errorText}>{errors.email}</span>
@@ -99,6 +125,7 @@ export default function RegistrarsePage() {
             value={form.password}
             onChange={(e) => setField('password', e.target.value)}
             autoComplete="new-password"
+            disabled={isLoading}
           />
           {errors.password && (
             <span className={styles.errorText}>{errors.password}</span>
@@ -117,6 +144,7 @@ export default function RegistrarsePage() {
             value={form.confirmPassword}
             onChange={(e) => setField('confirmPassword', e.target.value)}
             autoComplete="new-password"
+            disabled={isLoading}
           />
           {errors.confirmPassword && (
             <span className={styles.errorText}>
@@ -125,14 +153,23 @@ export default function RegistrarsePage() {
           )}
         </div>
 
-        <button className={styles.submitBtn} type="submit">
-          Crear cuenta
+        <button className={styles.submitBtn} type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <span className={styles.btnLoading}>
+              <Loader2 size={18} className={styles.spinner} />
+              Creando cuenta…
+            </span>
+          ) : (
+            'Crear cuenta'
+          )}
         </button>
       </form>
 
       {/* ── Demo Credentials ── */}
       <div className={styles.demoBox}>
-        <span className={styles.demoLabel}>🧪 Ya tenés cuenta? Usá:</span>
+        <span className={styles.demoLabel}>
+          🧪 ¿Ya tenés cuenta? Usá:
+        </span>
         <div className={styles.demoRow}>
           <span className={styles.demoRole}>Estudiante:</span>
           <code className={styles.demoCode}>sofia@email.com / 123456</code>

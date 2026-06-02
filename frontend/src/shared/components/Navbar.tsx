@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './Navbar.module.css';
 
 const NAV_ITEMS = [
@@ -15,6 +16,7 @@ const NAV_ITEMS = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -43,12 +45,21 @@ export function Navbar() {
         </ul>
 
         <div className={styles.actions}>
-          <Link href="/login" className={styles.loginBtn}>
-            Iniciar sesión
-          </Link>
-          <Link href="/register" className={styles.signupBtn}>
-            Registrarse
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/dashboard" className={styles.dashboardBtn}>
+              <GraduationCap size={18} />
+              Ir al panel educativo
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className={styles.loginBtn}>
+                Iniciar sesión
+              </Link>
+              <Link href="/register" className={styles.signupBtn}>
+                Registrarse
+              </Link>
+            </>
+          )}
           <button
             className={styles.menuBtn}
             onClick={() => setMenuOpen(!menuOpen)}
@@ -76,20 +87,33 @@ export function Navbar() {
             ))}
           </ul>
           <div className={styles.mobileActions}>
-            <Link
-              href="/iniciar-sesion"
-              className={styles.mobileLoginBtn}
-              onClick={() => setMenuOpen(false)}
-            >
-              Iniciar sesión
-            </Link>
-            <Link
-              href="/registrarse"
-              className={styles.mobileSignupBtn}
-              onClick={() => setMenuOpen(false)}
-            >
-              Registrarse
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/dashboard"
+                className={styles.mobileDashboardBtn}
+                onClick={() => setMenuOpen(false)}
+              >
+                <GraduationCap size={18} />
+                Ir al panel educativo
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className={styles.mobileLoginBtn}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Iniciar sesión
+                </Link>
+                <Link
+                  href="/register"
+                  className={styles.mobileSignupBtn}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

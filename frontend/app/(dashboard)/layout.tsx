@@ -13,6 +13,7 @@ import {
 import styles from './layout.module.css';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { Loader2 } from 'lucide-react';
 
 const sidebarItems = [
@@ -27,41 +28,40 @@ const sidebarItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { collapsed } = useSideBarStore();
+  const { isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
 
-  //  useEffect(() => {
-  //    const token = localStorage.getItem('access_token');
-  //
-  //    if (!token) {
-  //      router.push('/login');
-  //      return;
-  //    }
-  //
-  //    setIsLoading(false);
-  //  }, [router]);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
 
-  //  if (isLoading) {
-  //    return (
-  //      <div
-  //        style={{
-  //          display: 'flex',
-  //          alignItems: 'center',
-  //          justifyContent: 'center',
-  //          minHeight: '100vh',
-  //          backgroundColor: 'var(--bg-base)',
-  //        }}
-  //      >
-  //        <Loader2
-  //          style={{
-  //            width: 24,
-  //            height: 24,
-  //            animation: 'spin 1s linear infinite',
-  //            color: 'var(--text-muted)',
-  //          }}
-  //        />
-  //      </div>
-  //    );
-  //  }
+    setIsLoading(false);
+  }, [router, isAuthenticated]);
+
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          backgroundColor: 'var(--bg-base)',
+        }}
+      >
+        <Loader2
+          style={{
+            width: 24,
+            height: 24,
+            animation: 'spin 1s linear infinite',
+            color: 'var(--text-muted)',
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div

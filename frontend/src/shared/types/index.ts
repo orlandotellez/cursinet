@@ -8,3 +8,4 @@ export type * from './stats.types';
 export type * from './pricing.types';
 export type * from './revenue.types';
 export type * from './activity.types';
+export type * from './auth.types';

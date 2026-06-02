@@ -1,4 +1,3 @@
-export { mockUsers } from './users.data';
 export { instructors, getInstructorByUsername } from './instructors.data';
 export { categories } from './categories.data';
 export { allModules, courses, getCourseBySlug } from './courses.data';

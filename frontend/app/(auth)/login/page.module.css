@@ -106,6 +106,27 @@
   cursor: not-allowed;
 }
 
+.btnLoading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ── Demo credentials ── */
 
 .demoBox {
@@ -142,6 +163,32 @@
   flex-shrink: 0;
 }
 
+.demoCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: opacity var(--transition-fast);
+  font-family: inherit;
+}
+
+.demoCta:hover {
+  opacity: 0.8;
+}
+
+.demoCta:hover .demoArrow {
+  transform: translateX(3px);
+}
+
+.demoArrow {
+  font-size: 14px;
+  color: var(--accent);
+  transition: transform var(--transition-fast);
+}
+
 .demoCode {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -150,6 +197,36 @@
   padding: 3px 10px;
   border-radius: var(--radius-badge);
   user-select: all;
+}
+
+.demoHint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-disabled);
+}
+
+.demoNote {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-disabled);
+  line-height: 1.5;
+}
+
+.demoLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.demoLink:hover {
+  color: var(--accent-hover);
 }
 
 .footer {
