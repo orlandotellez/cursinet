@@ -2,28 +2,19 @@
 ### Permisos:
 ###   ✅ courses:read
 ###   ❌ TODO lo demás
+###
+### Usuario del seed: student@cursinet.com / password123
 ### ─────────────────────────────────────────────────────────────────────
 
 @Api_HostAddress = {{Api_HostAddress}}
 
 
-### 1. Register (ejecutar UNA SOLA VEZ)
-POST {{Api_HostAddress}}/auth/register
-Content-Type: application/json
-
-{
-  "email": "student@test.com",
-  "name": "Student User",
-  "password": "password123"
-}
-
-
-### 2. Login
+### 1. Login (el usuario ya existe por el seed)
 POST {{Api_HostAddress}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "student@test.com",
+  "email": "student@cursinet.com",
   "password": "password123"
 }
 
@@ -88,7 +79,7 @@ GET {{Api_HostAddress}}/test/admin/panel
 GET {{Api_HostAddress}}/test/system/config
 
 
-### 3. Logout
+### 2. Logout
 POST {{Api_HostAddress}}/auth/logout
 Content-Type: application/json
 
