@@ -23,8 +23,7 @@ packages/
 *.err
 
 # Config secrets / local overrides
-*.env
-*.env.*
+.env
 appsettings.*.local.*
 appsettings.development.json
 

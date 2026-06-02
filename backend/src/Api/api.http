@@ -1,66 +1,21 @@
-### 
+### ─── Cursinet API — endpoints de prueba ────────────────────────────
+###
+### Los archivos de prueba están organizados por dominio en la
+### carpeta http/. Usá esos en lugar de este archivo.
+###
+###   http/
+###   ├── http-client.env.json     ← variables de entorno
+###   ├── auth.http                ← register, login, refresh, logout
+###   ├── rbac-admin.http          ← flujo admin completo
+###   ├── rbac-instructor.http     ← flujo instructor completo
+###   ├── rbac-moderator.http      ← flujo moderator completo
+###   └── rbac-student.http        ← flujo student completo
+###
+### ─────────────────────────────────────────────────────────────────────
 
 @Api_HostAddress = http://localhost:5000/api/v1
 
 
 ### Health check
-
-GET http://localhost:5000/health HTTP/1.1
+GET http://localhost:5000/health
 Accept: application/json
-
-
-### Register — crea un usuario nuevo
-
-# Role opcional: student | instructor | admin | moderator
-# Si no se envía, por defecto es "student"
-
-POST {{Api_HostAddress}}/auth/register HTTP/1.1
-Content-Type: application/json
-
-{
-  "email": "testuser@agenciapro.com",
-  "name": "Test User",
-  "password": "password123"
-}
-
-
-### Register como instructor
-
-POST {{Api_HostAddress}}/auth/register HTTP/1.1
-Content-Type: application/json
-
-{
-  "email": "instructor2@agenciapro.com",
-  "name": "Instructor User",
-  "password": "password123",
-  "role": "instructor"
-}
-
-
-### Login
-
-POST {{Api_HostAddress}}/auth/Login HTTP/1.1
-Content-Type: application/json
-
-{
-  "email": "instructor2@agenciapro.com",
-  "password": "password123"
-}
-
-
-### Refresh — renueva access_token y refresh_token (rotación automática)
-
-POST {{Api_HostAddress}}/auth/refresh HTTP/1.1
-Content-Type: application/json
-
-{
-  "refreshToken": "eyJ..."
-}
-
-
-### Logout
-
-POST {{Api_HostAddress}}/auth/Logout HTTP/1.1
-Content-Type: application/json
-
-{}

@@ -1,0 +1,93 @@
+### ─── AUTH: Register, Login, Refresh, Logout ─────────────────────────
+
+
+### Requiere http-client.env.json en http/ o en la raíz del proyecto
+
+
+### Variables: Api_HostAddress = http://localhost:5000/api/v1
+
+
+### Health check
+
+GET http://localhost:5000/health HTTP/1.1
+Accept: application/json
+
+
+### Register (default: student)
+
+POST {{Api_HostAddress}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "user@test.com",
+  "name": "Test User",
+  "password": "password123"
+}
+
+
+### Register como admin
+
+POST {{Api_HostAddress}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "name": "Admin User",
+  "password": "password123",
+  "role": "admin"
+}
+
+
+### Register como instructor
+
+POST {{Api_HostAddress}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "instructor@test.com",
+  "name": "Instructor User",
+  "password": "password123",
+  "role": "instructor"
+}
+
+
+### Register como moderator
+
+POST {{Api_HostAddress}}/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "moderator@test.com",
+  "name": "Moderator User",
+  "password": "password123",
+  "role": "moderator"
+}
+
+
+### Login
+
+POST {{Api_HostAddress}}/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "password": "password123"
+}
+
+
+### Refresh (requiere cookie refreshToken)
+
+POST {{Api_HostAddress}}/auth/refresh HTTP/1.1
+Content-Type: application/json
+
+{
+  "refreshToken": "pegar-acá-el-token"
+}
+
+
+### Logout
+
+POST {{Api_HostAddress}}/auth/logout HTTP/1.1
+Content-Type: application/json
+
+{}
