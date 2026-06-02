@@ -13,7 +13,7 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
 
 		// Configuración que le daremos a los campos de la tabla
 		builder.HasKey(s => s.Id);
-		builder.Property(s => s.Id).HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(s => s.Id).HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(s => s.ExpiresAt).IsRequired().HasColumnName("expires_at");
 

@@ -13,7 +13,7 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 
 		// Configuraciones de campos de la tabla Categories
 		builder.HasKey(c => c.Id);
-		builder.Property(c => c.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(c => c.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(c => c.Name).IsRequired().HasColumnName("name").HasMaxLength(100);
 

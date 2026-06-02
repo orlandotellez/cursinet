@@ -13,7 +13,7 @@ public class UserTwoFactorConfiguration : IEntityTypeConfiguration<UserTwoFactor
 
 		// Configuración de los campos de la tabla
 		builder.HasKey(u => u.Id);
-		builder.Property(u => u.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(u => u.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(u => u.UserId).HasColumnName("user_id").IsRequired();
 		builder.HasIndex(u => u.UserId);

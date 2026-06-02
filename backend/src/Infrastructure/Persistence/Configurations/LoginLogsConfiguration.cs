@@ -13,7 +13,7 @@ public class LoginLogsConfiguration : IEntityTypeConfiguration<LoginLogs>
 
 		// Configuraciones de los campos de la tabla
 		builder.HasKey(l => l.Id);
-		builder.Property(l => l.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(l => l.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(l => l.UserId).HasColumnName("user_id");
 		builder.HasIndex(l => l.UserId);

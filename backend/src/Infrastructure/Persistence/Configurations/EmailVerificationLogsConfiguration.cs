@@ -13,7 +13,7 @@ public class EmailVerificationLogsConfiguration : IEntityTypeConfiguration<Email
 
 		// Configuraciones de los campos de la tabla
 		builder.HasKey(e => e.Id);
-		builder.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(e => e.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(e => e.UserId).HasColumnName("user_id").IsRequired();
 		builder.HasIndex(e => e.UserId);

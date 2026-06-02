@@ -13,7 +13,7 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
 
 		// Configuraciones de campos de la tabla Account
 		builder.HasKey(a => a.Id);
-		builder.Property(a => a.Id).HasColumnName("id").HasDefaultValueSql("uuid_generate_v4()");
+		builder.Property(a => a.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(a => a.AccountId).IsRequired().HasColumnName("account_id");
 		builder.HasIndex(a => a.AccountId);
