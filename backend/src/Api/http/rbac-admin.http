@@ -1,0 +1,95 @@
+### ─── 🟢 RBAC: FLUJO ADMIN ───────────────────────────────────────────
+### El rol Admin tiene TODOS los permisos.
+### Todos los endpoints deberían responder 200.
+### ─────────────────────────────────────────────────────────────────────
+
+@Api_HostAddress = {{Api_HostAddress}}
+
+
+### 1. Register (ejecutar UNA SOLA VEZ para crear el usuario)
+POST {{Api_HostAddress}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "name": "Admin User",
+  "password": "password123",
+  "role": "admin"
+}
+
+
+### 2. Login (setea cookies accessToken + refreshToken)
+POST {{Api_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "password": "password123"
+}
+
+
+### ─── Courses ─────────────────────────────────────────────────────────
+
+GET {{Api_HostAddress}}/test/courses/create
+
+###
+
+GET {{Api_HostAddress}}/test/courses/read
+
+###
+
+GET {{Api_HostAddress}}/test/courses/update
+
+###
+
+GET {{Api_HostAddress}}/test/courses/delete
+
+###
+
+GET {{Api_HostAddress}}/test/courses/publish
+
+
+### ─── Users ───────────────────────────────────────────────────────────
+
+GET {{Api_HostAddress}}/test/users/read
+
+###
+
+GET {{Api_HostAddress}}/test/users/update
+
+###
+
+GET {{Api_HostAddress}}/test/users/delete
+
+
+### ─── Categories ──────────────────────────────────────────────────────
+
+GET {{Api_HostAddress}}/test/categories/create
+
+###
+
+GET {{Api_HostAddress}}/test/categories/read
+
+###
+
+GET {{Api_HostAddress}}/test/categories/update
+
+###
+
+GET {{Api_HostAddress}}/test/categories/delete
+
+
+### ─── Admin ───────────────────────────────────────────────────────────
+
+GET {{Api_HostAddress}}/test/admin/panel
+
+###
+
+GET {{Api_HostAddress}}/test/system/config
+
+
+### 3. Logout
+POST {{Api_HostAddress}}/auth/logout
+Content-Type: application/json
+
+{}
