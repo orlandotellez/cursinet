@@ -1,0 +1,24 @@
+.wrapper {
+  margin-bottom: 20px;
+}
+
+.preview {
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.icon {
+  color: var(--text-muted);
+}
+
+.text {
+  font-size: 14px;
+  color: var(--text-muted);
+}

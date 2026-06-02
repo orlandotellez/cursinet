@@ -1,0 +1,41 @@
+.timestampBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-input);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.timestampBtn:hover {
+  background: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.textarea {
+  width: 100%;
+  padding: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 200px;
+  font-family: var(--font-mono);
+}
+
+.textarea:focus {
+  border-color: var(--accent);
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+}

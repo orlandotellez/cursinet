@@ -1,0 +1,53 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  gap: 12px;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.icon {
+  color: var(--accent-text);
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.size {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.downloadBtn {
+  padding: 8px;
+  border-radius: var(--radius-input);
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.downloadBtn:hover {
+  color: var(--text-primary);
+  background: var(--border-strong);
+}

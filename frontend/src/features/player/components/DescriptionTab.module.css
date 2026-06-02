@@ -1,0 +1,93 @@
+.wrapper {
+  min-height: 200px;
+}
+
+.contentBlock {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.navButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-input);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.navBtn:hover {
+  background: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.navBtnPrimary {
+  background: var(--accent);
+  color: white;
+}
+
+.navBtnPrimary:hover {
+  background: var(--accent-hover);
+  color: white;
+}
+
+.completeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-input);
+  background: var(--success);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background var(--transition-fast);
+}
+
+.completeBtn:hover {
+  background: #15803d;
+}
+
+@media (max-width: 480px) {
+  .navButtons {
+    flex-wrap: wrap;
+  }
+
+  .navBtn,
+  .completeBtn {
+    flex: 1;
+    justify-content: center;
+  }
+}
