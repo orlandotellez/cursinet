@@ -1,0 +1,41 @@
+.page {
+  max-width: 640px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-input);
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background var(--transition-fast);
+  align-self: flex-start;
+}
+
+.saveBtn:hover {
+  background: var(--accent-hover);
+}
+
+@media (max-width: 480px) {
+  .saveBtn {
+    width: 100%;
+  }
+}
