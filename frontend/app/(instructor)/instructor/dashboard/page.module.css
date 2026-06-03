@@ -1,0 +1,242 @@
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+}
+
+/* ── KPI Grid ── */
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpiCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kpiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kpiIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: color-mix(in srgb, #7C3AED 12%, transparent);
+  color: #7C3AED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpiChange {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius-badge);
+}
+
+.changePositive {
+  color: var(--success);
+  background: var(--success-bg);
+}
+
+.changeNegative {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.kpiValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.kpiLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Sections ── */
+
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.chartCard,
+.tableCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* ── Chart ── */
+
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 220px;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.barValue {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.bar {
+  width: 100%;
+  max-width: 40px;
+  background: #2563EB;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height var(--transition-panel);
+}
+
+.barLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── Table ── */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.actionCell {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.courseCell {
+  color: var(--text-secondary);
+}
+
+.timeCell {
+  color: var(--text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.mobileList {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .table {
+    display: none;
+  }
+
+  .mobileList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobileItem {
+    padding: 12px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-input);
+  }
+
+  .mobileItemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  .mobileAction {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .mobileTime {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .mobileCourse {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+}
