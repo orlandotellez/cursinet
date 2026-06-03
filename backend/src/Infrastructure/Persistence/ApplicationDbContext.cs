@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<Course> Courses => Set<Course>();
+    public DbSet<CourseTag> CourseTags => Set<CourseTag>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
