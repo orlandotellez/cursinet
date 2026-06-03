@@ -66,12 +66,7 @@ export default function LessonPage({ params }: { params: Promise<{ courseId: str
 
         <div className={styles.tabContent}>
           {activeTab === 'description' && (
-            <DescriptionTab
-              course={course}
-              courseId={courseId}
-              prevLesson={prevLesson}
-              nextLesson={nextLesson}
-            />
+            <DescriptionTab course={course} />
           )}
           {activeTab === 'comments' && (
             <CommentsTab

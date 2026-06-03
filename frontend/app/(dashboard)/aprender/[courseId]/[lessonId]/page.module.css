@@ -3,6 +3,9 @@
   gap: 24px;
   align-items: flex-start;
   min-height: calc(100vh - 64px);
+  width: 100%;
+  margin: auto;
+  max-width: 1400px;
 }
 
 .mainArea {
