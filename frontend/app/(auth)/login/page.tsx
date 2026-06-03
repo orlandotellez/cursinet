@@ -7,6 +7,20 @@ import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './page.module.css';
 import { UserRole } from '@/src/shared/types';
+
+// Redirige según el rol del usuario
+function redirectByRole(role: UserRole | undefined, navigate: (url: string) => void) {
+  switch (role) {
+    case 'admin':
+      navigate('/admin/dashboard');
+      break;
+    case 'instructor':
+      navigate('/instructor/dashboard');
+      break;
+    default:
+      navigate('/dashboard');
+  }
+}
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 
 // ─── Demo credentials ─────────────────────────────────────────────
@@ -30,10 +44,11 @@ export default function IniciarSesionPage() {
   const router = useRouter();
   const { isAuthenticated, login, isLoading, error, clearError, tryDemoCredentials } = useAuthStore();
 
-  // Si ya tiene sesión, redirigir al dashboard
+  // Si ya tiene sesión, redirigir según rol
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/dashboard');
+      const role = useAuthStore.getState().user?.role;
+      redirectByRole(role, router.replace);
     }
   }, [isAuthenticated, router]);
 
@@ -72,15 +87,16 @@ export default function IniciarSesionPage() {
   }
 
   function redirectAfterLogin() {
-    router.push('/dashboard');
+    const role = useAuthStore.getState().user?.role;
+    redirectByRole(role, router.replace);
   }
 
   /** Loguea directo con demo mode sin llamar a la API */
   function handleDemoLogin(cred: DemoCredential) {
     clearError();
-    const { login: _l } = useAuthStore.getState();
     useAuthStore.getState().demoLogin(cred.label as UserRole);
-    router.push('/dashboard');
+    const role = useAuthStore.getState().user?.role;
+    redirectByRole(role, router.replace);
   }
 
   /** Rellena los campos con la credencial demo */

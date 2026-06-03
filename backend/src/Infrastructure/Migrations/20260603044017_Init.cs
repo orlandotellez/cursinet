@@ -294,6 +294,127 @@ namespace Cursinet.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CourseTags",
+                columns: table => new
+                {
+                    course_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    tag_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseTags", x => new { x.course_id, x.tag_id });
+                    table.ForeignKey(
+                        name: "FK_CourseTags_Courses_course_id",
+                        column: x => x.course_id,
+                        principalTable: "Courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseTags_Tags_tag_id",
+                        column: x => x.tag_id,
+                        principalTable: "Tags",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Modules",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    course_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    sort_order = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    is_published = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modules", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Modules_Courses_course_id",
+                        column: x => x.course_id,
+                        principalTable: "Courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    course_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    stripe_payment_intent_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    amount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
+                    currency = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false, defaultValue: "USD"),
+                    status = table.Column<int>(type: "integer", nullable: false),
+                    type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    paid_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    refunded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Courses_course_id",
+                        column: x => x.course_id,
+                        principalTable: "Courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Payments_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Lessons",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    module_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    course_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    slug = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    type = table.Column<int>(type: "integer", nullable: false),
+                    video_url = table.Column<string>(type: "text", nullable: true),
+                    video_duration_seconds = table.Column<int>(type: "integer", nullable: true),
+                    content_markdown = table.Column<string>(type: "text", nullable: true),
+                    sort_order = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    is_published = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    is_preview = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    attachment_urls = table.Column<string[]>(type: "text[]", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lessons", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Courses_course_id",
+                        column: x => x.course_id,
+                        principalTable: "Courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Modules_module_id",
+                        column: x => x.module_id,
+                        principalTable: "Modules",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Account_account_id",
                 table: "Account",
@@ -363,6 +484,16 @@ namespace Cursinet.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CourseTags_course_id",
+                table: "CourseTags",
+                column: "course_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseTags_tag_id",
+                table: "CourseTags",
+                column: "tag_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EmailVerificationLogs_user_id",
                 table: "EmailVerificationLogs",
                 column: "user_id");
@@ -371,6 +502,27 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "IX_EmailVerificationLogs_verified_at",
                 table: "EmailVerificationLogs",
                 column: "verified_at");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_course_id",
+                table: "Lessons",
+                column: "course_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_module_id",
+                table: "Lessons",
+                column: "module_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_slug",
+                table: "Lessons",
+                column: "slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_type",
+                table: "Lessons",
+                column: "type");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LoginLogs_created_at",
@@ -393,6 +545,11 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Modules_course_id",
+                table: "Modules",
+                column: "course_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetLogs_created_at",
                 table: "PasswordResetLogs",
                 column: "created_at");
@@ -400,6 +557,26 @@ namespace Cursinet.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetLogs_user_id",
                 table: "PasswordResetLogs",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_course_id",
+                table: "Payments",
+                column: "course_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_status",
+                table: "Payments",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_stripe_payment_intent_id",
+                table: "Payments",
+                column: "stripe_payment_intent_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_user_id",
+                table: "Payments",
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
@@ -479,10 +656,13 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "Account");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "CourseTags");
 
             migrationBuilder.DropTable(
                 name: "EmailVerificationLogs");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "LoginLogs");
@@ -491,16 +671,25 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "PasswordResetLogs");
 
             migrationBuilder.DropTable(
-                name: "Sessions");
+                name: "Payments");
 
             migrationBuilder.DropTable(
-                name: "Tags");
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "user_two_factor");
 
             migrationBuilder.DropTable(
                 name: "Verification");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
+
+            migrationBuilder.DropTable(
+                name: "Modules");
+
+            migrationBuilder.DropTable(
+                name: "Courses");
 
             migrationBuilder.DropTable(
                 name: "Categories");

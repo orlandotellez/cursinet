@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-base);
+}
+
+.content {
+  width: 90%;
+  min-height: 100vh;
+  max-width: 1400px;
+  margin: auto;
+}
+
+.collapsed {
+  padding: 20px 20px 20px 100px;
+}
+
+.expanded {
+  padding: 20px 20px 20px 280px;
+}
+
+@media (max-width: 768px) {
+
+  .collapsed,
+  .expanded {
+    padding: 16px;
+  }
+}
