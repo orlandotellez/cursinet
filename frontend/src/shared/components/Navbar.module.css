@@ -4,15 +4,9 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: transparent;
-  transition: background var(--transition-fast),
-    backdrop-filter var(--transition-fast);
-  padding-inline: 20px;
-}
-
-.scrolled {
   background: color-mix(in srgb, var(--bg-base) 80%, transparent);
   backdrop-filter: blur(12px);
+  padding-inline: 20px;
   border-bottom: 1px solid var(--border);
 }
 
