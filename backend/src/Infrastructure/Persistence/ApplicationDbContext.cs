@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<CourseTag> CourseTags => Set<CourseTag>();
     public DbSet<Module> Modules => Set<Module>();
+    public DbSet<Lesson> Lessons => Set<Lesson>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
