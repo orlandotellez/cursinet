@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Lesson } from '@/src/shared/types';
 import styles from './LessonNavigation.module.css';
 
@@ -23,10 +23,6 @@ export function LessonNavigation({ courseId, prevLesson, nextLesson }: LessonNav
           </div>
         </Link>
       ) : <div />}
-
-      <button className={styles.completeBtn}>
-        <Check size={16} /> Completar
-      </button>
 
       {nextLesson ? (
         <Link href={`/aprender/${courseId}/${nextLesson.id}`} className={`${styles.btn} ${styles.btnRight}`}>
