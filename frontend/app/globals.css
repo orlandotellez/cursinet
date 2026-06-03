@@ -45,6 +45,41 @@
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-panel: 250ms ease-out;
+
+  /* Plyr — tema dark */
+  --plyr-color-main: var(--accent);
+  --plyr-video-controls-background: linear-gradient(rgba(0, 0, 0, 0), rgba(2, 6, 23, 0.85));
+  --plyr-video-control-color: var(--text-primary);
+  --plyr-video-control-color-hover: #fff;
+  --plyr-video-control-background-hover: var(--accent);
+  --plyr-menu-background: rgba(15, 23, 42, 0.96);
+  --plyr-menu-color: var(--text-primary);
+  --plyr-menu-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --plyr-menu-radius: 8px;
+  --plyr-menu-border-color: var(--border-strong);
+  --plyr-menu-border-shadow-color: transparent;
+  --plyr-tooltip-background: rgba(15, 23, 42, 0.96);
+  --plyr-tooltip-color: var(--text-primary);
+  --plyr-tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --plyr-tooltip-radius: 6px;
+  --plyr-range-thumb-background: #fff;
+  --plyr-range-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --plyr-range-fill-background: var(--accent);
+  --plyr-video-range-track-background: rgba(255, 255, 255, 0.2);
+  --plyr-video-progress-buffered-background: rgba(255, 255, 255, 0.15);
+  --plyr-captions-background: rgba(2, 6, 23, 0.85);
+  --plyr-captions-text-color: var(--text-primary);
+  --plyr-badge-background: var(--bg-elevated);
+  --plyr-badge-text-color: var(--text-primary);
+  --plyr-font-family: var(--font-sans);
+  --plyr-font-size-time: 14px;
+  --plyr-font-size-menu: 14px;
+  --plyr-font-weight-regular: 400;
+  --plyr-font-weight-bold: 600;
+  --plyr-line-height: 1.5;
+  --plyr-control-spacing: 12px;
+  --plyr-control-icon-size: 20px;
+  --plyr-control-radius: 4px;
 }
 
 *,
