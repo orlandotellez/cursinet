@@ -1,18 +1,20 @@
 'use client'
 
-import { Play } from 'lucide-react';
+import { VideoPlayer } from '@/src/shared/components/VideoPlayer';
 import styles from './VideoContent.module.css';
 
-export function VideoContent() {
+interface VideoContentProps {
+  videoUrl?: string;
+  title?: string;
+}
+
+export function VideoContent({ videoUrl, title }: VideoContentProps) {
+  if (!videoUrl || videoUrl === '#') return null;
+
   return (
     <section className={styles.wrapper}>
       <div className={styles.container}>
-        <div className={styles.placeholder}>
-          <div className={styles.overlay}>
-            <Play size={48} className={styles.icon} />
-          </div>
-          <span className={styles.hint}>Reproducir video</span>
-        </div>
+        <VideoPlayer videoUrl={videoUrl} title={title} />
       </div>
     </section>
   );

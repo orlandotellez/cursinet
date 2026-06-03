@@ -17,7 +17,12 @@ export function LessonContentRenderer({ lesson }: LessonContentRendererProps) {
 
   switch (lesson.type) {
     case 'video':
-      return <VideoContent />;
+      return (
+        <VideoContent
+          videoUrl={content?.videoUrl}
+          title={lesson.title}
+        />
+      );
     case 'text':
       return <TextContent body={content?.body || 'Contenido no disponible'} />;
     case 'code':
