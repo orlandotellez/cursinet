@@ -1,6 +1,18 @@
 import Link from "next/link";
 import styles from "./Hero.module.css"
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Server, Monitor, Layers, Cloud, BarChart3, Smartphone, CheckCircle, Shield } from "lucide-react";
+import { categories } from "@/src/features/courses/data";
+
+const iconMap: Record<string, React.ReactNode> = {
+  Server: <Server size={16} />,
+  Monitor: <Monitor size={16} />,
+  Layers: <Layers size={16} />,
+  Cloud: <Cloud size={16} />,
+  BarChart3: <BarChart3 size={16} />,
+  Smartphone: <Smartphone size={16} />,
+  CheckCircle: <CheckCircle size={16} />,
+  Shield: <Shield size={16} />,
+};
 
 export const HeroSection = () => {
   return (
@@ -46,23 +58,21 @@ export const HeroSection = () => {
           </div>
         </div>
         <div className={styles.heroVisual}>
-          <div className={styles.heroMockup}>
-            <div className={styles.mockupHeader}>
-              <div className={styles.mockupDots}>
-                <span />
-                <span />
-                <span />
-              </div>
-              <span className={styles.mockupTitle}>cursinet/courses</span>
-            </div>
-            <div className={styles.mockupBody}>
-              <div className={styles.mockupLine} style={{ width: '80%' }} />
-              <div className={styles.mockupLine} style={{ width: '60%' }} />
-              <div className={styles.mockupLineAccent} style={{ width: '45%' }} />
-              <div className={styles.mockupLine} style={{ width: '70%' }} />
-              <div className={styles.mockupLine} style={{ width: '55%' }} />
-              <div className={styles.mockupLineAccent} style={{ width: '35%' }} />
-              <div className={styles.mockupLine} style={{ width: '65%' }} />
+          <div className={styles.catCard}>
+            <span className={styles.catBadge}>Áreas</span>
+            <h3 className={styles.catTitle}>Explora por categoría</h3>
+            <div className={styles.catGrid}>
+              {categories.map((cat) => (
+                <Link key={cat.id} href={`/cursos?categoria=${cat.slug}`} className={styles.catItem}>
+                  <span className={styles.catIcon}>
+                    {iconMap[cat.icon]}
+                  </span>
+                  <div className={styles.catInfo}>
+                    <span className={styles.catName}>{cat.name}</span>
+                    <span className={styles.catCount}>{cat.coursesCount} cursos</span>
+                  </div>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
