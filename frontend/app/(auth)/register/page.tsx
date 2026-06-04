@@ -5,19 +5,30 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
+import { redirectByRole } from '@/src/shared/lib/authUtils';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 
 export default function RegistrarsePage() {
   const router = useRouter();
   const { isAuthenticated, register, isLoading, error, clearError } = useAuthStore();
-
-  // Si ya tiene sesión, redirigir al dashboard
+  // Guard: esperar a que Zustand hidrate desde localStorage
+  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/dashboard');
+    const persist = useAuthStore.persist;
+    if (!persist) { setHydrated(true); return; }
+    const unsub = persist.onFinishHydration(() => setHydrated(true));
+    if (persist.hasHydrated()) setHydrated(true);
+    return unsub;
+  }, []);
+
+  // Si ya tiene sesión y el store ya hidrató, redirigir según rol
+  useEffect(() => {
+    if (hydrated && isAuthenticated) {
+      const role = useAuthStore.getState().user?.role;
+      redirectByRole(role, router.replace);
     }
-  }, [isAuthenticated, router]);
+  }, [hydrated, isAuthenticated, router]);
 
   const [form, setForm] = useState({
     name: '',
@@ -58,7 +69,8 @@ export default function RegistrarsePage() {
         password: form.password,
       });
 
-      router.push('/dashboard');
+      const role = useAuthStore.getState().user?.role;
+      redirectByRole(role, router.replace);
     } catch {
       // error ya está en el store
     }
