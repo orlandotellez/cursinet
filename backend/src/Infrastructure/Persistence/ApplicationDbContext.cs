@@ -26,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<LessonProgress> LessonProgress => Set<LessonProgress>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Quiz> Quizzes => Set<Quiz>();
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
