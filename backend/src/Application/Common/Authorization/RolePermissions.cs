@@ -19,6 +19,14 @@ public static class RolePermissions
             Permissions.CoursePublish,
             Permissions.UserRead,
             Permissions.CategoryRead,
+            Permissions.ModuleCreate,
+            Permissions.ModuleRead,
+            Permissions.ModuleUpdate,
+            Permissions.ModuleDelete,
+            Permissions.LessonCreate,
+            Permissions.LessonRead,
+            Permissions.LessonUpdate,
+            Permissions.LessonDelete,
         ],
 
         [UserRole.Moderator] =
@@ -33,6 +41,12 @@ public static class RolePermissions
         [UserRole.Student] =
         [
             Permissions.CourseRead,
+            Permissions.EnrollmentCreate,
+            Permissions.EnrollmentRead,
+            Permissions.ModuleRead,
+            Permissions.LessonRead,
+            Permissions.PaymentCreate,
+            Permissions.PaymentRead,
         ],
     };
 
