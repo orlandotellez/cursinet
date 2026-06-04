@@ -5,6 +5,15 @@ import { persist } from 'zustand/middleware';
 import * as authApi from '../api/auth';
 import { LoginPayload, RegisterPayload, User, UserRole } from '../types';
 import { DEMO_USERS } from '../lib/mockData';
+import { clearAllStorage } from '../lib/authUtils';
+
+function normalizeRole(role: string): UserRole {
+  return role.toLowerCase() as UserRole;
+}
+
+function normalizeUser(user: User): User {
+  return { ...user, role: normalizeRole(user.role) };
+}
 
 // Store
 interface AuthState {
@@ -36,7 +45,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const data = await authApi.login(payload);
           set({
-            user: data.user,
+            user: normalizeUser(data.user),
             isAuthenticated: true,
             isLoading: false,
             isDemoMode: false,
@@ -54,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const data = await authApi.register(payload);
           set({
-            user: data.user,
+            user: normalizeUser(data.user),
             isAuthenticated: true,
             isLoading: false,
             isDemoMode: false,
@@ -93,12 +102,20 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
+        // Intentar logout en backend (limpia httpOnly cookies)
         try {
           await authApi.logout();
         } catch {
-          // Si falla el backend igual limpiamos estado local
+          // Si falla el backend, igual limpiamos todo local
         }
+
+        // Reset estado
         set({ user: null, isAuthenticated: false, isDemoMode: false, error: null });
+
+        // Nuke total — localStorage, sessionStorage, cookies
+        if (typeof window !== 'undefined') {
+          clearAllStorage();
+        }
       },
 
       clearError: () => set({ error: null }),

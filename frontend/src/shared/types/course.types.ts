@@ -76,3 +76,27 @@ export interface CourseCardData {
   badge?: string;
   status?: CourseStatus;
 }
+
+// ─── Backend-aligned types for Modules & Lessons API ────────────────────────
+
+export interface CurriculumModule {
+  id: string;
+  title: string;
+  description?: string;
+  sortOrder: number;
+  lessons: CurriculumLesson[];
+}
+
+export interface CurriculumLesson {
+  id: string;
+  moduleId: string;
+  title: string;
+  slug: string;
+  type: 'Video' | 'Text' | 'Code' | 'Quiz' | 'Resource';
+  sortOrder: number;
+  isPublished: boolean;
+  isPreview: boolean;
+  videoDurationSeconds: number | null;
+  videoUrl?: string | null;
+  contentMarkdown?: string | null;
+}
