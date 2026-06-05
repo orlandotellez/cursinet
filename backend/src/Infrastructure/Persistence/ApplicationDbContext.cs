@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Module> Modules => Set<Module>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<Lesson> Lessons => Set<Lesson>();
+    public DbSet<LessonNote> LessonNotes => Set<LessonNote>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<LessonProgress> LessonProgress => Set<LessonProgress>();
     public DbSet<Payment> Payments => Set<Payment>();
