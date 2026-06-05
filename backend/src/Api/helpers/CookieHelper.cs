@@ -8,14 +8,14 @@ public class CookieHelper
 {
     private readonly IWebHostEnvironment _environment;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    
+
     // Inyectamos tanto el entorno como el accesador del contexto HTTP
     public CookieHelper(IWebHostEnvironment environment, IHttpContextAccessor httpContextAccessor)
     {
         _environment = environment;
         _httpContextAccessor = httpContextAccessor;
     }
-    
+
     public void SetAuthCookies(string accessToken, string refreshToken)
     {
         // Obtenemos el objeto Response de manera segura a través del HttpContext
@@ -29,7 +29,7 @@ public class CookieHelper
             Path = "/",
             HttpOnly = true,
             Secure = isProduction,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         };
 
@@ -38,7 +38,7 @@ public class CookieHelper
             Path = "/",
             HttpOnly = true,
             Secure = isProduction,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         };
 
@@ -55,7 +55,7 @@ public class CookieHelper
         {
             Path = "/"
         };
-        
+
         response.Cookies.Delete("accessToken", cookieOptions);
         response.Cookies.Delete("refreshToken", cookieOptions);
     }
