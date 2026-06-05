@@ -13,7 +13,7 @@ import ReactMarkdown from 'react-markdown';
 import { VideoPlayer } from '@/src/shared/components/VideoPlayer';
 import { getCourseById, type CourseDTO } from '@/src/shared/api/courses';
 import { getCurriculum, type CurriculumResponse, type CurriculumLesson } from '@/src/shared/api/curriculum';
-import { getProgress, upsertProgress, type LessonProgressResponse } from '@/src/shared/api/lessons';
+import { getProgress, upsertProgress, getLesson, type LessonProgressResponse } from '@/src/shared/api/lessons';
 import { getLessonContent } from '@/src/features/courses/data/lesson-content';
 import type { Course, Lesson, Level } from '@/src/shared/types';
 
@@ -326,7 +326,16 @@ export default function LessonViewerPage() {
         setLoading(false);
         return;
       }
-      setLesson(found);
+      try {
+        const detail = await getLesson(found.moduleId, lessonId);
+        setLesson({
+          ...found,
+          videoUrl: detail.videoUrl,
+          contentMarkdown: detail.contentMarkdown,
+        });
+      } catch {
+        setLesson(found);
+      }
 
       try {
         const p = await getProgress(found.moduleId, lessonId);
