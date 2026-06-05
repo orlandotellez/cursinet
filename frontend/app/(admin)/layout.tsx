@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, BookOpen, BarChart3 } from 'lucide-react';
-import { Loader2 } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, BarChart3, Loader2 } from 'lucide-react';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
@@ -21,20 +20,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { collapsed } = useSideBarStore();
   const { user, isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
+  // Guard: esperar a que Zustand hidrate desde localStorage
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    const persist = useAuthStore.persist;
+    if (!persist) { setHydrated(true); return; }
+    const unsub = persist.onFinishHydration(() => setHydrated(true));
+    if (persist.hasHydrated()) setHydrated(true);
+    return unsub;
+  }, []);
 
   useEffect(() => {
+    // Esperar a que Zustand hidrate desde localStorage
+    if (!hydrated) return;
+
     if (!isAuthenticated) {
       router.replace('/login');
       return;
     }
 
-    if (user?.role !== 'admin') {
+    // Si todavía no tenemos user pero estamos autenticados, esperar
+    // (puede ser un estado de transición durante la hidratación de persist)
+    if (!user) return;
+
+    if (user.role !== 'admin') {
       router.replace('/dashboard');
       return;
     }
 
     setIsLoading(false);
-  }, [router, isAuthenticated, user]);
+  }, [hydrated, router, isAuthenticated, user]);
 
   if (isLoading) {
     return (

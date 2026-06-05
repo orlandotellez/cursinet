@@ -1,9 +1,10 @@
 export interface Review {
   id: string;
+  courseId: string;
   userId: string;
   userName: string;
-  userAvatar: string;
+  userAvatar: string | null;
   rating: number;
-  comment: string;
+  comment: string | null;
   createdAt: string;
 }

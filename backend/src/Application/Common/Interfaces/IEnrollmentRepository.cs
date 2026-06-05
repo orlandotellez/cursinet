@@ -1,0 +1,10 @@
+using Cursinet.Domain.Entities;
+
+namespace Cursinet.Application.Common.Interfaces;
+
+public interface IEnrollmentRepository
+{
+    Task<Enrollment?> GetByCourseAndUserAsync(Guid courseId, Guid userId);
+    Task<List<Enrollment>> GetByUserAsync(Guid userId);
+    Task<Enrollment> CreateAsync(Enrollment enrollment, Guid courseId);
+}

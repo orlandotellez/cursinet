@@ -24,4 +24,6 @@ public class Module
 	public DateTime UpdatedAt {get; set;} // Fecha de actualización
 
 	public DateTime? DeletedAt {get; set;} // Soft-delete
+
+	public List<Lesson> Lessons {get; set;} = []; // Lecciones del módulo
 }

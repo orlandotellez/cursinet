@@ -19,7 +19,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
 		builder.HasIndex(l => l.ModuleId);
 		// Relación con la tabla de módulos
 		builder.HasOne(l => l.Module)
-			.WithMany()
+			.WithMany(m => m.Lessons)
 			.HasForeignKey(l => l.ModuleId)
 			.OnDelete(DeleteBehavior.Cascade);
 

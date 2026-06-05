@@ -5,22 +5,9 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
-import styles from './page.module.css';
+import { redirectByRole } from '@/src/shared/lib/authUtils';
 import { UserRole } from '@/src/shared/types';
-
-// Redirige según el rol del usuario
-function redirectByRole(role: UserRole | undefined, navigate: (url: string) => void) {
-  switch (role) {
-    case 'admin':
-      navigate('/admin/dashboard');
-      break;
-    case 'instructor':
-      navigate('/instructor/dashboard');
-      break;
-    default:
-      navigate('/dashboard');
-  }
-}
+import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 
 // ─── Demo credentials ─────────────────────────────────────────────
@@ -43,14 +30,23 @@ const DEMO_CREDENTIALS: DemoCredential[] = [
 export default function IniciarSesionPage() {
   const router = useRouter();
   const { isAuthenticated, login, isLoading, error, clearError, tryDemoCredentials } = useAuthStore();
-
-  // Si ya tiene sesión, redirigir según rol
+  // Guard: esperar a que Zustand hidrate desde localStorage
+  const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
-    if (isAuthenticated) {
+    const persist = useAuthStore.persist;
+    if (!persist) { setHydrated(true); return; }
+    const unsub = persist.onFinishHydration(() => setHydrated(true));
+    if (persist.hasHydrated()) setHydrated(true);
+    return unsub;
+  }, []);
+
+  // Si ya tiene sesión y el store ya hidrató, redirigir según rol
+  useEffect(() => {
+    if (hydrated && isAuthenticated) {
       const role = useAuthStore.getState().user?.role;
       redirectByRole(role, router.replace);
     }
-  }, [isAuthenticated, router]);
+  }, [hydrated, isAuthenticated, router]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -72,12 +68,9 @@ export default function IniciarSesionPage() {
     try {
       // Intentar login vía API real
       await login({ email: email.trim(), password });
-
-      // Si llegamos acá, el login fue exitoso
       redirectAfterLogin();
     } catch {
       // Si falla la API, ofrecer demo mode como fallback
-      // tryDemoCredentials buscará en la lista de usuarios demo offline
       const matched = tryDemoCredentials(email.trim(), password);
       if (matched) {
         redirectAfterLogin();
@@ -95,8 +88,7 @@ export default function IniciarSesionPage() {
   function handleDemoLogin(cred: DemoCredential) {
     clearError();
     useAuthStore.getState().demoLogin(cred.label as UserRole);
-    const role = useAuthStore.getState().user?.role;
-    redirectByRole(role, router.replace);
+    redirectByRole(cred.label as UserRole, router.replace);
   }
 
   /** Rellena los campos con la credencial demo */

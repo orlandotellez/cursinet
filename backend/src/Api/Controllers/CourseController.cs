@@ -4,6 +4,7 @@ using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cursinet.Api.Controllers;
@@ -23,7 +24,7 @@ public class CourseController : ControllerBase
 
     /// Listar cursos (público, con filtros opcionales)
     [HttpGet]
-    [RequirePermission(Permissions.CourseRead)]
+    [AllowAnonymous]
     public async Task<ActionResult<List<CourseResponse>>> GetAll(
         [FromQuery] Guid? categoryId,
         [FromQuery] CourseLevel? level,
@@ -38,7 +39,7 @@ public class CourseController : ControllerBase
 
     /// Obtener detalle de un curso por ID
     [HttpGet("{id:guid}")]
-    [RequirePermission(Permissions.CourseRead)]
+    [AllowAnonymous]
     public async Task<ActionResult<CourseResponse>> GetById(Guid id)
     {
         var course = await _courseService.GetByIdAsync(id);
@@ -47,7 +48,7 @@ public class CourseController : ControllerBase
 
     /// Obtener detalle de un curso por slug
     [HttpGet("by-slug/{slug}")]
-    [RequirePermission(Permissions.CourseRead)]
+    [AllowAnonymous]
     public async Task<ActionResult<CourseResponse>> GetBySlug(string slug)
     {
         var course = await _courseService.GetBySlugAsync(slug);

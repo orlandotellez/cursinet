@@ -42,3 +42,10 @@
 .results {
   min-height: 300px;
 }
+
+.loadingText {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}

@@ -15,19 +15,25 @@ public class AuthService : IAuthService
     private readonly IAccountRepository _accountRepository;
     private readonly ITokenService _tokenService;
     private readonly ISessionRepository _sessionRepository;
+    private readonly IVerificationRepository _verificationRepository;
+    private readonly IEmailService _emailService;
 
     public AuthService(
         IUserRepository userRepository,
         IPasswordService passwordService,
         IAccountRepository accountRepository,
         ITokenService tokenService,
-        ISessionRepository sessionRepository)
+        ISessionRepository sessionRepository,
+        IVerificationRepository verificationRepository,
+        IEmailService emailService)
     {
         _userRepository = userRepository;
         _passwordService = passwordService;
         _accountRepository = accountRepository;
         _tokenService = tokenService;
         _sessionRepository = sessionRepository;
+        _verificationRepository = verificationRepository;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -82,6 +88,20 @@ public class AuthService : IAuthService
         };
 
         await _sessionRepository.CreateAsync(session);
+
+        // Send verification email
+        var verificationCode = GenerateVerificationCode();
+        var verification = new Verification
+        {
+            Id = Guid.NewGuid(),
+            Identifier = user.Email,
+            Value = verificationCode,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        await _verificationRepository.CreateAsync(verification);
+        await _emailService.SendVerificationEmailAsync(user.Email, user.Name, verificationCode);
 
         var response = new AuthResponse
         {
@@ -196,5 +216,136 @@ public class AuthService : IAuthService
     public async Task LogoutAsync(string refreshToken)
     {
         await _sessionRepository.DeleteAsync(refreshToken);
+    }
+
+    public async Task<AuthResponse> VerifyEmailAsync(string identifier, string code)
+    {
+        var verification = await _verificationRepository.GetByIdentifierAndValueAsync(identifier, code);
+        if (verification == null)
+            throw AppExceptions.BadRequest("Invalid or expired verification code");
+
+        var user = await _userRepository.GetByEmailAsync(identifier);
+        if (user == null)
+            throw AppExceptions.NotFound("User not found");
+
+        if (user.EmailVerified)
+            return new AuthResponse { Message = "Email already verified." };
+
+        user.EmailVerified = true;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
+
+        await _verificationRepository.DeleteAsync(verification.Id);
+
+        // TODO: Add audit log entry (EmailVerificationLogs) when repository is available
+
+        return new AuthResponse
+        {
+            Message = "Email verified successfully. You can now access all features.",
+        };
+    }
+
+    public async Task ResendVerificationAsync(string email)
+    {
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user == null)
+            throw AppExceptions.NotFound("User not found");
+
+        if (user.EmailVerified)
+            throw AppExceptions.BadRequest("Email is already verified");
+
+        // Remove old verification codes for this email
+        await _verificationRepository.DeleteByIdentifierAsync(email);
+
+        // Generate new code
+        var code = GenerateVerificationCode();
+        var verification = new Verification
+        {
+            Id = Guid.NewGuid(),
+            Identifier = email,
+            Value = code,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await _verificationRepository.CreateAsync(verification);
+        await _emailService.SendVerificationEmailAsync(email, user.Name, code);
+    }
+
+    public async Task<ForgotPasswordResponse> ForgotPasswordAsync(string email)
+    {
+        // Security: always return the same message regardless of whether the email exists
+        // to prevent email enumeration attacks
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user == null)
+            return new ForgotPasswordResponse
+            {
+                Message = "If the email exists, a password reset link has been sent.",
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            };
+
+        // Remove old reset codes for this email
+        await _verificationRepository.DeleteByIdentifierAsync(email);
+
+        // Generate new code
+        var code = GenerateVerificationCode();
+        var verification = new Verification
+        {
+            Id = Guid.NewGuid(),
+            Identifier = email,
+            Value = code,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+
+        await _verificationRepository.CreateAsync(verification);
+        await _emailService.SendPasswordResetEmailAsync(email, user.Name, code);
+
+        return new ForgotPasswordResponse
+        {
+            Message = "If the email exists, a password reset link has been sent.",
+            ExpiresAt = verification.ExpiresAt,
+        };
+    }
+
+    public async Task<ResetPasswordResponse> ResetPasswordAsync(string email, string code, string newPassword)
+    {
+        var verification = await _verificationRepository.GetByIdentifierAndValueAsync(email, code);
+        if (verification == null)
+            throw AppExceptions.BadRequest("Invalid or expired reset code");
+
+        var user = await _userRepository.GetByEmailAsync(email);
+        if (user == null)
+            throw AppExceptions.NotFound("User not found");
+
+        var account = await _accountRepository.GetCredentialsByEmailAsync(email);
+        if (account == null)
+            throw AppExceptions.NotFound("Password account not found");
+
+        // Hash new password and update
+        var hashedPassword = _passwordService.HashPassword(newPassword);
+        account.Password = hashedPassword;
+        account.UpdatedAt = DateTime.UtcNow;
+        await _accountRepository.UpdateAsync(account);
+
+        // Delete the used verification
+        await _verificationRepository.DeleteAsync(verification.Id);
+
+        // Invalidate all sessions for this user (force re-login)
+        await _sessionRepository.DeleteByUserIdAsync(user.Id);
+
+        return new ResetPasswordResponse
+        {
+            Message = "Password reset successfully. Please login with your new password.",
+        };
+    }
+
+    private static string GenerateVerificationCode()
+    {
+        const string chars = "0123456789";
+        var random = new Random();
+        return new string(Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray());
     }
 }

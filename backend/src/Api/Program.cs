@@ -4,6 +4,12 @@ using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Features.Auth;
 using Cursinet.Application.Features.Courses;
+using Cursinet.Application.Features.Enrollments;
+using Cursinet.Application.Features.Modules;
+using Cursinet.Application.Features.Lessons;
+using Cursinet.Application.Features.Reviews;
+using Cursinet.Application.Features.Certificates;
+using Cursinet.Application.Features.Payments;
 using Cursinet.Domain.Enums;
 using Cursinet.Infrastructure.Persistence;
 using Cursinet.Infrastructure.Persistence.Repositories;
@@ -96,16 +102,30 @@ builder.Services.AddAuthorization(options =>
 // SERVICIOS DE APLICACIÓN E INFRAESTRUCTURA
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IModuleService, ModuleService>();
+builder.Services.AddScoped<ILessonService, LessonService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<ICertificateService, CertificateService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, DevEmailService>();
 
 // REPOSITORIOS
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<ILessonProgressRepository, LessonProgressRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
 // DATA SEEDER
 builder.Services.AddScoped<DataSeeder>();

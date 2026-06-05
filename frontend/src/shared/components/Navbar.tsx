@@ -13,10 +13,19 @@ const NAV_ITEMS = [
   { label: 'Precios', href: '#pricing' },
 ];
 
+const DASHBOARD_CONFIG: Record<string, { label: string; href: string }> = {
+  student: { label: 'Ir al panel educativo', href: '/dashboard' },
+  instructor: { label: 'Ir al panel de instructor', href: '/instructor/dashboard' },
+  admin: { label: 'Ir al panel de administración', href: '/admin/dashboard' },
+};
+
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+
+  const dashboardConfig = DASHBOARD_CONFIG[user?.role ?? 'student'] ?? DASHBOARD_CONFIG.student;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -46,9 +55,9 @@ export function Navbar() {
 
         <div className={styles.actions}>
           {isAuthenticated ? (
-            <Link href="/dashboard" className={styles.dashboardBtn}>
+            <Link href={dashboardConfig.href} className={styles.dashboardBtn}>
               <GraduationCap size={18} />
-              Ir al panel educativo
+              {dashboardConfig.label}
             </Link>
           ) : (
             <>
@@ -89,12 +98,12 @@ export function Navbar() {
           <div className={styles.mobileActions}>
             {isAuthenticated ? (
               <Link
-                href="/dashboard"
+                href={dashboardConfig.href}
                 className={styles.mobileDashboardBtn}
                 onClick={() => setMenuOpen(false)}
               >
                 <GraduationCap size={18} />
-                Ir al panel educativo
+                {dashboardConfig.label}
               </Link>
             ) : (
               <>

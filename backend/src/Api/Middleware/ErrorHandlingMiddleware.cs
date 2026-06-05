@@ -39,15 +39,45 @@ public class ErrorHandlingMiddleware
         // Aquí asignamos el código Http (404, 500, etc)
         context.Response.StatusCode = exception switch
         {
-            AppException => (int)HttpStatusCode.BadRequest,
+            AppException appEx => appEx.StatusCode,
             _ => (int)HttpStatusCode.InternalServerError
-
         };
 
-        // Creamos un objeto con la propiedad error
-        var response = new { error = exception.Message };
+        // ProblemDetails (RFC 7807) con código de error custom
+        object responseObj;
+        if (exception is AppException appException)
+        {
+            responseObj = new
+            {
+                type = "https://tools.ietf.org/html/rfc7807",
+                title = appException.StatusCode switch
+                {
+                    400 => "Bad Request",
+                    401 => "Unauthorized",
+                    403 => "Forbidden",
+                    404 => "Not Found",
+                    409 => "Conflict",
+                    422 => "Unprocessable Entity",
+                    _ => "Error"
+                },
+                status = appException.StatusCode,
+                detail = appException.Message,
+                code = appException.Code
+            };
+        }
+        else
+        {
+            responseObj = new
+            {
+                type = "https://tools.ietf.org/html/rfc7807",
+                title = "Internal Server Error",
+                status = 500,
+                detail = exception.Message,
+                code = "internal.error"
+            };
+        }
 
         // Convertimos la respuesta en un JSON
-        return context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        return context.Response.WriteAsync(JsonSerializer.Serialize(responseObj));
     }
 }

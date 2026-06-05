@@ -1,16 +1,21 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BookOpen } from 'lucide-react';
-import { enrollments } from '@/src/features/courses/data';
 import { FilterTabs } from '@/src/features/courses/mycourses/FilterTabs';
 import { EnrolledCard } from '@/src/features/courses/mycourses/EnrolledCard';
+import { useEnrollmentStore } from '@/src/shared/store/useEnrollmentStore';
 import styles from './page.module.css';
 
 type Filter = 'all' | 'in-progress' | 'completed';
 
 export default function MisCursosPage() {
   const [filter, setFilter] = useState<Filter>('all');
+  const { enrollments, loadMyEnrollments, isLoading } = useEnrollmentStore();
+
+  useEffect(() => {
+    loadMyEnrollments();
+  }, [loadMyEnrollments]);
 
   const filtered = enrollments.filter((e) => {
     if (filter === 'in-progress') return e.progress > 0 && e.progress < 100;
