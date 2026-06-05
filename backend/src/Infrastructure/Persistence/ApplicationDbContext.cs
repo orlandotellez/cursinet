@@ -26,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<LessonProgress> LessonProgress => Set<LessonProgress>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Certificate> Certificates => Set<Certificate>();
     public DbSet<Quiz> Quizzes => Set<Quiz>();
