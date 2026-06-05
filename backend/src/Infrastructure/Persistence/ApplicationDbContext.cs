@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<CourseTag> CourseTags => Set<CourseTag>();
     public DbSet<Module> Modules => Set<Module>();
+    public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<Lesson> Lessons => Set<Lesson>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<LessonProgress> LessonProgress => Set<LessonProgress>();
