@@ -543,6 +543,143 @@ namespace Cursinet.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Quizzes",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    lesson_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    passing_score = table.Column<int>(type: "integer", nullable: false, defaultValue: 70),
+                    max_attempts = table.Column<int>(type: "integer", nullable: true),
+                    time_limit_minutes = table.Column<int>(type: "integer", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quizzes", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Quizzes_Lessons_lesson_id",
+                        column: x => x.lesson_id,
+                        principalTable: "Lessons",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuizAttempts",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    quiz_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    score = table.Column<decimal>(type: "numeric(5,2)", nullable: true),
+                    is_passed = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    time_spent_seconds = table.Column<int>(type: "integer", nullable: true),
+                    started_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    completed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizAttempts", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_QuizAttempts_Quizzes_quiz_id",
+                        column: x => x.quiz_id,
+                        principalTable: "Quizzes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_QuizAttempts_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuizQuestions",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    quiz_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    text = table.Column<string>(type: "text", nullable: false),
+                    type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    explanation = table.Column<string>(type: "text", nullable: true),
+                    sort_order = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizQuestions", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_QuizQuestions_Quizzes_quiz_id",
+                        column: x => x.quiz_id,
+                        principalTable: "Quizzes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuizOptions",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    question_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    text = table.Column<string>(type: "text", nullable: false),
+                    is_correct = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    sort_order = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizOptions", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_QuizOptions_QuizQuestions_question_id",
+                        column: x => x.question_id,
+                        principalTable: "QuizQuestions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuizAttemptAnswers",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    attempt_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    question_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    selected_option_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    code_answer = table.Column<string>(type: "text", nullable: true),
+                    is_correct = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_QuizAttemptAnswers", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_QuizAttemptAnswers_QuizAttempts_attempt_id",
+                        column: x => x.attempt_id,
+                        principalTable: "QuizAttempts",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_QuizAttemptAnswers_QuizOptions_selected_option_id",
+                        column: x => x.selected_option_id,
+                        principalTable: "QuizOptions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_QuizAttemptAnswers_QuizQuestions_question_id",
+                        column: x => x.question_id,
+                        principalTable: "QuizQuestions",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Account_account_id",
                 table: "Account",
@@ -762,6 +899,46 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_QuizAttemptAnswers_attempt_id",
+                table: "QuizAttemptAnswers",
+                column: "attempt_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizAttemptAnswers_question_id",
+                table: "QuizAttemptAnswers",
+                column: "question_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizAttemptAnswers_selected_option_id",
+                table: "QuizAttemptAnswers",
+                column: "selected_option_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizAttempts_quiz_id",
+                table: "QuizAttempts",
+                column: "quiz_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizAttempts_user_id",
+                table: "QuizAttempts",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizOptions_question_id",
+                table: "QuizOptions",
+                column: "question_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuizQuestions_quiz_id",
+                table: "QuizQuestions",
+                column: "quiz_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Quizzes_lesson_id",
+                table: "Quizzes",
+                column: "lesson_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_course_id",
                 table: "Reviews",
                 column: "course_id");
@@ -870,6 +1047,9 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "PasswordResetLogs");
 
             migrationBuilder.DropTable(
+                name: "QuizAttemptAnswers");
+
+            migrationBuilder.DropTable(
                 name: "Reviews");
 
             migrationBuilder.DropTable(
@@ -886,6 +1066,18 @@ namespace Cursinet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "QuizAttempts");
+
+            migrationBuilder.DropTable(
+                name: "QuizOptions");
+
+            migrationBuilder.DropTable(
+                name: "QuizQuestions");
+
+            migrationBuilder.DropTable(
+                name: "Quizzes");
 
             migrationBuilder.DropTable(
                 name: "Lessons");
