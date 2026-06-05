@@ -18,6 +18,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserTwoFactor> UserTwoFactor => Set<UserTwoFactor>();
     public DbSet<LoginLogs> LoginLogs => Set<LoginLogs>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<Course> Courses => Set<Course>();
     public DbSet<CourseTag> CourseTags => Set<CourseTag>();
