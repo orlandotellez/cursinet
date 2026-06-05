@@ -11,6 +11,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<Verification> Verifications => Set<Verification>();
     public DbSet<PasswordResetLogs> PasswordResetLogs => Set<PasswordResetLogs>();
