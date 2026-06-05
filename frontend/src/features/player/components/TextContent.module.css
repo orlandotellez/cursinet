@@ -6,92 +6,103 @@
   margin-bottom: 20px;
 }
 
-.textContent {
+.emptyState {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.markdownBody {
   padding: 24px;
   max-width: 100%;
   overflow-x: auto;
-}
-
-.h1 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-top: 24px;
-  margin-bottom: 12px;
-}
-
-.h2 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-.h3 {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-top: 16px;
-  margin-bottom: 8px;
-}
-
-.p {
   font-size: 15px;
   line-height: 1.7;
   color: var(--text-secondary);
-  margin-bottom: 12px;
 }
 
-.p strong {
+.markdownBody h1,
+.markdownBody h2,
+.markdownBody h3,
+.markdownBody h4 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 700;
   color: var(--text-primary);
-  font-weight: 600;
 }
 
-.li {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-  padding-left: 20px;
-  list-style: disc;
+.markdownBody h1 {
+  font-size: 1.6em;
 }
 
-.li strong {
-  color: var(--text-primary);
-  font-weight: 600;
+.markdownBody h2 {
+  font-size: 1.35em;
 }
 
-.spacer {
-  height: 8px;
+.markdownBody h3 {
+  font-size: 1.15em;
 }
 
-.codeBlock {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+.markdownBody p {
+  margin-bottom: 1em;
+}
+
+.markdownBody ul,
+.markdownBody ol {
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.markdownBody li {
+  margin-bottom: 0.25em;
+}
+
+.markdownBody code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--accent);
+}
+
+.markdownBody pre {
+  margin: 1em 0;
+  padding: 16px;
   border-radius: var(--radius-card);
-  padding: 16px 20px;
-  margin: 16px 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
   overflow-x: auto;
-  position: relative;
 }
 
-.codeLang {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  letter-spacing: 0.05em;
+.markdownBody pre code {
+  background: none;
+  padding: 0;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.codeBlock code {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.7;
+.markdownBody blockquote {
+  margin: 1em 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-elevated);
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
   color: var(--text-secondary);
-  white-space: pre;
+}
+
+.markdownBody strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.markdownBody a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.markdownBody a:hover {
+  text-decoration: underline;
 }

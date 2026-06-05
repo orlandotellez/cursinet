@@ -4,12 +4,21 @@ import { VideoPlayer } from '@/src/shared/components/VideoPlayer';
 import styles from './VideoContent.module.css';
 
 interface VideoContentProps {
-  videoUrl?: string;
+  videoUrl?: string | null;
   title?: string;
+  emptyMessage?: string;
 }
 
-export function VideoContent({ videoUrl, title }: VideoContentProps) {
-  if (!videoUrl || videoUrl === '#') return null;
+export function VideoContent({ videoUrl, title, emptyMessage }: VideoContentProps) {
+  if (!videoUrl || videoUrl === '#') {
+    return (
+      <section className={styles.wrapper}>
+        <div className={styles.emptyState}>
+          {emptyMessage ?? 'No hay URL de video configurada.'}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.wrapper}>
