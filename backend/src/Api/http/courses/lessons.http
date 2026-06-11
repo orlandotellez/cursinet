@@ -1,0 +1,134 @@
+### ─── 📝 LESSONS: CRUD + Reorder + Progress ──────────────────────
+### Las lecciones pertenecen a un módulo.
+### Los endpoints de progress son para estudiantes.
+### Tipos de lección: Video, Text, Code, Quiz, Resource
+###
+### FLUJO SUGERIDO (Admin/Instructor):
+###   1. Login
+###   2. CREATE lesson (dentro de un módulo existente)
+###   3. GET lessons → listar
+###   4. UPDATE lesson
+###   5. REORDER lessons
+###
+### FLUJO SUGERIDO (Student):
+###   1. Login como Student
+###   2. GET lesson/{id}/progress → ver progreso
+###   3. PUT lesson/{id}/progress → marcar progreso
+### ────────────────────────────────────────────────────────────────────────
+
+@moduleId = 00000000-0000-0000-0000-000000000000
+@lessonId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. GET ALL (requiere permiso LessonRead) ─────────────────────
+
+### Listar lecciones de un módulo
+GET {{Api_HostAddress}}/modules/{{moduleId}}/lessons
+Accept: application/json
+
+
+### ─── 2. GET BY ID (requiere permiso LessonRead) ───────────────────
+
+### Detalle completo de una lección
+GET {{Api_HostAddress}}/modules/{{moduleId}}/lessons/{{lessonId}}
+Accept: application/json
+
+
+### ─── 3. CREATE — Video (requiere permiso LessonCreate) ─────────────
+
+### Crear lección tipo Video
+POST {{Api_HostAddress}}/modules/{{moduleId}}/lessons
+Content-Type: application/json
+
+{
+  "title": "Variables y Tipos de Datos",
+  "type": "Video",
+  "videoUrl": "https://www.youtube.com/watch?v=ejemplo",
+  "videoDurationSeconds": 720,
+  "contentMarkdown": "# Variables\n\nEn JavaScript, las variables se declaran con `let`, `const` o `var`.\n\n```javascript\nlet nombre = \"Juan\";\nconst PI = 3.1416;\n```",
+  "isPreview": true
+}
+
+
+### ─── 4. CREATE — Text (requiere permiso LessonCreate) ──────────────
+
+### Crear lección tipo Text (solo contenido escrito)
+POST {{Api_HostAddress}}/modules/{{moduleId}}/lessons
+Content-Type: application/json
+
+{
+  "title": "Guía de Referencia Rápida",
+  "type": "Text",
+  "contentMarkdown": "# Referencia Rápida\n\n## Tipos de Datos\n- string\n- number\n- boolean\n- null\n- undefined\n- object\n- symbol",
+  "isPreview": false
+}
+
+
+### ─── 5. CREATE — Quiz (requiere permiso LessonCreate) ─────────────
+
+### Crear lección tipo Quiz (evaluación corta)
+POST {{Api_HostAddress}}/modules/{{moduleId}}/lessons
+Content-Type: application/json
+
+{
+  "title": "Ejercicio: Variables",
+  "type": "Quiz",
+  "isPreview": false
+}
+
+
+### ─── 6. UPDATE (requiere permiso LessonUpdate) ─────────────────────
+
+### Actualizar título y contenido de una lección
+PUT {{Api_HostAddress}}/modules/{{moduleId}}/lessons/{{lessonId}}
+Content-Type: application/json
+
+{
+  "title": "Variables y Tipos de Datos - Actualizado",
+  "contentMarkdown": "# Variables\n\nContenido actualizado con ejemplos adicionales.",
+  "isPreview": false
+}
+
+
+### ─── 7. DELETE (requiere permiso LessonDelete) ─────────────────────
+
+### Eliminar una lección
+DELETE {{Api_HostAddress}}/modules/{{moduleId}}/lessons/{{lessonId}}
+Content-Type: application/json
+
+{}
+
+
+### ─── 8. REORDER (requiere permiso LessonUpdate) ────────────────────
+
+### Reordenar lecciones dentro de un módulo
+PUT {{Api_HostAddress}}/modules/{{moduleId}}/lessons/reorder
+Content-Type: application/json
+
+{
+  "items": [
+    { "id": "{{lessonId}}", "sortOrder": 2 },
+    { "id": "00000000-0000-0000-0000-000000000001", "sortOrder": 1 },
+    { "id": "00000000-0000-0000-0000-000000000002", "sortOrder": 3 }
+  ]
+}
+
+
+### ─── 9. GET PROGRESS (requiere permiso LessonRead) ─────────────────
+
+### Ver progreso del estudiante en una lección específica
+GET {{Api_HostAddress}}/modules/{{moduleId}}/lessons/{{lessonId}}/progress
+Accept: application/json
+
+
+### ─── 10. UPSERT PROGRESS (requiere permiso LessonRead) ──────────────
+
+### Actualizar progreso del estudiante en una lección
+PUT {{Api_HostAddress}}/modules/{{moduleId}}/lessons/{{lessonId}}/progress
+Content-Type: application/json
+
+{
+  "watchedSeconds": 300,
+  "lastPositionSeconds": 300,
+  "isCompleted": false
+}

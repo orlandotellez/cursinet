@@ -1,0 +1,86 @@
+### ─── 📦 MODULES: CRUD + Reorder + Curriculum ─────────────────────
+### Los módulos pertenecen a un curso.
+### GET /courses/{courseId}/modules/curriculum es público.
+### El resto requiere autenticación con permisos específicos.
+###
+### FLUJO SUGERIDO:
+###   1. Login como Admin o Instructor
+###   2. GET /courses/{courseId}/modules → listar módulos existentes
+###   3. CREATE module → copiar id del response
+###   4. CREATE lesson dentro del módulo (desde lessons.http)
+###   5. UPDATE / DELETE según sea necesario
+### ────────────────────────────────────────────────────────────────────────
+
+@courseId = 00000000-0000-0000-0000-000000000000
+@moduleId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. GET ALL (requiere permiso ModuleRead) ─────────────────────
+
+### Listar todos los módulos de un curso
+GET {{Api_HostAddress}}/courses/{{courseId}}/modules
+Accept: application/json
+
+
+### ─── 2. GET BY ID (requiere permiso ModuleRead) ───────────────────
+
+### Detalle de un módulo específico (incluye lecciones si las hay)
+GET {{Api_HostAddress}}/courses/{{courseId}}/modules/{{moduleId}}
+Accept: application/json
+
+
+### ─── 3. GET CURRICULUM (público, no requiere auth) ────────────────
+
+### Curriculum completo del curso: módulos + lecciones ordenadas
+### Útil para mostrar el temario en la página pública del curso.
+GET {{Api_HostAddress}}/courses/{{courseId}}/modules/curriculum
+Accept: application/json
+
+
+### ─── 4. CREATE (requiere permiso ModuleCreate) ─────────────────────
+
+### Crear un nuevo módulo en el curso
+POST {{Api_HostAddress}}/courses/{{courseId}}/modules
+Content-Type: application/json
+
+{
+  "title": "Introducción a JavaScript",
+  "description": "Conceptos básicos: variables, tipos de datos, operadores"
+}
+
+
+### ─── 5. UPDATE (requiere permiso ModuleUpdate) ─────────────────────
+
+### Actualizar título, descripción o estado de publicación
+PUT {{Api_HostAddress}}/courses/{{courseId}}/modules/{{moduleId}}
+Content-Type: application/json
+
+{
+  "title": "Introducción a JavaScript - Actualizado",
+  "description": "Versión extendida con ejercicios prácticos",
+  "isPublished": true
+}
+
+
+### ─── 6. DELETE (requiere permiso ModuleDelete) ─────────────────────
+
+### Eliminar un módulo (y sus lecciones en cascada)
+DELETE {{Api_HostAddress}}/courses/{{courseId}}/modules/{{moduleId}}
+Content-Type: application/json
+
+{}
+
+
+### ─── 7. REORDER (requiere permiso ModuleUpdate) ────────────────────
+
+### Reordenar módulos — enviar array con { id, sortOrder }
+PUT {{Api_HostAddress}}/courses/{{courseId}}/modules/reorder
+Content-Type: application/json
+
+{
+  "items": [
+    { "id": "{{moduleId}}", "sortOrder": 2 },
+    { "id": "00000000-0000-0000-0000-000000000001", "sortOrder": 1 },
+    { "id": "00000000-0000-0000-0000-000000000002", "sortOrder": 3 }
+  ]
+}

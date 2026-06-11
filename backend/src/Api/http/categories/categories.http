@@ -1,0 +1,13 @@
+### ─── 🏷️ CATEGORIES: Categorías de cursos ─────────────────────────
+### Actualmente solo GET público (lista todas las categorías).
+### Útil para obtener categoryId y usarlo en cursos.http.
+###
+### USO:
+###   1. GET /categories → copiar un categoryId
+###   2. Pegar ese ID en @categoryId en cursos.http
+###   3. CREATE / UPDATE / DELETE cursos usando ese ID
+### ────────────────────────────────────────────────────────────────────────
+
+### Listar todas las categorías disponibles
+GET {{Api_HostAddress}}/categories
+Accept: application/json

@@ -1,82 +1,72 @@
-### ─── 🟠 RBAC: FLUJO MODERATOR ──────────────────────────────────────
-### Permisos:
-###   ✅ courses:read, users:read/update, categories:read, admin:panel
-###   ❌ courses:create/update/delete/publish, users:delete,
-###      categories:create/update/delete, system:config
+### ─── 🟠 RBAC: FLUJO COMPLETO MODERATOR ──────────────────────────────
+### Permisos esperados:
+###   ✅ courses:read
+###   ✅ users:read, users:update
+###   ✅ categories:read
+###   ✅ admin:panel
+###   ❌ courses:create, courses:update, courses:delete, courses:publish
+###   ❌ users:delete
+###   ❌ categories:create, categories:update, categories:delete
+###   ❌ system:config
 ###
 ### Usuario del seed: moderator@cursinet.com / password123
+###
+### FLUJO:
+###   1. Login
+###   2. Testear permisos → verificar 200 vs 403
+###   3. Logout
 ### ─────────────────────────────────────────────────────────────────────
 
-@Api_HostAddress = {{Api_HostAddress}}
+@courseId = 00000000-0000-0000-0000-000000000000
 
 
-### 1. Login (el usuario ya existe por el seed)
+### 1. Login
 POST {{Api_HostAddress}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "moderator@cursinet.com",
-  "password": "password123"
+  "email": "{{ModeratorEmail}}",
+  "password": "{{DefaultPassword}}"
 }
 
 
 ### ─── Courses ─── read ✅ 200 | create/update/delete/publish ❌ 403
 
 GET {{Api_HostAddress}}/test/courses/read
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/create
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/update
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/delete
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/publish
 
 
 ### ─── Users ─── read/update ✅ 200 | delete ❌ 403 ──────────────────
 
 GET {{Api_HostAddress}}/test/users/read
-
 ###
-
 GET {{Api_HostAddress}}/test/users/update
-
 ###
-
 GET {{Api_HostAddress}}/test/users/delete
 
 
 ### ─── Categories ─── read ✅ 200 | create/update/delete ❌ 403 ──────
 
 GET {{Api_HostAddress}}/test/categories/read
-
 ###
-
 GET {{Api_HostAddress}}/test/categories/create
-
 ###
-
 GET {{Api_HostAddress}}/test/categories/update
-
 ###
-
 GET {{Api_HostAddress}}/test/categories/delete
 
 
 ### ─── Admin ─── panel ✅ 200 | config ❌ 403 ─────────────────────────
 
 GET {{Api_HostAddress}}/test/admin/panel
-
 ###
-
 GET {{Api_HostAddress}}/test/system/config
 
 

@@ -1,81 +1,66 @@
-### ─── 🔵 RBAC: FLUJO STUDENT ─────────────────────────────────────────
-### Permisos:
+### ─── 🔵 RBAC: FLUJO COMPLETO STUDENT ────────────────────────────────
+### Permisos esperados:
 ###   ✅ courses:read
 ###   ❌ TODO lo demás
 ###
 ### Usuario del seed: student@cursinet.com / password123
+###
+### FLUJO:
+###   1. Login
+###   2. Testear permisos → solo read debería ser 200
+###   3. Logout
 ### ─────────────────────────────────────────────────────────────────────
 
-@Api_HostAddress = {{Api_HostAddress}}
+@courseId = 00000000-0000-0000-0000-000000000000
 
 
-### 1. Login (el usuario ya existe por el seed)
+### 1. Login
 POST {{Api_HostAddress}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "student@cursinet.com",
-  "password": "password123"
+  "email": "{{StudentEmail}}",
+  "password": "{{DefaultPassword}}"
 }
 
 
 ### ─── Courses ─── read ✅ 200 | create/update/delete/publish ❌ 403
 
 GET {{Api_HostAddress}}/test/courses/read
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/create
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/update
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/delete
-
 ###
-
 GET {{Api_HostAddress}}/test/courses/publish
 
 
-### ─── Users ─── TODO ❌ 403 ───────────────────────────────────────────
+### ─── Users ─── TODO ❌ 403 ──────────────────────────────────────────
 
 GET {{Api_HostAddress}}/test/users/read
-
 ###
-
 GET {{Api_HostAddress}}/test/users/update
-
 ###
-
 GET {{Api_HostAddress}}/test/users/delete
 
 
-### ─── Categories ─── TODO ❌ 403 ──────────────────────────────────────
+### ─── Categories ─── TODO ❌ 403 ─────────────────────────────────────
 
 GET {{Api_HostAddress}}/test/categories/create
-
 ###
-
 GET {{Api_HostAddress}}/test/categories/read
-
 ###
-
 GET {{Api_HostAddress}}/test/categories/update
-
 ###
-
 GET {{Api_HostAddress}}/test/categories/delete
 
 
-### ─── Admin ─── TODO ❌ 403 ───────────────────────────────────────────
+### ─── Admin ─── TODO ❌ 403 ──────────────────────────────────────────
 
 GET {{Api_HostAddress}}/test/admin/panel
-
 ###
-
 GET {{Api_HostAddress}}/test/system/config
 
 

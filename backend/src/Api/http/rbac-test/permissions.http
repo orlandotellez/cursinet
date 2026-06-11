@@ -1,0 +1,75 @@
+### ─── 🧪 PERMISSIONS: Test de verificación RBAC ─────────────────────
+### Endpoints del TestController para validar que los permisos
+### funcionan correctamente para cada rol.
+###
+### Usar después de hacer login con el rol correspondiente.
+### Cada endpoint responde 200 si el permiso está concedido, 403 si no.
+### ────────────────────────────────────────────────────────────────────────
+
+
+### ─── Courses ──────────────────────────────────────────────────────
+
+### Permiso: courses:create
+GET {{Api_HostAddress}}/test/courses/create
+Accept: application/json
+
+### Permiso: courses:read
+GET {{Api_HostAddress}}/test/courses/read
+Accept: application/json
+
+### Permiso: courses:update
+GET {{Api_HostAddress}}/test/courses/update
+Accept: application/json
+
+### Permiso: courses:delete
+GET {{Api_HostAddress}}/test/courses/delete
+Accept: application/json
+
+### Permiso: courses:publish
+GET {{Api_HostAddress}}/test/courses/publish
+Accept: application/json
+
+
+### ─── Users ────────────────────────────────────────────────────────
+
+### Permiso: users:read
+GET {{Api_HostAddress}}/test/users/read
+Accept: application/json
+
+### Permiso: users:update
+GET {{Api_HostAddress}}/test/users/update
+Accept: application/json
+
+### Permiso: users:delete
+GET {{Api_HostAddress}}/test/users/delete
+Accept: application/json
+
+
+### ─── Categories ───────────────────────────────────────────────────
+
+### Permiso: categories:create
+GET {{Api_HostAddress}}/test/categories/create
+Accept: application/json
+
+### Permiso: categories:read
+GET {{Api_HostAddress}}/test/categories/read
+Accept: application/json
+
+### Permiso: categories:update
+GET {{Api_HostAddress}}/test/categories/update
+Accept: application/json
+
+### Permiso: categories:delete
+GET {{Api_HostAddress}}/test/categories/delete
+Accept: application/json
+
+
+### ─── Admin ────────────────────────────────────────────────────────
+
+### Permiso: admin:panel
+GET {{Api_HostAddress}}/test/admin/panel
+Accept: application/json
+
+### Permiso: system:config
+GET {{Api_HostAddress}}/test/system/config
+Accept: application/json
