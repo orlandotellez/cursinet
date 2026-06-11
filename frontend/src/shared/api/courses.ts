@@ -1,5 +1,7 @@
 import { API_URL } from "../lib/constants";
 import { authedFetch } from "../lib/api";
+import { validateOrThrow } from "../lib/validation";
+import { createCourseSchema, updateCourseSchema } from "../validations";
 
 // ─── Types aligned with backend ───────────────────────────────────────────
 
@@ -114,6 +116,7 @@ export async function getCourseBySlug(slug: string): Promise<CourseDTO> {
 }
 
 export async function createCourse(payload: CreateCoursePayload): Promise<CourseDTO> {
+  validateOrThrow(createCourseSchema, payload);
   const res = await authedFetch(`${API_URL}/courses`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -124,6 +127,7 @@ export async function createCourse(payload: CreateCoursePayload): Promise<Course
 }
 
 export async function updateCourse(id: string, payload: UpdateCoursePayload): Promise<CourseDTO> {
+  validateOrThrow(updateCourseSchema, payload);
   const res = await authedFetch(`${API_URL}/courses/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

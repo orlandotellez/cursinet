@@ -1,4 +1,6 @@
 import { API_URL } from "../lib/constants";
+import { validateOrThrow } from "../lib/validation";
+import { createModuleSchema, updateModuleSchema, reorderModulesSchema } from "../validations";
 
 // ─── Types aligned with backend ─────────────────────────────────────────────
 
@@ -64,6 +66,7 @@ export async function getModule(courseId: string, moduleId: string): Promise<Mod
 }
 
 export async function createModule(courseId: string, payload: CreateModulePayload): Promise<ModuleResponse> {
+  validateOrThrow(createModuleSchema, payload);
   const res = await fetch(`${API_URL}/courses/${courseId}/modules`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -74,6 +77,7 @@ export async function createModule(courseId: string, payload: CreateModulePayloa
 }
 
 export async function updateModule(courseId: string, moduleId: string, payload: UpdateModulePayload): Promise<ModuleResponse> {
+  validateOrThrow(updateModuleSchema, payload);
   const res = await fetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -95,6 +99,7 @@ export async function deleteModule(courseId: string, moduleId: string): Promise<
 }
 
 export async function reorderModules(courseId: string, payload: ReorderPayload): Promise<void> {
+  validateOrThrow(reorderModulesSchema, payload);
   const res = await fetch(`${API_URL}/courses/${courseId}/modules/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

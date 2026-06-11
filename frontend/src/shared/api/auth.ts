@@ -1,7 +1,10 @@
 import { API_URL } from "../lib/constants";
+import { validateOrThrow } from "../lib/validation";
+import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from "../validations";
 import { AuthResponse, LoginPayload, RegisterPayload } from "../types";
 
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
+  validateOrThrow(loginSchema, payload);
   const res = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -18,6 +21,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
+  validateOrThrow(registerSchema, { ...payload, confirmPassword: payload.password });
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -65,6 +69,7 @@ export async function logout(): Promise<void> {
 }
 
 export async function verifyEmail(identifier: string, code: string): Promise<{ message: string }> {
+  validateOrThrow(verifyEmailSchema, { identifier, code });
   const res = await fetch(`${API_URL}/auth/verify-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -81,6 +86,7 @@ export async function verifyEmail(identifier: string, code: string): Promise<{ m
 }
 
 export async function resendVerification(email: string): Promise<{ message: string }> {
+  validateOrThrow(forgotPasswordSchema, { email });
   const res = await fetch(`${API_URL}/auth/resend-verification`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -97,6 +103,7 @@ export async function resendVerification(email: string): Promise<{ message: stri
 }
 
 export async function forgotPassword(email: string): Promise<{ message: string; expiresAt: string }> {
+  validateOrThrow(forgotPasswordSchema, { email });
   const res = await fetch(`${API_URL}/auth/forgot-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -113,6 +120,7 @@ export async function forgotPassword(email: string): Promise<{ message: string; 
 }
 
 export async function resetPassword(email: string, code: string, newPassword: string): Promise<{ message: string }> {
+  validateOrThrow(resetPasswordSchema, { email, code, newPassword, confirmPassword: newPassword });
   const res = await fetch(`${API_URL}/auth/reset-password`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

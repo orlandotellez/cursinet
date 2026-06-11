@@ -1,4 +1,6 @@
 import { API_URL } from "../lib/constants";
+import { validateOrThrow } from "../lib/validation";
+import { createLessonSchema, updateLessonSchema, reorderLessonsSchema, upsertProgressSchema } from "../validations";
 
 // ─── Types aligned with backend ─────────────────────────────────────────────
 
@@ -85,6 +87,7 @@ export async function createLesson(
   moduleId: string,
   payload: CreateLessonPayload,
 ): Promise<LessonResponse> {
+  validateOrThrow(createLessonSchema, payload);
   const res = await fetch(`${API_URL}/modules/${moduleId}/lessons`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -99,6 +102,7 @@ export async function updateLesson(
   lessonId: string,
   payload: UpdateLessonPayload,
 ): Promise<LessonResponse> {
+  validateOrThrow(updateLessonSchema, payload);
   const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -126,6 +130,7 @@ export async function reorderLessons(
   moduleId: string,
   payload: ReorderPayload,
 ): Promise<void> {
+  validateOrThrow(reorderLessonsSchema, payload);
   const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -157,6 +162,7 @@ export async function upsertProgress(
   lessonId: string,
   payload: UpsertProgressPayload,
 ): Promise<LessonProgressResponse> {
+  validateOrThrow(upsertProgressSchema, payload);
   const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}/progress`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
