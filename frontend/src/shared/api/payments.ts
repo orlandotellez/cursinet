@@ -5,8 +5,11 @@ import type {
   ConfirmPaymentRequest,
   PaymentResponse,
 } from '../types/payment.types';
+import { validateOrThrow } from '../lib/validation';
+import { createPaymentSchema, confirmPaymentSchema } from '../validations';
 
 export async function createPayment(data: CreatePaymentRequest): Promise<CreatePaymentResponse> {
+  validateOrThrow(createPaymentSchema, data);
   const res = await fetch(`${API_URL}/payments/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -23,6 +26,7 @@ export async function createPayment(data: CreatePaymentRequest): Promise<CreateP
 }
 
 export async function confirmPayment(data: ConfirmPaymentRequest): Promise<PaymentResponse> {
+  validateOrThrow(confirmPaymentSchema, data);
   const res = await fetch(`${API_URL}/payments/confirm`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

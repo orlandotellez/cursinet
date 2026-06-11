@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { redirectByRole } from '@/src/shared/lib/authUtils';
+import { validateShape } from '@/src/shared/lib/validation';
+import { registerSchema } from '@/src/shared/validations';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 
@@ -46,15 +48,9 @@ export default function RegistrarsePage() {
   }
 
   function validate() {
-    const next: typeof errors = {};
-    if (!form.name.trim()) next.name = 'El nombre es obligatorio';
-    if (!form.email.trim()) next.email = 'El correo es obligatorio';
-    if (form.password.length < 8)
-      next.password = 'Debe tener al menos 8 caracteres';
-    if (form.password !== form.confirmPassword)
-      next.confirmPassword = 'Las contraseñas no coinciden';
-    setErrors(next);
-    return Object.keys(next).length === 0;
+    const result = validateShape(registerSchema, form);
+    setErrors(result.fieldErrors);
+    return result.success;
   }
 
   async function handleSubmit(e: React.FormEvent) {

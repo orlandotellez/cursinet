@@ -1,5 +1,7 @@
 import { API_URL } from "../lib/constants";
 import { authedFetch } from "../lib/api";
+import { validateOrThrow } from "../lib/validation";
+import { createPaymentSchema } from "../validations";
 
 export interface EnrollmentResponse {
   id: string;
@@ -22,6 +24,7 @@ export interface EnrollmentStatusResponse {
 }
 
 export async function enrollFree(courseId: string): Promise<EnrollmentResponse> {
+  validateOrThrow(createPaymentSchema, { courseId });
   const res = await authedFetch(`${API_URL}/enrollments`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -5,6 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
+import { validateShape } from '@/src/shared/lib/validation';
+import { verifyEmailSchema, resendVerificationSchema } from '@/src/shared/validations';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -37,8 +39,11 @@ function VerificarEmailForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim() || !code.trim()) {
-      setError('Completá todos los campos');
+
+    const validation = validateShape(verifyEmailSchema, { identifier: email, code });
+    if (!validation.success) {
+      const firstError = Object.values(validation.fieldErrors)[0] ?? 'Completá todos los campos';
+      setError(firstError);
       return;
     }
 
@@ -56,8 +61,9 @@ function VerificarEmailForm() {
   }
 
   async function handleResend() {
-    if (!email.trim()) {
-      setError('Ingresá tu correo primero');
+    const validation = validateShape(resendVerificationSchema, { email });
+    if (!validation.success) {
+      setError(validation.fieldErrors.email ?? 'Ingresá tu correo primero');
       return;
     }
 

@@ -1,5 +1,7 @@
 import { API_URL } from "../lib/constants";
 import type { Review } from "../types";
+import { validateOrThrow } from "../lib/validation";
+import { reviewPayloadSchema } from "../validations";
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -20,6 +22,7 @@ export async function createReview(
   courseId: string,
   payload: { rating: number; comment?: string },
 ): Promise<Review> {
+  validateOrThrow(reviewPayloadSchema, payload);
   const res = await fetch(`${API_URL}/courses/${courseId}/reviews`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -34,6 +37,7 @@ export async function updateReview(
   reviewId: string,
   payload: { rating: number; comment?: string },
 ): Promise<Review> {
+  validateOrThrow(reviewPayloadSchema, payload);
   const res = await fetch(`${API_URL}/courses/${courseId}/reviews/${reviewId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

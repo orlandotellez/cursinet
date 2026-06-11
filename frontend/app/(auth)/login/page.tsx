@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { redirectByRole } from '@/src/shared/lib/authUtils';
+import { validateShape } from '@/src/shared/lib/validation';
+import { loginSchema } from '@/src/shared/validations';
 import { UserRole } from '@/src/shared/types';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
@@ -53,11 +55,9 @@ export default function IniciarSesionPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   function validate() {
-    const next: typeof errors = {};
-    if (!email.trim()) next.email = 'El correo es obligatorio';
-    if (!password) next.password = 'La contraseña es obligatoria';
-    setErrors(next);
-    return Object.keys(next).length === 0;
+    const result = validateShape(loginSchema, { email, password });
+    setErrors(result.fieldErrors);
+    return result.success;
   }
 
   async function handleSubmit(e: React.FormEvent) {
