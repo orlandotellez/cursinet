@@ -1,0 +1,39 @@
+### ─── 📋 ENROLLMENTS: Inscripción a cursos ────────────────────────
+### Maneja la inscripción de estudiantes a cursos.
+### GET /enrollments/mine → cursos del usuario autenticado.
+### POST /enrollments → inscribirse a un curso.
+### GET /enrollments/{courseId}/status → verificar estado de inscripción.
+###
+### FLUJO SUGERIDO:
+###   1. Login como Student
+###   2. POST /enrollments → inscribirse a un curso
+###   3. GET /enrollments/mine → listar mis cursos
+###   4. GET /enrollments/{courseId}/status → ver progreso
+### ────────────────────────────────────────────────────────────────────────
+
+@courseId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. CREATE (requiere permiso EnrollmentCreate) ────────────────
+
+### Inscribirse a un curso
+POST {{Api_HostAddress}}/enrollments
+Content-Type: application/json
+
+{
+  "courseId": "{{courseId}}"
+}
+
+
+### ─── 2. GET MINE (requiere permiso EnrollmentRead) ─────────────────
+
+### Listar cursos del usuario autenticado (con progreso)
+GET {{Api_HostAddress}}/enrollments/mine
+Accept: application/json
+
+
+### ─── 3. GET STATUS (requiere permiso EnrollmentRead) ──────────────
+
+### Verificar estado de inscripción en un curso específico
+GET {{Api_HostAddress}}/enrollments/{{courseId}}/status
+Accept: application/json

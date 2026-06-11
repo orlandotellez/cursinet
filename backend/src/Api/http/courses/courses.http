@@ -1,0 +1,148 @@
+### ─── 📚 COURSES: CRUD + Publish + Filtros ──────────────────────────
+### Requiere login previo para crear/actualizar/eliminar/publicar.
+### GET endpoints son públicos (AllowAnonymous).
+###
+### FLUJO SUGERIDO:
+###   1. Login como Admin (desde auth/auth.http)
+###   2. GET /categories → copiar categoryId real
+###   3. CREATE course → copiar id del response
+###   4. GET /courses/{id} → ver detalle
+###   5. UPDATE course
+###   6. PUBLISH course
+###   7. DELETE course
+### ────────────────────────────────────────────────────────────────────────
+
+@categoryId = 00000000-0000-0000-0000-000000000000
+@courseId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. GET ALL (con filtros opcionales) ──────────────────────────
+
+### Sin filtros — lista paginada de cursos
+GET {{Api_HostAddress}}/courses
+Accept: application/json
+
+
+### Filtrar por nivel
+GET {{Api_HostAddress}}/courses?level=Begginer
+Accept: application/json
+
+
+### Filtrar por nivel Intermedio
+GET {{Api_HostAddress}}/courses?level=Intermediate
+Accept: application/json
+
+
+### Filtrar por categoría (reemplazar categoryId con GUID real)
+GET {{Api_HostAddress}}/courses?categoryId={{categoryId}}
+Accept: application/json
+
+
+### Solo cursos publicados
+GET {{Api_HostAddress}}/courses?isPublished=true
+Accept: application/json
+
+
+### Solo cursos destacados
+GET {{Api_HostAddress}}/courses?isFeatured=true
+Accept: application/json
+
+
+### Búsqueda por texto en título
+GET {{Api_HostAddress}}/courses?search=javascript
+Accept: application/json
+
+
+### Combinación de filtros
+GET {{Api_HostAddress}}/courses?level=Advanced&isPublished=true&search=react
+Accept: application/json
+
+
+### ─── 2. GET BY ID ─────────────────────────────────────────────────
+
+### Reemplazar courseId con GUID real
+GET {{Api_HostAddress}}/courses/{{courseId}}
+Accept: application/json
+
+
+### ─── 3. GET BY SLUG ───────────────────────────────────────────────
+
+GET {{Api_HostAddress}}/courses/by-slug/fundamentos-de-programacion-en-javascript
+Accept: application/json
+
+
+### ─── 4. CREATE (requiere permiso CourseCreate) ────────────────────
+
+### Crear un curso — reemplazar categoryId con GUID real de la BD
+POST {{Api_HostAddress}}/courses
+Content-Type: application/json
+
+{
+  "title": "Fundamentos de Programación en JavaScript",
+  "categoryId": "{{categoryId}}",
+  "level": "Begginer",
+  "shortDescription": "Aprendé JavaScript desde cero, sin conocimientos previos.",
+  "description": "Curso completo de JavaScript que cubre variables, funciones, objetos, arrays, closures, prototipos, async/await, y proyectos prácticos.",
+  "language": "es",
+  "durationMinutes": 480,
+  "price": 29.99,
+  "originalPrice": 49.99,
+  "isFree": false,
+  "requirements": [
+    "Ganas de aprender",
+    "Una computadora con navegador web"
+  ],
+  "learningObjectives": [
+    "Entender los fundamentos de JavaScript",
+    "Escribir funciones y manejar eventos",
+    "Trabajar con el DOM",
+    "Consumir APIs REST"
+  ]
+}
+
+
+### ─── 5. UPDATE (requiere permiso CourseUpdate) ────────────────────
+
+### Reemplazar courseId con GUID real
+PUT {{Api_HostAddress}}/courses/{{courseId}}
+Content-Type: application/json
+
+{
+  "title": "Fundamentos de Programación en JavaScript - Edición 2025",
+  "shortDescription": "Versión actualizada con contenido nuevo.",
+  "durationMinutes": 540,
+  "price": 34.99,
+  "learningObjectives": [
+    "Entender los fundamentos de JavaScript",
+    "Escribir funciones y manejar eventos",
+    "Trabajar con el DOM",
+    "Consumir APIs REST",
+    "Usar módulos ES6"
+  ]
+}
+
+
+### ─── 6. PUBLISH (requiere permiso CoursePublish) ─────────────────
+
+### Publicar un curso (cambia estado a publicado, visible para todos)
+POST {{Api_HostAddress}}/courses/{{courseId}}/publish
+Content-Type: application/json
+
+{}
+
+
+### ─── 7. DELETE (soft-delete, requiere permiso CourseDelete) ───────
+
+### Eliminar un curso
+DELETE {{Api_HostAddress}}/courses/{{courseId}}
+Content-Type: application/json
+
+{}
+
+
+### ─── LOGOUT (al finalizar) ─────────────────────────────────────────
+
+POST {{Api_HostAddress}}/auth/logout
+Content-Type: application/json
+
+{}

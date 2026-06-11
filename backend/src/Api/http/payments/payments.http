@@ -1,0 +1,52 @@
+### ─── 💳 PAYMENTS: Pagos y transacciones ──────────────────────────
+### Integración con Stripe (opcional, según configuración).
+### CreatePayment → inicia el flujo de pago, devuelve clientSecret.
+### ConfirmPayment → confirma el pago después de Stripe checkout.
+###
+### FLUJO SUGERIDO:
+###   1. Login como Student
+###   2. POST /payments/create → iniciar pago (copiar paymentId)
+###   3. POST /payments/confirm → confirmar pago
+###   4. GET /payments/mine → listar mis pagos
+###   5. GET /payments/{id} → detalle del pago
+### ────────────────────────────────────────────────────────────────────────
+
+@courseId = 00000000-0000-0000-0000-000000000000
+@paymentId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. CREATE PAYMENT (requiere permiso PaymentCreate) ──────────
+
+### Iniciar flujo de pago para un curso
+POST {{Api_HostAddress}}/payments/create
+Content-Type: application/json
+
+{
+  "courseId": "{{courseId}}"
+}
+
+
+### ─── 2. CONFIRM PAYMENT (requiere permiso PaymentCreate) ─────────
+
+### Confirmar pago (después de Stripe checkout)
+POST {{Api_HostAddress}}/payments/confirm
+Content-Type: application/json
+
+{
+  "paymentId": "{{paymentId}}",
+  "stripePaymentIntentId": "pi_1234567890abcdef"
+}
+
+
+### ─── 3. GET MINE (requiere permiso PaymentRead) ──────────────────
+
+### Listar historial de pagos del usuario autenticado
+GET {{Api_HostAddress}}/payments/mine
+Accept: application/json
+
+
+### ─── 4. GET BY ID (requiere permiso PaymentRead) ─────────────────
+
+### Detalle de un pago específico
+GET {{Api_HostAddress}}/payments/{{paymentId}}
+Accept: application/json

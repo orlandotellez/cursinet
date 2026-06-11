@@ -1,0 +1,36 @@
+### ─── 📜 CERTIFICATES: Certificados de finalización ──────────────
+### Requiere autenticación (Authorize class-level).
+### POST /certificates/{courseId} → genera certificado al completar curso.
+### GET /certificates → lista certificados del usuario.
+###
+### FLUJO SUGERIDO:
+###   1. Login como Student (con curso completado)
+###   2. POST /certificates/{courseId} → generar certificado
+###   3. GET /certificates → listar certificados
+### ────────────────────────────────────────────────────────────────────────
+
+@courseId = 00000000-0000-0000-0000-000000000000
+@certificateId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. GET ALL ───────────────────────────────────────────────────
+
+### Listar certificados del usuario autenticado
+GET {{Api_HostAddress}}/certificates
+Accept: application/json
+
+
+### ─── 2. GENERATE ──────────────────────────────────────────────────
+
+### Generar certificado al completar un curso
+POST {{Api_HostAddress}}/certificates/{{courseId}}
+Content-Type: application/json
+
+{}
+
+
+### ─── 3. GET BY ID (si existe endpoint) ─────────────────────────--
+
+### Ver detalle de un certificado específico
+# GET {{Api_HostAddress}}/certificates/{{certificateId}}
+# Accept: application/json

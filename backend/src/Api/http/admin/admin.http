@@ -1,0 +1,96 @@
+### ─── 🛠️ ADMIN: Gestión de usuarios, roles y auditoría ─────────────
+### TODOS los endpoints requieren ser Admin.
+### Incluye dashboard, gestión de usuarios, auditoría y pagos.
+###
+### FLUJO SUGERIDO:
+###   1. Login como Admin (desde auth/auth.http)
+###   2. GET /admin/dashboard → estadísticas generales
+###   3. GET /admin/users → listar usuarios (paginado + filtros)
+###   4. GET /admin/users/{id} → detalle de usuario
+###   5. PUT /admin/users/{id}/role → cambiar rol
+###   6. DELETE /admin/users/{id} → soft delete
+###   7. POST /admin/users/{id}/activate → reactivar
+###   8. GET /admin/audit-logs → ver logs de actividad
+###   9. GET /admin/payments → ver historial de pagos
+### ────────────────────────────────────────────────────────────────────────
+
+@userId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. DASHBOARD ─────────────────────────────────────────────────
+
+### Estadísticas del dashboard (usuarios, cursos, ingresos)
+GET {{Api_HostAddress}}/admin/dashboard
+Accept: application/json
+
+
+### ─── 2. LIST USERS (paginado + filtros) ───────────────────────────
+
+### Todos los usuarios (página 1, 10 por página)
+GET {{Api_HostAddress}}/admin/users?page=1&limit=10
+Accept: application/json
+
+
+### Filtrar por rol
+GET {{Api_HostAddress}}/admin/users?role=Admin
+Accept: application/json
+
+
+### Filtrar por búsqueda (email o nombre)
+GET {{Api_HostAddress}}/admin/users?search=juan
+Accept: application/json
+
+
+### Combinado
+GET {{Api_HostAddress}}/admin/users?page=1&limit=20&role=Instructor&search=test
+Accept: application/json
+
+
+### ─── 3. GET USER DETAIL ──────────────────────────────────────────
+
+### Detalle completo de un usuario (cursos, inscripciones)
+GET {{Api_HostAddress}}/admin/users/{{userId}}
+Accept: application/json
+
+
+### ─── 4. UPDATE USER ROLE ─────────────────────────────────────────
+
+### Cambiar rol de un usuario
+PUT {{Api_HostAddress}}/admin/users/{{userId}}/role
+Content-Type: application/json
+
+{
+  "role": "Instructor"
+}
+
+
+### ─── 5. SOFT DELETE USER ─────────────────────────────────────────
+
+### Desactivar un usuario (soft delete)
+DELETE {{Api_HostAddress}}/admin/users/{{userId}}
+Content-Type: application/json
+
+{}
+
+
+### ─── 6. ACTIVATE USER ────────────────────────────────────────────
+
+### Reactivar un usuario previamente eliminado
+POST {{Api_HostAddress}}/admin/users/{{userId}}/activate
+Content-Type: application/json
+
+{}
+
+
+### ─── 7. AUDIT LOGS ──────────────────────────────────────────────
+
+### Ver registro de actividades del sistema
+GET {{Api_HostAddress}}/admin/audit-logs?page=1&limit=20
+Accept: application/json
+
+
+### ─── 8. PAYMENTS ─────────────────────────────────────────────────
+
+### Ver historial completo de pagos (todos los usuarios)
+GET {{Api_HostAddress}}/admin/payments?page=1&limit=20
+Accept: application/json

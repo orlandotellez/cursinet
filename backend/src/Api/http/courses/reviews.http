@@ -1,0 +1,55 @@
+### ─── ⭐ REVIEWS: CRUD de reseñas de cursos ──────────────────────
+### GET es público (cualquiera puede ver reseñas).
+### POST / PUT / DELETE requieren autenticación (Authorize).
+### Las reseñas pertenecen a un curso específico.
+###
+### FLUJO SUGERIDO:
+###   1. GET /courses/{courseId}/reviews → ver reseñas existentes
+###   2. Login como Student
+###   3. POST /courses/{courseId}/reviews → crear reseña
+###   4. PUT /courses/{courseId}/reviews/{reviewId} → actualizar
+###   5. DELETE /courses/{courseId}/reviews/{reviewId} → eliminar
+### ────────────────────────────────────────────────────────────────────────
+
+@courseId = 00000000-0000-0000-0000-000000000000
+@reviewId = 00000000-0000-0000-0000-000000000000
+
+
+### ─── 1. GET ALL (público) ─────────────────────────────────────────
+
+### Listar todas las reseñas de un curso
+GET {{Api_HostAddress}}/courses/{{courseId}}/reviews
+Accept: application/json
+
+
+### ─── 2. CREATE (requiere autenticación) ────────────────────────────
+
+### Crear reseña para un curso
+POST {{Api_HostAddress}}/courses/{{courseId}}/reviews
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Excelente curso, muy bien explicado. Los ejercicios prácticos ayudan mucho a entender los conceptos."
+}
+
+
+### ─── 3. UPDATE (requiere autenticación) ────────────────────────────
+
+### Actualizar reseña existente
+PUT {{Api_HostAddress}}/courses/{{courseId}}/reviews/{{reviewId}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Actualización: después de avanzar más, encontré algunos temas que podrían profundizarse. Pero en general muy bueno."
+}
+
+
+### ─── 4. DELETE (requiere autenticación) ────────────────────────────
+
+### Eliminar reseña
+DELETE {{Api_HostAddress}}/courses/{{courseId}}/reviews/{{reviewId}}
+Content-Type: application/json
+
+{}
