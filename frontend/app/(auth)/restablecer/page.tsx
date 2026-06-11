@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
+import { validateShape } from '@/src/shared/lib/validation';
+import { resetPasswordSchema } from '@/src/shared/validations';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -37,19 +39,18 @@ function RestablecerForm() {
     if (codeParam) setCode(codeParam);
   }, [emailParam, codeParam]);
 
-  function validate() {
-    if (!email.trim()) return 'El correo es obligatorio';
-    if (!code.trim()) return 'El código es obligatorio';
-    if (password.length < 8) return 'La contraseña debe tener al menos 8 caracteres';
-    if (password !== confirmPassword) return 'Las contraseñas no coinciden';
-    return null;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const validationError = validate();
-    if (validationError) {
-      setError(validationError);
+
+    const validation = validateShape(resetPasswordSchema, {
+      email,
+      code,
+      newPassword: password,
+      confirmPassword,
+    });
+    if (!validation.success) {
+      const firstError = Object.values(validation.fieldErrors)[0] ?? 'Error de validación';
+      setError(firstError);
       return;
     }
 

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
+import { validateShape } from '@/src/shared/lib/validation';
+import { forgotPasswordSchema } from '@/src/shared/validations';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -15,8 +17,10 @@ export default function OlvidoContrasenaPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) {
-      setError('El correo es obligatorio');
+
+    const validation = validateShape(forgotPasswordSchema, { email });
+    if (!validation.success) {
+      setError(validation.fieldErrors.email ?? 'Error de validación');
       return;
     }
 
