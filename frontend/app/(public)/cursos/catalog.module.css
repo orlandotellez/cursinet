@@ -7,7 +7,6 @@
   margin: 0 auto;
 }
 
-/* ── Toolbar layout ── */
 
 .toolbar {
   display: flex;
@@ -37,15 +36,6 @@
   border-color: var(--danger);
 }
 
-/* ── Results container ── */
-
 .results {
   min-height: 300px;
-}
-
-.loadingText {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-  font-size: 0.95rem;
 }
