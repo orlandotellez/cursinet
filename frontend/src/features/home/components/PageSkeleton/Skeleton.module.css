@@ -1,0 +1,569 @@
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--bg-elevated) 25%,
+      color-mix(in srgb, var(--bg-elevated) 60%, var(--bg-hover)) 50%,
+      var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.pageSkeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.heroSection {
+  padding: 120px 24px 80px;
+  overflow: hidden;
+}
+
+.heroInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+  padding: 160px 24px 100px;
+}
+
+@media (min-width: 1024px) {
+  .heroInner {
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.badge {
+  width: 200px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.titleLine1 {
+  width: 85%;
+  height: 44px;
+}
+
+.titleLine2 {
+  width: 55%;
+  height: 44px;
+}
+
+.subtitleLine1 {
+  width: 100%;
+  height: 18px;
+}
+
+.subtitleLine2 {
+  width: 70%;
+  height: 18px;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.ctaPrimary {
+  width: 170px;
+  height: 48px;
+  border-radius: var(--radius-input);
+}
+
+.ctaGhost {
+  width: 140px;
+  height: 48px;
+  border-radius: var(--radius-input);
+}
+
+.socialRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.avatarRow {
+  display: flex;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-left: -8px;
+  border: 2px solid transparent;
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.socialText {
+  width: 150px;
+  height: 16px;
+}
+
+.heroVisual {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .heroVisual {
+    display: block;
+  }
+}
+
+.catCard {
+  padding: 28px;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--bg-elevated) 60%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.catBadge {
+  width: 50px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.catGridTitle {
+  width: 180px;
+  height: 22px;
+}
+
+.catGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.catItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: var(--radius-input);
+}
+
+.catIconBox {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.catInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.catNameLine {
+  width: 75%;
+  height: 14px;
+}
+
+.catCountLine {
+  width: 45%;
+  height: 11px;
+}
+
+/* ---- StatsBar ---- */
+
+.statsSection {
+  background: color-mix(in srgb, var(--bg-elevated) 30%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.statsInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .statsInner {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.statValue {
+  width: 100px;
+  height: 36px;
+}
+
+.statLabel {
+  width: 130px;
+  height: 16px;
+}
+
+
+.section {
+  padding: 80px 24px;
+}
+
+.sectionAlt {
+  padding: 80px 24px;
+  background: color-mix(in srgb, var(--bg-elevated) 30%, transparent);
+}
+
+.sectionInner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sectionTitle {
+  width: 320px;
+  height: 36px;
+}
+
+.sectionSubtitle {
+  width: 440px;
+  height: 18px;
+}
+
+.sectionFooter {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.viewAllBtn {
+  width: 190px;
+  height: 44px;
+  border-radius: var(--radius-input);
+  margin: 0 auto;
+}
+
+
+.coursesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .coursesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .coursesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.courseCard {
+  border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.thumbnail {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: 0;
+}
+
+.cardContent {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metaCategory {
+  width: 80px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.metaLevel {
+  width: 70px;
+  height: 14px;
+  border-radius: 999px;
+}
+
+.cardTitle {
+  width: 90%;
+  height: 18px;
+}
+
+.cardTitleShort {
+  width: 65%;
+  height: 18px;
+}
+
+.cardDesc1 {
+  width: 100%;
+  height: 14px;
+}
+
+.cardDesc2 {
+  width: 80%;
+  height: 14px;
+}
+
+.instructorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instructorAvatarCircle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.instructorNameLine {
+  width: 110px;
+  height: 14px;
+}
+
+.cardStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cardStat {
+  width: 60px;
+  height: 14px;
+}
+
+.priceLine {
+  width: 80px;
+  height: 20px;
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+
+.categoriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .categoriesGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+}
+
+.categoryCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  border-radius: var(--radius-card);
+}
+
+.categoryIconBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.categoryInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.categoryNameLine {
+  width: 70%;
+  height: 16px;
+}
+
+.categoryCountLine {
+  width: 40%;
+  height: 13px;
+}
+
+.categoryArrowBox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* ---- Pricing Section ---- */
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .pricingGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pricingGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.pricingCard {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  border-radius: var(--radius-card);
+  gap: 16px;
+}
+
+.pricingNameLine {
+  width: 60%;
+  height: 20px;
+}
+
+.pricingDescLine {
+  width: 85%;
+  height: 14px;
+}
+
+.pricingDivider {
+  width: 100%;
+  height: 1px;
+  background: color-mix(in srgb, var(--border) 50%, transparent);
+  margin: 8px 0;
+}
+
+.pricingAmountLine {
+  width: 100px;
+  height: 36px;
+}
+
+.pricingFeatureList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.pricingFeature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.featureCheck {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.featureText {
+  width: 75%;
+  height: 14px;
+}
+
+.pricingCtaLine {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-input);
+  margin-top: 12px;
+}
+
+.ctaSection {
+  padding: 100px 24px;
+  background: color-mix(in srgb, var(--bg-elevated) 30%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.ctaInner {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.ctaTitleLine {
+  width: 75%;
+  height: 40px;
+}
+
+.ctaTextLine {
+  width: 85%;
+  height: 18px;
+}
+
+.ctaBtnLine {
+  width: 220px;
+  height: 54px;
+  border-radius: var(--radius-input);
+  margin-top: 8px;
+}
