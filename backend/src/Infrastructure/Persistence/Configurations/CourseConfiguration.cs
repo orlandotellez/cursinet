@@ -10,16 +10,15 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 {
 	public void Configure(EntityTypeBuilder<Course> builder)
 	{
-		// Nombre que le daremos a la tabla
+
 		builder.ToTable("Courses");
 
-		// Configuraciones de los campos de la tabla Courses
 		builder.HasKey(c => c.Id);
 		builder.Property(c => c.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
 
 		builder.Property(c => c.InstructorId).IsRequired().HasColumnName("instructor_id");
 		builder.HasIndex(c => c.InstructorId);
-		// Relación con la tabla de usuarios (instructor)
+
 		builder.HasOne(c => c.Instructor)
 			.WithMany()
 			.HasForeignKey(c => c.InstructorId)
@@ -27,7 +26,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
 		builder.Property(c => c.CategoryId).IsRequired().HasColumnName("category_id");
 		builder.HasIndex(c => c.CategoryId);
-		// Relación con la tabla de categorías
+
 		builder.HasOne(c => c.Category)
 			.WithMany()
 			.HasForeignKey(c => c.CategoryId)
@@ -89,6 +88,13 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 		builder.Property(c => c.CreatedAt).IsRequired().HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
 		builder.Property(c => c.UpdatedAt).IsRequired().HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
 		builder.Property(c => c.DeletedAt).HasColumnName("deleted_at");
+
+		builder.Property(c => c.DeletedByUserId).HasColumnName("deleted_by_user_id");
+		builder.HasIndex(c => c.DeletedByUserId);
+		builder.HasOne(c => c.DeletedByUser)
+			.WithMany()
+			.HasForeignKey(c => c.DeletedByUserId)
+			.OnDelete(DeleteBehavior.SetNull);
 
 		builder.HasIndex(c => c.SearchVector).HasDatabaseName("idx_courses_search");
 	}

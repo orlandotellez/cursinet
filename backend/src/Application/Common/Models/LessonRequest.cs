@@ -17,7 +17,8 @@ public record UpdateLessonRequest(
     string? VideoUrl = null,
     int? VideoDurationSeconds = null,
     string? ContentMarkdown = null,
-    bool? IsPreview = null
+    bool? IsPreview = null,
+    bool? IsPublished = null
 );
 
 public record UpsertProgressRequest(

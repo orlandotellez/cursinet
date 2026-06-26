@@ -37,12 +37,10 @@ public class ModuleService : IModuleService
 
         var modules = await _moduleRepository.GetByCourseAsync(courseId);
 
-        // Si no es owner ni admin, filtrar solo módulos publicados
         if (!isOwner && !isAdmin)
         {
             modules = modules.Where(m => m.IsPublished).ToList();
 
-            // Dentro de cada módulo, filtrar solo lecciones publicadas
             foreach (var module in modules)
             {
                 module.Lessons = module.Lessons?
@@ -67,7 +65,6 @@ public class ModuleService : IModuleService
         var isOwner = currentUserId.HasValue && course.InstructorId == currentUserId.Value;
         var isAdmin = role == UserRole.Admin;
 
-        // Si no es owner ni admin, filtrar solo lecciones publicadas
         if (!isOwner && !isAdmin)
         {
             module.Lessons = module.Lessons?
@@ -89,12 +86,11 @@ public class ModuleService : IModuleService
 
         var modules = await _moduleRepository.GetByCourseAsync(courseId);
 
-        // Para curriculum público o estudiantes: solo items publicados
         var curriculumModules = isOwner || isAdmin
-            ? modules.Select(m => m.MapToCurriculumDto()).ToList()
+            ? modules.Select(m => m.MapToCurriculumDto(includeUnpublished: true)).ToList()
             : modules
                 .Where(m => m.IsPublished)
-                .Select(m => m.MapToCurriculumDto())
+                .Select(m => m.MapToCurriculumDto(includeUnpublished: false))
                 .ToList();
 
         return new CurriculumResponse
@@ -104,17 +100,16 @@ public class ModuleService : IModuleService
         };
     }
 
-    public async Task<ModuleResponse> CreateAsync(Guid courseId, CreateModuleRequest request, Guid userId)
+    public async Task<ModuleResponse> CreateAsync(Guid courseId, CreateModuleRequest request, Guid userId, UserRole role)
     {
-        // Owner check
+
         var course = await _courseRepository.GetByIdAsync(courseId);
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId)
+        if (course.InstructorId != userId && role != UserRole.Admin)
             throw AppExceptions.Forbidden("You are not the owner of this course");
 
-        // Obtener el siguiente sort order
         var existingModules = await _moduleRepository.GetByCourseAsync(courseId);
         var maxSortOrder = existingModules.Any() ? existingModules.Max(m => m.SortOrder) : 0;
 
@@ -125,7 +120,7 @@ public class ModuleService : IModuleService
             Title = request.Title,
             Description = request.Description,
             SortOrder = maxSortOrder + 1,
-            IsPublished = false,
+            IsPublished = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -140,7 +135,6 @@ public class ModuleService : IModuleService
         if (module == null)
             throw AppExceptions.NotFound("Module not found");
 
-        // Owner check via course
         var course = await _courseRepository.GetByIdAsync(module.CourseId);
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
@@ -164,7 +158,6 @@ public class ModuleService : IModuleService
         if (module == null)
             throw AppExceptions.NotFound("Module not found");
 
-        // Owner check via course
         var course = await _courseRepository.GetByIdAsync(module.CourseId);
         if (course == null)
             throw AppExceptions.NotFound("Course not found");

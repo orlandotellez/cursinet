@@ -21,7 +21,10 @@ public class CourseService : ICourseService
 
     public async Task<List<CourseResponse>> GetAllAsync(CourseFilter? filter = null)
     {
-        var courses = await _courseRepository.GetAllAsync();
+        var includeDeleted = filter?.IncludeDeleted == true;
+        var courses = includeDeleted
+            ? await _courseRepository.GetAllIncludingDeletedAsync()
+            : await _courseRepository.GetAllAsync();
 
         if (filter != null)
         {
@@ -33,6 +36,8 @@ public class CourseService : ICourseService
                 courses = courses.Where(c => c.IsPublished == filter.IsPublished.Value).ToList();
             if (filter.IsFeatured.HasValue)
                 courses = courses.Where(c => c.IsFeatured == filter.IsFeatured.Value).ToList();
+            if (filter.InstructorId.HasValue)
+                courses = courses.Where(c => c.InstructorId == filter.InstructorId.Value).ToList();
             if (!string.IsNullOrWhiteSpace(filter.Search))
                 courses = courses.Where(c =>
                     c.Title.Contains(filter.Search, StringComparison.OrdinalIgnoreCase) ||
@@ -63,12 +68,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseResponse> CreateAsync(CreateCourseRequest request, Guid userId)
     {
-        // Validar categoría
-        // La validación en sí se hace en el repo al insertar (FK constraint),
-        // pero podemos ser más explícitos lanzando un 404 si no existe
-        // (quien llame al service debería validar, pero es buena práctica)
 
-        // Generar slug único
         var slug = GenerateSlug(request.Title);
         var baseSlug = slug;
         var counter = 1;
@@ -111,16 +111,13 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        // Owner check: solo el instructor dueño o un Admin pueden modificar
         if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
             throw AppExceptions.Forbidden("You are not the owner of this course");
 
-        // Actualizar solo los campos que vienen en el request
         if (request.Title != null)
         {
             course.Title = request.Title;
 
-            // Regenerar slug si cambió el título
             var newSlug = GenerateSlug(request.Title);
             if (newSlug != course.Slug)
             {
@@ -161,11 +158,10 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        // Owner check
         if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
             throw AppExceptions.Forbidden("You are not the owner of this course");
 
-        await _courseRepository.SoftDeleteAsync(id);
+        await _courseRepository.SoftDeleteAsync(course, userId);
     }
 
     public async Task<CourseResponse> PublishAsync(Guid id, Guid userId, UserRole currentUserRole)
@@ -174,7 +170,6 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        // Owner check
         if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
             throw AppExceptions.Forbidden("You are not the owner of this course");
 
@@ -183,6 +178,26 @@ public class CourseService : ICourseService
 
         course.IsPublished = true;
         course.PublishedAt = DateTime.UtcNow;
+        course.UpdatedAt = DateTime.UtcNow;
+
+        var updated = await _courseRepository.UpdateAsync(course);
+        return updated.MapToDto();
+    }
+
+    public async Task<CourseResponse> UnpublishAsync(Guid id, Guid userId, UserRole currentUserRole)
+    {
+        var course = await _courseRepository.GetByIdAsync(id);
+        if (course == null)
+            throw AppExceptions.NotFound("Course not found");
+
+        if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
+            throw AppExceptions.Forbidden("You are not the owner of this course");
+
+        if (!course.IsPublished)
+            throw AppExceptions.Conflict("Course is not published");
+
+        course.IsPublished = false;
+        course.PublishedAt = null;
         course.UpdatedAt = DateTime.UtcNow;
 
         var updated = await _courseRepository.UpdateAsync(course);
