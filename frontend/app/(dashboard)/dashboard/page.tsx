@@ -26,8 +26,8 @@ function transformEnrollment(enr: EnrollmentResponse): Enrollment {
       instructor: { name: enr.instructorName, avatar: '' },
       category: { name: '' },
       level: 'beginner' as const,
-      duration: 0,
-      lessonsCount: 0,
+      duration: enr.courseDurationMinutes,
+      lessonsCount: enr.totalLessons,
       price: 0,
       rating: 0,
       reviewsCount: 0,
@@ -36,8 +36,8 @@ function transformEnrollment(enr: EnrollmentResponse): Enrollment {
     progress: enr.progressPercentage,
     enrolledAt: enr.enrolledAt,
     lastAccessedAt: enr.lastAccessedAt ?? enr.enrolledAt,
-    completedLessons: Math.round((enr.progressPercentage / 100) * 10), // Estimación
-    totalLessons: 10, // Estimación, idealmente del backend
+    completedLessons: enr.completedLessons,
+    totalLessons: enr.totalLessons,
   };
 }
 
@@ -53,7 +53,11 @@ export default function DashboardPage() {
   const studentStats = {
     completed: enrollments.filter((e) => e.progressPercentage === 100).length,
     lessonsDone: transformedEnrollments.reduce((acc, e) => acc + e.completedLessons, 0),
-    totalHours: Math.round(transformedEnrollments.reduce((acc, e) => acc + (e.completedLessons / e.totalLessons) * 10, 0)),
+    totalHours: Math.round(transformedEnrollments.reduce((acc, e) => {
+      if (e.totalLessons === 0) return acc;
+      const avgMinPerLesson = e.course.duration / e.totalLessons;
+      return acc + (e.completedLessons * avgMinPerLesson) / 60;
+    }, 0)),
     streak: 0, // Requiere backend tracking
     currentStreak: 0, // Requiere backend tracking
   };
