@@ -31,6 +31,7 @@ function mapToCourse(
     shortDescription: dto.shortDescription ?? '',
     description: dto.description ?? '',
     thumbnail: dto.thumbnailUrl ?? '',
+    previewVideoUrl: dto.previewVideoUrl ?? null,
     instructor: {
       id: dto.instructorId,
       name: dto.instructorName,
@@ -159,9 +160,8 @@ export default function CourseDetailPage() {
   }
 
   const firstLessonId = course.modules[0]?.lessons[0]?.id;
-  const firstLessonHref = firstLessonId
-    ? `/aprender/${course.id}/${firstLessonId}`
-    : '#';
+  // Ir a la página de bienvenida que muestra el video de preview o redirige a la 1ra lección
+  const firstLessonHref = `/aprender/${course.id}`;
 
   const handleEnroll = async () => {
     if (!course) return;
