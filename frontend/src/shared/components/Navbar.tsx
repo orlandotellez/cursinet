@@ -9,8 +9,7 @@ import styles from './Navbar.module.css';
 const NAV_ITEMS = [
   { label: 'Inicio', href: '/' },
   { label: 'Cursos', href: '/cursos' },
-  { label: 'Instructores', href: '/instructores' },
-  { label: 'Precios', href: '#pricing' },
+  { label: 'Precios', href: '/#pricing' },
 ];
 
 const DASHBOARD_CONFIG: Record<string, { label: string; href: string }> = {

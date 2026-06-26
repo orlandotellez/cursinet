@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronLeft, ChevronRight, LogOut, User, X } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, LogOut, Settings, X } from 'lucide-react';
 import { useState } from 'react';
 import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
@@ -24,12 +24,24 @@ export function Sidebar({ title, items }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     setShowConfirm(false);
+    setUserMenuOpen(false);
     router.push('/');
   };
+
+  const settingsHref =
+    user?.role === 'admin'
+      ? '/admin/configuracion'
+      : user?.role === 'instructor'
+        ? '/instructor/configuracion'
+        : '/configuracion';
+
+  const userInitial = user?.name?.charAt(0)?.toUpperCase() || '?';
+  const hasAvatar = !!user?.image;
 
   return (
     <aside
@@ -68,26 +80,6 @@ export function Sidebar({ title, items }: SidebarProps) {
         })}
       </nav>
 
-      {/* User Info */}
-      {user && (
-        <div className={styles.userInfo}>
-          <div className={styles.userAvatar}>
-            {
-              collapsed ? (
-
-                <User size={18} />
-              ) : (
-                <>
-                  <User size={18} />
-                  <span className={styles.userEmail}>{user.name || user.email}</span>
-
-                </>
-              )
-            }
-          </div>
-        </div>
-      )}
-
       {/* Collapse Button */}
       <div className={styles.collapseContainer}>
         <button onClick={setCollapsed} className={styles.collapseButton}>
@@ -102,17 +94,71 @@ export function Sidebar({ title, items }: SidebarProps) {
         </button>
       </div>
 
-      {/* Logout */}
-      <div className={styles.logoutContainer}>
-        <button
-          onClick={() => setShowConfirm(true)}
-          className={`${styles.navItem} ${styles.logoutButton} ${collapsed ? styles.isCollapsedIcon : ''}`}
-          title="Cerrar sesión"
-        >
-          <LogOut size={20} />
-          {!collapsed && <span>Cerrar sesión</span>}
-        </button>
-      </div>
+      {/* User Section — avatar, nombre, email + dropdown */}
+      {user && (
+        <div className={styles.userSection}>
+          <button
+            className={`${styles.userTrigger} ${collapsed ? styles.userTriggerCollapsed : ''}`}
+            onClick={() => setUserMenuOpen(!userMenuOpen)}
+            title={collapsed ? user.name : undefined}
+          >
+            <div className={styles.userAvatar}>
+              {hasAvatar ? (
+                <img src={user.image!} alt={user.name} className={styles.avatarImg} />
+              ) : (
+                <span className={styles.avatarLetter}>{userInitial}</span>
+              )}
+            </div>
+            {!collapsed && (
+              <div className={styles.userDetails}>
+                <span className={styles.userName}>{user.name}</span>
+                <span className={styles.userEmail}>{user.email}</span>
+              </div>
+            )}
+            {!collapsed && (
+              <ChevronDown
+                size={16}
+                className={`${styles.userChevron} ${userMenuOpen ? styles.userChevronOpen : ''}`}
+              />
+            )}
+          </button>
+
+          {/* Dropdown */}
+          {userMenuOpen && (
+            <>
+              <div className={styles.userOverlay} onClick={() => setUserMenuOpen(false)} />
+              <div className={`${styles.userDropdown} ${collapsed ? styles.userDropdownCollapsed : ''}`}>
+                {collapsed && (
+                  <div className={styles.dropdownUserInfo}>
+                    <span className={styles.dropdownUserName}>{user.name}</span>
+                    <span className={styles.dropdownUserEmail}>{user.email}</span>
+                  </div>
+                )}
+                <button
+                  className={styles.dropdownItem}
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    router.push(settingsHref);
+                  }}
+                >
+                  <Settings size={16} />
+                  <span>Configuración</span>
+                </button>
+                <button
+                  className={`${styles.dropdownItem} ${styles.dropdownItemDanger}`}
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    setShowConfirm(true);
+                  }}
+                >
+                  <LogOut size={16} />
+                  <span>Cerrar sesión</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* ── Confirmación de cierre de sesión ── */}
       {showConfirm && (
