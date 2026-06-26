@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, BookOpen, Loader2 } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Compass, Loader2 } from 'lucide-react';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './layout.module.css';
 
 const instructorSidebarItems = [
+  { label: 'Explorar Cursos', href: '/cursos', icon: Compass },
   { label: 'Dashboard', href: '/instructor/dashboard', icon: LayoutDashboard },
   { label: 'Mis Cursos', href: '/instructor/cursos', icon: BookOpen },
 ];
@@ -42,7 +43,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
     // (puede ser un estado de transición durante la hidratación de persist)
     if (!user) return;
 
-    if (user.role !== 'instructor') {
+    if (user.role !== 'instructor' && user.role !== 'admin') {
       router.replace('/dashboard');
       return;
     }

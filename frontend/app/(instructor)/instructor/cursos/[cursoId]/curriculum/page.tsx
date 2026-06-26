@@ -257,6 +257,32 @@ export default function CurriculumEditorPage() {
     }
   }
 
+  // ─── Publish / Unpublish toggles ──────────────────────────────────────
+
+  async function handleTogglePublishModule(mod: ModuleResponse) {
+    try {
+      const updated = await updateModule(cursoId, mod.id, { isPublished: !mod.isPublished });
+      setModules((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error al cambiar estado del módulo');
+    }
+  }
+
+  async function handleTogglePublishLesson(modId: string, lesson: LessonSummary) {
+    try {
+      const updated = await updateLesson(modId, lesson.id, { isPublished: !lesson.isPublished });
+      setModules((prev) =>
+        prev.map((m) =>
+          m.id === modId
+            ? { ...m, lessons: (m.lessons ?? []).map((l) => (l.id === updated.id ? { ...l, isPublished: updated.isPublished } : l)) }
+            : m,
+        ),
+      );
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error al cambiar estado de la lección');
+    }
+  }
+
   // ─── Render ─────────────────────────────────────────────────────────────
 
   if (loading) {
@@ -354,9 +380,13 @@ export default function CurriculumEditorPage() {
                     }
                     onEdit={() => handleOpenEditModule(mod)}
                     onDelete={() => handleDeleteModule(mod)}
+                    onTogglePublish={() => handleTogglePublishModule(mod)}
                     onAddLesson={() => handleOpenCreateLesson(mod.id)}
                     onEditLesson={(lesson) =>
                       handleOpenEditLesson(mod.id, lesson)
+                    }
+                    onTogglePublishLesson={(lesson) =>
+                      handleTogglePublishLesson(mod.id, lesson)
                     }
                     onDeleteLesson={(lesson) =>
                       handleDeleteLesson(mod.id, lesson)

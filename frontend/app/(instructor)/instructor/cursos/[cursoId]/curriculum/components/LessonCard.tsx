@@ -20,6 +20,7 @@ import styles from '../page.module.css';
 interface LessonCardProps {
   lesson: LessonSummary;
   onEdit: () => void;
+  onTogglePublish: () => void;
   onDelete: () => void;
 }
 
@@ -50,7 +51,7 @@ function formatDuration(seconds: number | null): string {
   return `${mins}min`;
 }
 
-export function LessonCard({ lesson, onEdit, onDelete }: LessonCardProps) {
+export function LessonCard({ lesson, onEdit, onTogglePublish, onDelete }: LessonCardProps) {
   const {
     attributes,
     listeners,
@@ -100,6 +101,13 @@ export function LessonCard({ lesson, onEdit, onDelete }: LessonCardProps) {
       </div>
 
       <div className={styles.lessonActions}>
+        <button
+          className={styles.iconBtn}
+          onClick={onTogglePublish}
+          title={lesson.isPublished ? 'Despublicar lección' : 'Publicar lección'}
+        >
+          {lesson.isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
+        </button>
         <button
           className={styles.iconBtn}
           onClick={onEdit}

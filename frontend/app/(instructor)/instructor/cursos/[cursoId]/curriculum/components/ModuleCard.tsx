@@ -25,8 +25,10 @@ interface ModuleCardProps {
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onTogglePublish: () => void;
   onAddLesson: () => void;
   onEditLesson: (lesson: LessonSummary) => void;
+  onTogglePublishLesson: (lesson: LessonSummary) => void;
   onDeleteLesson: (lesson: LessonSummary) => void;
 }
 
@@ -36,8 +38,10 @@ export function ModuleCard({
   onToggle,
   onEdit,
   onDelete,
+  onTogglePublish,
   onAddLesson,
   onEditLesson,
+  onTogglePublishLesson,
   onDeleteLesson,
 }: ModuleCardProps) {
   const {
@@ -91,6 +95,13 @@ export function ModuleCard({
         <div className={styles.moduleActions}>
           <button
             className={styles.iconBtn}
+            onClick={onTogglePublish}
+            title={module.isPublished ? 'Despublicar módulo' : 'Publicar módulo'}
+          >
+            {module.isPublished ? <EyeOff size={15} /> : <Eye size={15} />}
+          </button>
+          <button
+            className={styles.iconBtn}
             onClick={onAddLesson}
             title="Agregar lección"
           >
@@ -121,6 +132,7 @@ export function ModuleCard({
                 key={lesson.id}
                 lesson={lesson}
                 onEdit={() => onEditLesson(lesson)}
+                onTogglePublish={() => onTogglePublishLesson(lesson)}
                 onDelete={() => onDeleteLesson(lesson)}
               />
             ))
