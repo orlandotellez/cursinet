@@ -9,10 +9,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
 	public void Configure(EntityTypeBuilder<User> builder)
 	{
-		// Nombre que le daremos a la tabla
+
 		builder.ToTable("Users");
 
-		// Configuraciones de campos de la tabla Users
 		builder.HasKey(u => u.Id);
 		builder.Property(u => u.Id).HasDefaultValueSql("gen_random_uuid()");
 
@@ -52,5 +51,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 		builder.Property(u => u.CreatedAt).IsRequired().HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
 		builder.Property(u => u.UpdatedAt).IsRequired().HasColumnName("updated_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
 		builder.Property(u => u.DeletedAt).HasColumnName("deleted_at");
+		builder.Property(u => u.DeletedByUserId).HasColumnName("deleted_by_user_id");
+		builder.Property(u => u.DeletedByName).HasColumnName("deleted_by_name").HasMaxLength(255);
 	}
 }

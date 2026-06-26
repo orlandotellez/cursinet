@@ -10,7 +10,7 @@ public record UserDto
     public bool EmailVerified { get; set; }
     public string? Phone { get; set; }
     public string? Image { get; set; }
-    public string Role { get; set; } = string.Empty; // Lo pasamos como string para el cliente
+    public string Role { get; set; } = string.Empty;
     public string? UserName { get; set; }
     public string? Bio { get; set; }
     public string? WebsiteUrl { get; set; }
@@ -18,7 +18,10 @@ public record UserDto
     public string? LinkedinUrl { get; set; }
     public bool IsActive { get; set; }
     public DateTime? LastSeenAt { get; set; }
-    public DateTime CreatedAt { get; set; } 
+    public DateTime CreatedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public Guid? DeletedByUserId { get; set; }
+    public string? DeletedByName { get; set; }
 }
 
 public record SessionResponse

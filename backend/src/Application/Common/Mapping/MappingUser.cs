@@ -26,7 +26,10 @@ public static class MappingUser
             LinkedinUrl = user.LinkedinUrl,
             IsActive = user.IsActive,
             LastSeenAt = user.LastSeenAt,
-            CreatedAt = user.CreatedAt
+            CreatedAt = user.CreatedAt,
+            DeletedAt = user.DeletedAt,
+            DeletedByUserId = user.DeletedByUserId,
+            DeletedByName = user.DeletedByName,
         };
     }
 }

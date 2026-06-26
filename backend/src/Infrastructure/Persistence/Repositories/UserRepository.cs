@@ -13,6 +13,16 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<List<User>> GetAllAsync(bool includeDeleted = false)
+    {
+        var query = _context.Users.AsQueryable();
+
+        if (!includeDeleted)
+            query = query.Where(u => u.DeletedAt == null);
+
+        return await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
+    }
+
     public async Task<User> CreateAsync(User user)
     {
         await _context.Users.AddAsync(user);
@@ -37,12 +47,27 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task SoftDeleteAsync(Guid id)
+    public async Task SoftDeleteAsync(Guid id, Guid deletedByUserId, string deletedByName)
     {
         var user = await _context.Users.FindAsync(id);
         if (user != null)
         {
-            user.DeletedAt = DateTime.UtcNow; 
+            user.DeletedAt = DateTime.UtcNow;
+            user.DeletedByUserId = deletedByUserId;
+            user.DeletedByName = deletedByName;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task RestoreAsync(Guid id)
+    {
+        var user = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Id == id);
+        if (user != null)
+        {
+            user.DeletedAt = null;
+            user.DeletedByUserId = null;
+            user.DeletedByName = null;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
