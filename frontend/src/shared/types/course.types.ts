@@ -8,6 +8,7 @@ export interface Course {
   shortDescription: string;
   description: string;
   thumbnail: string;
+  previewVideoUrl?: string | null;
   instructor: Instructor;
   category: Category;
   level: Level;

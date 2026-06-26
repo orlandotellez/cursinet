@@ -19,9 +19,6 @@ export const HeroSection = () => {
     <section className={styles.hero}>
       <div className={styles.heroInner}>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>
-            Plataforma de aprendizaje técnico
-          </span>
           <h1 className={styles.heroTitle}>
             Aprende tecnología construyendo{' '}
             <span className={styles.heroHighlight}>sistemas reales.</span>
@@ -39,22 +36,6 @@ export const HeroSection = () => {
             <Link href="#pricing" className={styles.heroBtnGhost}>
               Ver demo gratis &rarr;
             </Link>
-          </div>
-          <div className={styles.heroSocial}>
-            <div className={styles.heroAvatars}>
-              {['M', 'L', 'C', 'A', '+'].map((initial, i) => (
-                <div
-                  key={i}
-                  className={styles.heroAvatar}
-                  style={{ zIndex: 5 - i }}
-                >
-                  {initial}
-                </div>
-              ))}
-            </div>
-            <p className={styles.heroSocialText}>
-              <strong>Más de 12,000</strong> estudiantes activos
-            </p>
           </div>
         </div>
         <div className={styles.heroVisual}>

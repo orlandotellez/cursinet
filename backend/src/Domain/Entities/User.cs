@@ -1,42 +1,46 @@
-using Cursinet.Domain.Enums; // Importamos los enums a necesitar
- 
+using Cursinet.Domain.Enums;
+
 namespace Cursinet.Domain.Entities;
 
 public class User
 {
-	public Guid Id {get; set;} // Identificador único
+	public Guid Id {get; set;}
 
-	public string Name {get; set;} = string.Empty; // Nombre Completo
+	public string Name {get; set;} = string.Empty;
 
-	public string Email {get; set;} = string.Empty; // Email de acceso
+	public string Email {get; set;} = string.Empty;
 
-	public bool EmailVerified {get; set;} // Verificación de email
+	public bool EmailVerified {get; set;}
 
-	public string? Phone {get; set;} // Teléfono (opcional)
+	public string? Phone {get; set;}
 
-	public string? Image {get; set;} // URL de avatar/foto 
+	public string? Image {get; set;}
 
-	public UserRole Role {get; set;} // Rol de usuario
+	public UserRole Role {get; set;}
 
-	public string? UserName {get; set;} // Nombre de usuario público
+	public string? UserName {get; set;}
 
-	public string? Bio {get; set;} // Biografía corta
+	public string? Bio {get; set;}
 
-	public string? WebsiteUrl {get; set;} // Sitio web personal
+	public string? WebsiteUrl {get; set;}
 
-	public string? GithubUrl {get; set;} // Perfil de Github
+	public string? GithubUrl {get; set;}
 
-	public string? LinkedinUrl {get; set;} // Perfil de LinkedIn
+	public string? LinkedinUrl {get; set;}
 
-	public string? StripeCustomerId {get; set;} // ID de cliente en Stripe
+	public string? StripeCustomerId {get; set;}
 
-	public bool IsActive {get; set;} // Cuenta activa/inactiva
+	public bool IsActive {get; set;}
 
-	public DateTime? LastSeenAt {get; set;} // Última vez online
+	public DateTime? LastSeenAt {get; set;}
 
-	public DateTime CreatedAt {get; set;} // Fecha de registro
+	public DateTime CreatedAt {get; set;}
 
-	public DateTime UpdatedAt {get; set;} // Última actualización
+	public DateTime UpdatedAt {get; set;}
 
-	public DateTime? DeletedAt {get; set;} // Soft-delete
+	public DateTime? DeletedAt {get; set;}
+
+	public Guid? DeletedByUserId {get; set;}
+
+	public string? DeletedByName {get; set;}
 }

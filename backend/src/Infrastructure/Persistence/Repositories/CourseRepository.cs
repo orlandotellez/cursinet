@@ -24,6 +24,17 @@ public class CourseRepository : ICourseRepository
             .ToListAsync();
     }
 
+    public async Task<List<Course>> GetAllIncludingDeletedAsync()
+    {
+        return await _context.Courses
+            .Include(c => c.Category)
+            .Include(c => c.Instructor)
+            .Include(c => c.DeletedByUser)
+            .OrderByDescending(c => c.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<Course?> GetByIdAsync(Guid id)
     {
         return await _context.Courses
@@ -50,7 +61,6 @@ public class CourseRepository : ICourseRepository
         await _context.Courses.AddAsync(course);
         await _context.SaveChangesAsync();
 
-        // Recargar con includes para la response
         return (await GetByIdAsync(course.Id))!;
     }
 
@@ -71,5 +81,28 @@ public class CourseRepository : ICourseRepository
             _context.Courses.Update(course);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task SoftDeleteAsync(Course course, Guid? deletedByUserId = null)
+    {
+
+        _context.Entry(course).State = EntityState.Modified;
+        course.DeletedAt = DateTime.UtcNow;
+        course.DeletedByUserId = deletedByUserId;
+        try
+        {
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"[SoftDelete] ✅ Course {course.Id} deleted_at set to {course.DeletedAt}, by: {deletedByUserId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SoftDelete] ❌ SaveChanges FAILED for {course.Id}: {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task SoftDeleteAsync(Course course)
+    {
+        await SoftDeleteAsync(course, null);
     }
 }

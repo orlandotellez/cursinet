@@ -42,7 +42,6 @@ public class LessonService : ILessonService
 
         var lessons = await _lessonRepository.GetByModuleAsync(moduleId);
 
-        // Si no es owner ni admin, solo lecciones publicadas
         if (!isOwner && !isAdmin)
         {
             lessons = lessons.Where(l => l.IsPublished).ToList();
@@ -66,7 +65,6 @@ public class LessonService : ILessonService
         if (module == null)
             throw AppExceptions.NotFound("Module not found");
 
-        // Owner check via course
         var course = await _courseRepository.GetByIdAsync(module.CourseId);
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
@@ -74,7 +72,6 @@ public class LessonService : ILessonService
         if (course.InstructorId != userId && role != UserRole.Admin)
             throw AppExceptions.Forbidden("You are not the owner of this course");
 
-        // Generar slug único
         var slug = GenerateSlug(request.Title);
         var baseSlug = slug;
         var counter = 1;
@@ -84,7 +81,6 @@ public class LessonService : ILessonService
             counter++;
         }
 
-        // Obtener el siguiente sort order
         var existingLessons = await _lessonRepository.GetByModuleAsync(moduleId);
         var maxSortOrder = existingLessons.Any() ? existingLessons.Max(l => l.SortOrder) : 0;
 
@@ -100,7 +96,7 @@ public class LessonService : ILessonService
             VideoDurationSeconds = request.VideoDurationSeconds,
             ContentMarkdown = request.Type != LessonType.Video ? request.ContentMarkdown : null,
             SortOrder = maxSortOrder + 1,
-            IsPublished = false,
+            IsPublished = true,
             IsPreview = request.IsPreview,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -116,7 +112,6 @@ public class LessonService : ILessonService
         if (lesson == null)
             throw AppExceptions.NotFound("Lesson not found");
 
-        // Owner check via module → course
         var module = await _moduleRepository.GetByIdAsync(lesson.ModuleId);
         if (module == null)
             throw AppExceptions.NotFound("Module not found");
@@ -132,7 +127,6 @@ public class LessonService : ILessonService
         {
             lesson.Title = request.Title;
 
-            // Regenerar slug si cambió el título
             var newSlug = GenerateSlug(request.Title);
             if (newSlug != lesson.Slug)
             {
@@ -151,7 +145,6 @@ public class LessonService : ILessonService
         {
             lesson.Type = request.Type.Value;
 
-            // Limpiar campos irrelevantes según el tipo
             if (request.Type.Value != LessonType.Video)
             {
                 lesson.VideoUrl = null;
@@ -167,6 +160,7 @@ public class LessonService : ILessonService
         if (request.VideoDurationSeconds.HasValue) lesson.VideoDurationSeconds = request.VideoDurationSeconds;
         if (request.ContentMarkdown != null) lesson.ContentMarkdown = request.ContentMarkdown;
         if (request.IsPreview.HasValue) lesson.IsPreview = request.IsPreview.Value;
+        if (request.IsPublished.HasValue) lesson.IsPublished = request.IsPublished.Value;
 
         lesson.UpdatedAt = DateTime.UtcNow;
 
@@ -180,7 +174,6 @@ public class LessonService : ILessonService
         if (lesson == null)
             throw AppExceptions.NotFound("Lesson not found");
 
-        // Owner check via module → course
         var module = await _moduleRepository.GetByIdAsync(lesson.ModuleId);
         if (module == null)
             throw AppExceptions.NotFound("Module not found");

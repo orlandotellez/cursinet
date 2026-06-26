@@ -42,6 +42,10 @@ public static class MappingCourse
             PublishedAt = course.PublishedAt,
             CreatedAt = course.CreatedAt,
             UpdatedAt = course.UpdatedAt,
+
+            DeletedAt = course.DeletedAt,
+            DeletedByUserId = course.DeletedByUserId,
+            DeletedByName = course.DeletedByUser?.Name ?? (course.DeletedByUserId != null ? "Unknown" : null),
         };
     }
 }

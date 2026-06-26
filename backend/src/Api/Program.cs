@@ -10,7 +10,11 @@ using Cursinet.Application.Features.Lessons;
 using Cursinet.Application.Features.Reviews;
 using Cursinet.Application.Features.Certificates;
 using Cursinet.Application.Features.Payments;
+using Cursinet.Application.Features.Users;
+using Cursinet.Application.Features.Analytics;
+using Cursinet.Application.Features.Bookmarks;
 using Cursinet.Domain.Enums;
+using Cursinet.Api.Middleware;
 using Cursinet.Infrastructure.Persistence;
 using Cursinet.Infrastructure.Persistence.Repositories;
 using Cursinet.Infrastructure.Services;
@@ -21,7 +25,6 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -31,11 +34,10 @@ builder.Services.AddCors(options =>
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); // necesario para cookies HttpOnly
+            .AllowCredentials();
     });
 });
 
-// REGISTRO DE SERVICIOS (Antes de builder.Build)
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -44,19 +46,16 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 
-// Helpers de Autenticación, Cookies y Tokens
 builder.Services.AddScoped<AuthHelper>();
 builder.Services.AddScoped<CookieHelper>();
 builder.Services.AddScoped<TokenHelper>();
 
-// CONFIGURACIÓN DE ENTITY FRAMEWORK CORE
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Host=localhost;Database=cursinet_db;Username=dev-espada;Password=espadaPOSTGRES";
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Infrastructure")));
 
-// CONFIGURACIÓN DE JWT AUTHENTICATION
 var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("JWT Secret is not configured");
 
@@ -73,7 +72,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero,
         };
 
-        // Leer el token de la cookie si no viene en Authorization header
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -88,7 +86,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Authorization RBAC
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 builder.Services.AddAuthorization(options =>
 {
@@ -99,7 +96,6 @@ builder.Services.AddAuthorization(options =>
     }
 });
 
-// SERVICIOS DE APLICACIÓN E INFRAESTRUCTURA
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
@@ -108,12 +104,14 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<ICertificateService, CertificateService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, DevEmailService>();
+builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 
-// REPOSITORIOS
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserCrudService, UserCrudService>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
@@ -126,21 +124,18 @@ builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 
-// DATA SEEDER
 builder.Services.AddScoped<DataSeeder>();
 
-// CONSTRUCCIÓN DE LA APLICACIÓN
 var app = builder.Build();
 
-// EJECUTAR SEED AL INICIAR
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     await seeder.SeedAsync();
 }
 
-// CONFIGURACIÓN DEL PIPELINE (Middlewares)
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -150,13 +145,13 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Enrutamiento de controladores (api/v1/auth/register, etc.)
 app.MapControllers();
 
-// Endpoint rápido de prueba
 app.MapGet("/health", () => "ok");
 
 app.Run();

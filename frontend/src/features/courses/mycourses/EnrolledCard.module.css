@@ -16,6 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .letter {
@@ -23,6 +24,43 @@
   font-weight: 700;
   font-family: var(--font-mono);
   color: var(--text-muted);
+}
+
+.favBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  z-index: 1;
+  backdrop-filter: blur(2px);
+}
+
+.favBtn:hover {
+  background: rgba(0, 0, 0, 0.65);
+  transform: scale(1.1);
+}
+
+.favBtn:active {
+  transform: scale(0.95);
+}
+
+.favActive {
+  color: var(--danger, #ef4444);
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.favActive:hover {
+  background: rgba(239, 68, 68, 0.35);
 }
 
 .body {

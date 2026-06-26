@@ -8,10 +8,15 @@
 .subtitle {
   font-size: 14px;
   color: var(--text-secondary);
-  margin-bottom: 28px;
+  margin-bottom: 0;
 }
 
-/* ── KPI Grid ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
 
 .kpiGrid {
   display: grid;
@@ -52,8 +57,8 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background: color-mix(in srgb, #7C3AED 12%, transparent);
-  color: #7C3AED;
+  background: color-mix(in srgb, #2563EB 12%, transparent);
+  color: #2563EB;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,7 +95,80 @@
   color: var(--text-muted);
 }
 
-/* ── Sections ── */
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 960px) {
+  .chartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chartCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chartTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.chartBody {
+  width: 100%;
+}
+
+.rangeTabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-input);
+  padding: 3px;
+}
+
+.rangeTab {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.rangeTab:hover {
+  color: var(--text-primary);
+}
+
+.rangeTabActive {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
 
 .section {
   margin-bottom: 28px;
@@ -103,7 +181,6 @@
   margin-bottom: 16px;
 }
 
-.chartCard,
 .tableCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -111,48 +188,6 @@
   padding: 24px;
   overflow: hidden;
 }
-
-/* ── Chart ── */
-
-.chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  height: 220px;
-}
-
-.barCol {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  height: 100%;
-  justify-content: flex-end;
-}
-
-.barValue {
-  font-size: 10px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.bar {
-  width: 100%;
-  max-width: 40px;
-  background: #2563EB;
-  border-radius: 4px 4px 0 0;
-  min-height: 4px;
-  transition: height var(--transition-panel);
-}
-
-.barLabel {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-/* ── Table ── */
 
 .table {
   width: 100%;

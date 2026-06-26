@@ -6,10 +6,10 @@ using NpgsqlTypes;
 
 namespace Cursinet.Infrastructure.Migrations
 {
-    /// <inheritdoc />
+    /
     public partial class Init : Migration
     {
-        /// <inheritdoc />
+        /
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -79,7 +79,9 @@ namespace Cursinet.Infrastructure.Migrations
                     last_seen_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_by_user_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    deleted_by_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -132,6 +134,31 @@ namespace Cursinet.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    action = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    entity_type = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    entity_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    old_values = table.Column<string>(type: "jsonb", nullable: true),
+                    new_values = table.Column<string>(type: "jsonb", nullable: true),
+                    ip_address = table.Column<string>(type: "character varying(45)", maxLength: 45, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_AuditLogs_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Courses",
                 columns: table => new
                 {
@@ -161,7 +188,8 @@ namespace Cursinet.Infrastructure.Migrations
                     published_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    deleted_by_user_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -172,6 +200,12 @@ namespace Cursinet.Infrastructure.Migrations
                         principalTable: "Categories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Courses_Users_deleted_by_user_id",
+                        column: x => x.deleted_by_user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Courses_Users_instructor_id",
                         column: x => x.instructor_id,
@@ -227,6 +261,31 @@ namespace Cursinet.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    type = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    title = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    body = table.Column<string>(type: "text", nullable: false),
+                    image_url = table.Column<string>(type: "text", nullable: true),
+                    action_url = table.Column<string>(type: "text", nullable: true),
+                    is_read = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PasswordResetLogs",
                 columns: table => new
                 {
@@ -272,6 +331,32 @@ namespace Cursinet.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    stripe_subscription_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    plan = table.Column<int>(type: "integer", nullable: false),
+                    status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    current_period_start = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    current_period_end = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    cancel_at_period_end = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user_two_factor",
                 columns: table => new
                 {
@@ -292,6 +377,31 @@ namespace Cursinet.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bookmarks",
+                columns: table => new
+                {
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    course_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookmarks", x => new { x.user_id, x.course_id });
+                    table.ForeignKey(
+                        name: "FK_Bookmarks_Courses_course_id",
+                        column: x => x.course_id,
+                        principalTable: "Courses",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookmarks_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -514,6 +624,73 @@ namespace Cursinet.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    lesson_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    parent_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    body = table.Column<string>(type: "text", nullable: false),
+                    likes_count = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    is_edited = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Comments_Comments_parent_id",
+                        column: x => x.parent_id,
+                        principalTable: "Comments",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Comments_Lessons_lesson_id",
+                        column: x => x.lesson_id,
+                        principalTable: "Lessons",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Comments_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LessonNotes",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    lesson_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    content = table.Column<string>(type: "text", nullable: false),
+                    video_timestamp_seconds = table.Column<int>(type: "integer", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LessonNotes", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_LessonNotes_Lessons_lesson_id",
+                        column: x => x.lesson_id,
+                        principalTable: "Lessons",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LessonNotes_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "LessonProgress",
                 columns: table => new
                 {
@@ -702,6 +879,36 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AuditLogs_created_at",
+                table: "AuditLogs",
+                column: "created_at");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuditLogs_entity_id",
+                table: "AuditLogs",
+                column: "entity_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuditLogs_entity_type",
+                table: "AuditLogs",
+                column: "entity_type");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuditLogs_user_id",
+                table: "AuditLogs",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookmarks_course_id",
+                table: "Bookmarks",
+                column: "course_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookmarks_user_id",
+                table: "Bookmarks",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Categories_is_active",
                 table: "Categories",
                 column: "is_active");
@@ -735,6 +942,21 @@ namespace Cursinet.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_lesson_id",
+                table: "Comments",
+                column: "lesson_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_parent_id",
+                table: "Comments",
+                column: "parent_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_user_id",
+                table: "Comments",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "idx_courses_search",
                 table: "Courses",
                 column: "search_vector");
@@ -743,6 +965,11 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "IX_Courses_category_id",
                 table: "Courses",
                 column: "category_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Courses_deleted_by_user_id",
+                table: "Courses",
+                column: "deleted_by_user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_instructor_id",
@@ -807,6 +1034,16 @@ namespace Cursinet.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_LessonNotes_lesson_id",
+                table: "LessonNotes",
+                column: "lesson_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonNotes_user_id",
+                table: "LessonNotes",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_LessonProgress_lesson_id",
                 table: "LessonProgress",
                 column: "lesson_id");
@@ -867,6 +1104,21 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "IX_Modules_course_id",
                 table: "Modules",
                 column: "course_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_is_read",
+                table: "Notifications",
+                column: "is_read");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_type",
+                table: "Notifications",
+                column: "type");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_user_id",
+                table: "Notifications",
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetLogs_created_at",
@@ -966,6 +1218,21 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_status",
+                table: "Subscriptions",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_stripe_subscription_id",
+                table: "Subscriptions",
+                column: "stripe_subscription_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_user_id",
+                table: "Subscriptions",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tags_slug",
                 table: "Tags",
                 column: "slug",
@@ -1019,14 +1286,23 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "value");
         }
 
-        /// <inheritdoc />
+        /
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "Account");
 
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
+                name: "Bookmarks");
+
+            migrationBuilder.DropTable(
                 name: "Certificates");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "CourseTags");
@@ -1038,10 +1314,16 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "Enrollments");
 
             migrationBuilder.DropTable(
+                name: "LessonNotes");
+
+            migrationBuilder.DropTable(
                 name: "LessonProgress");
 
             migrationBuilder.DropTable(
                 name: "LoginLogs");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "PasswordResetLogs");
@@ -1054,6 +1336,9 @@ namespace Cursinet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "Subscriptions");
 
             migrationBuilder.DropTable(
                 name: "user_two_factor");

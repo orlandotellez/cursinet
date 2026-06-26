@@ -1,0 +1,36 @@
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.yLabel {
+  font-size: 11px;
+  fill: var(--text-muted);
+  font-family: inherit;
+}
+
+.xLabel {
+  font-size: 10px;
+  fill: var(--text-muted);
+  font-family: inherit;
+}
+
+.dot {
+  transition: r 0.15s ease;
+  cursor: default;
+}
+
+.dot:hover {
+  r: 6;
+}
+
+.empty {
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}

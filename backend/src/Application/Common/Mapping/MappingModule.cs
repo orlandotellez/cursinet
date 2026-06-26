@@ -28,17 +28,22 @@ public static class MappingModule
         };
     }
 
-    public static CurriculumModule MapToCurriculumDto(this Module module)
+    public static CurriculumModule MapToCurriculumDto(this Module module, bool includeUnpublished = false)
     {
         if (module == null) throw AppExceptions.UnprocessableEntity(nameof(module));
+
+        var lessons = module.Lessons?
+            .Where(l => l.DeletedAt == null);
+
+        if (!includeUnpublished)
+            lessons = lessons?.Where(l => l.IsPublished);
 
         return new CurriculumModule
         {
             Id = module.Id,
             Title = module.Title,
             SortOrder = module.SortOrder,
-            Lessons = module.Lessons?
-                .Where(l => l.DeletedAt == null && l.IsPublished)
+            Lessons = lessons?
                 .OrderBy(l => l.SortOrder)
                 .Select(l => l.MapToSummary())
                 .ToList() ?? [],

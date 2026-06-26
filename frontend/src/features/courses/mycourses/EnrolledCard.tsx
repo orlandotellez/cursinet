@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link';
-import { Play } from 'lucide-react';
+import { Play, Heart } from 'lucide-react';
 import type { Enrollment } from '@/src/shared/types';
+import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
 import styles from './EnrolledCard.module.css';
 
 interface EnrolledCardProps {
@@ -17,6 +18,14 @@ const levelLabels: Record<string, string> = {
 
 export function EnrolledCard({ enrollment }: EnrolledCardProps) {
   const isCompleted = enrollment.progress === 100;
+  const isBookmarked = useBookmarkStore((s) => s.isBookmarked(enrollment.courseId));
+  const toggleBookmark = useBookmarkStore((s) => s.toggleBookmark);
+
+  const handleToggleFav = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleBookmark(enrollment.courseId);
+  };
 
   return (
     <article className={styles.card}>
@@ -24,6 +33,16 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
         <span className={styles.letter}>
           {enrollment.course.title.charAt(0)}
         </span>
+        <button
+          className={`${styles.favBtn} ${isBookmarked ? styles.favActive : ''}`}
+          onClick={handleToggleFav}
+          aria-label={isBookmarked ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+        >
+          <Heart
+            size={16}
+            fill={isBookmarked ? 'currentColor' : 'none'}
+          />
+        </button>
       </div>
       <div className={styles.body}>
         <div className={styles.meta}>
@@ -51,7 +70,7 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
           href={
             isCompleted
               ? '/certificados'
-              : `/aprender/${enrollment.courseId}/${enrollment.course.slug}`
+              : `/aprender/${enrollment.courseId}`
           }
           className={styles.continueBtn}
         >

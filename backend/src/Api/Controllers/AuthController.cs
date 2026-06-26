@@ -1,6 +1,7 @@
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cursinet.Api.Controllers;
@@ -15,6 +16,7 @@ public class AuthController : ControllerBase
     private readonly AuthHelper _authHelper;
     private readonly CookieHelper _cookieHelper;
     private readonly TokenHelper _tokenHelper;
+    private readonly IUserCrudService _userCrudService;
 
     public AuthController(
         IAuthService authService,
@@ -22,7 +24,8 @@ public class AuthController : ControllerBase
         IWebHostEnvironment environment,
         AuthHelper authHelper,
         CookieHelper cookieHelper,
-        TokenHelper tokenHelper)
+        TokenHelper tokenHelper,
+        IUserCrudService userCrudService)
     {
         _authService = authService;
         _configuration = configuration;
@@ -30,6 +33,7 @@ public class AuthController : ControllerBase
         _authHelper = authHelper;
         _cookieHelper = cookieHelper;
         _tokenHelper = tokenHelper;
+        _userCrudService = userCrudService;
     }
 
     [HttpPost("register")]
@@ -115,6 +119,18 @@ public class AuthController : ControllerBase
     {
         var result = await _authService.ResetPasswordAsync(request.Email, request.Code, request.NewPassword);
         return Ok(result);
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<UserDto>> Me()
+    {
+        var userId = await _authHelper.ResolveCurrentUserId();
+        if (userId == null)
+            return Unauthorized(new { error = "User not authenticated" });
+
+        var user = await _userCrudService.GetByIdAsync(userId.Value);
+        return Ok(user);
     }
 
     [HttpPost("logout")]

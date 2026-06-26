@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Edit, Trash2, Search, Loader2, AlertCircle, BookOpen, Send } from 'lucide-react';
 import Link from 'next/link';
 import { getCourses, deleteCourse, publishCourse, type CourseDTO } from '@/src/shared/api/courses';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import CourseFormModal, { type CourseFormData } from '@/src/features/courses/components/CourseFormModal';
+import { ConfirmDialog } from '@/src/shared/components/ConfirmDialog';
 import styles from './page.module.css';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -29,6 +31,7 @@ function courseToFormData(course: CourseDTO): CourseFormData {
 }
 
 export default function InstructorCursos() {
+  const userId = useAuthStore((s) => s.user?.id);
   const [courses, setCourses] = useState<CourseDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,14 +41,16 @@ export default function InstructorCursos() {
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingCourseId, setEditingCourseId] = useState<string | undefined>();
   const [editingFormData, setEditingFormData] = useState<CourseFormData | undefined>();
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const deleteIdRef = useRef<string | null>(null);
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getCourses({ isPublished: undefined });
+      const data = await getCourses({ isPublished: undefined, instructorId: userId });
       setCourses(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al cargar cursos';
@@ -53,10 +58,10 @@ export default function InstructorCursos() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    fetchCourses();
+    if (userId) fetchCourses();
   }, [fetchCourses]);
 
   const filtered = courses.filter((c) => {
@@ -80,15 +85,29 @@ export default function InstructorCursos() {
     setModalOpen(true);
   }
 
-  async function handleDelete(id: string, title: string) {
-    if (!window.confirm(`¿Estás seguro de eliminar "${title}"?`)) return;
+  function handleDeleteClick(id: string, title: string) {
+    console.log('[Instructor] Delete btn clicked, setting ref:', id);
+    deleteIdRef.current = id;
+    setDeleteTarget({ id, title });
+  }
 
+  async function handleConfirmDelete() {
+    console.log('[Instructor] handleConfirmDelete called, ref:', deleteIdRef.current, 'deleteTarget:', deleteTarget);
+    const id = deleteIdRef.current;
+    if (!id) {
+      console.log('[Instructor] NO ID in ref, returning');
+      return;
+    }
+    console.log('[Instructor] Deleting course:', id);
     setDeletingId(id);
     try {
       await deleteCourse(id);
+      console.log('[Instructor] API delete success for:', id);
       setCourses((prev) => prev.filter((c) => c.id !== id));
+      setDeleteTarget(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al eliminar';
+      console.log('[Instructor] Delete FAILED:', msg);
       alert(msg);
     } finally {
       setDeletingId(null);
@@ -261,7 +280,7 @@ export default function InstructorCursos() {
                                 <Edit size={15} />
                               </button>
                               <button
-                                onClick={() => handleDelete(course.id, course.title)}
+                                onClick={() => handleDeleteClick(course.id, course.title)}
                                 className={`${styles.actionBtn} ${styles.actionDelete}`}
                                 title="Eliminar"
                                 disabled={deletingId === course.id || publishingId === course.id}
@@ -336,7 +355,7 @@ export default function InstructorCursos() {
                             <Edit size={15} /> Editar
                           </button>
                           <button
-                            onClick={() => handleDelete(course.id, course.title)}
+                            onClick={() => handleDeleteClick(course.id, course.title)}
                             className={`${styles.actionBtn} ${styles.actionDelete}`}
                             disabled={deletingId === course.id || publishingId === course.id}
                           >
@@ -363,6 +382,16 @@ export default function InstructorCursos() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Eliminar curso"
+        message={deleteTarget ? `¿Estás seguro de que querés eliminar "${deleteTarget.title}"? Esta acción no se puede deshacer.` : ''}
+        confirmLabel={deletingId === deleteTarget?.id ? 'Eliminando...' : 'Eliminar'}
+        loading={deletingId === deleteTarget?.id}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => { setDeleteTarget(null); setDeletingId(null); }}
+      />
 
       <CourseFormModal
         isOpen={modalOpen}

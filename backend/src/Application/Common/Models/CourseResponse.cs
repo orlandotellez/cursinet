@@ -25,7 +25,6 @@ public record CourseResponse
     public double AverageRating { get; init; }
     public int ReviewsCount { get; init; }
 
-    // Navigation (flattened)
     public Guid InstructorId { get; init; }
     public string InstructorName { get; init; } = string.Empty;
     public Guid CategoryId { get; init; }
@@ -35,4 +34,8 @@ public record CourseResponse
     public DateTime? PublishedAt { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
+
+    public DateTime? DeletedAt { get; init; }
+    public Guid? DeletedByUserId { get; init; }
+    public string? DeletedByName { get; init; }
 }

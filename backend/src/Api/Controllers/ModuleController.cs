@@ -22,7 +22,7 @@ public class ModuleController : ControllerBase
         _authHelper = authHelper;
     }
 
-    /// Obtener todos los módulos de un curso
+    /
     [HttpGet]
     [RequirePermission(Permissions.ModuleRead)]
     public async Task<ActionResult<List<ModuleResponse>>> GetAll(Guid courseId)
@@ -34,7 +34,7 @@ public class ModuleController : ControllerBase
         return Ok(modules);
     }
 
-    /// Obtener detalle de un módulo por ID
+    /
     [HttpGet("{id:guid}")]
     [RequirePermission(Permissions.ModuleRead)]
     public async Task<ActionResult<ModuleResponse>> GetById(Guid courseId, Guid id)
@@ -46,7 +46,7 @@ public class ModuleController : ControllerBase
         return Ok(module);
     }
 
-    /// Obtener curriculum de un curso (público — no requiere auth)
+    /
     [HttpGet("curriculum")]
     [AllowAnonymous]
     public async Task<ActionResult<CurriculumResponse>> GetCurriculum(Guid courseId)
@@ -58,7 +58,7 @@ public class ModuleController : ControllerBase
         return Ok(curriculum);
     }
 
-    /// Crear un módulo
+    /
     [HttpPost]
     [RequirePermission(Permissions.ModuleCreate)]
     public async Task<ActionResult<ModuleResponse>> Create(Guid courseId, [FromBody] CreateModuleRequest request)
@@ -67,11 +67,12 @@ public class ModuleController : ControllerBase
         if (userId == null)
             return Unauthorized(new { error = "User not authenticated" });
 
-        var module = await _moduleService.CreateAsync(courseId, request, userId.Value);
+        var role = GetCurrentUserRole();
+        var module = await _moduleService.CreateAsync(courseId, request, userId.Value, role);
         return CreatedAtAction(nameof(GetById), new { courseId, id = module.Id }, module);
     }
 
-    /// Actualizar un módulo
+    /
     [HttpPut("{id:guid}")]
     [RequirePermission(Permissions.ModuleUpdate)]
     public async Task<ActionResult<ModuleResponse>> Update(Guid courseId, Guid id, [FromBody] UpdateModuleRequest request)
@@ -85,7 +86,7 @@ public class ModuleController : ControllerBase
         return Ok(module);
     }
 
-    /// Soft-delete de un módulo
+    /
     [HttpDelete("{id:guid}")]
     [RequirePermission(Permissions.ModuleDelete)]
     public async Task<ActionResult> Delete(Guid courseId, Guid id)
@@ -99,7 +100,7 @@ public class ModuleController : ControllerBase
         return Ok(new { message = "Module deleted successfully" });
     }
 
-    /// Reordenar módulos
+    /
     [HttpPut("reorder")]
     [RequirePermission(Permissions.ModuleUpdate)]
     public async Task<ActionResult> Reorder(Guid courseId, [FromBody] ReorderRequest request)
@@ -112,8 +113,6 @@ public class ModuleController : ControllerBase
         await _moduleService.ReorderAsync(courseId, request, userId.Value, role);
         return Ok(new { message = "Modules reordered successfully" });
     }
-
-    // ─── Helpers ───────────────────────────────────────────
 
     private async Task<Guid?> GetCurrentUserIdAsync()
         => await _authHelper.ResolveCurrentUserId();

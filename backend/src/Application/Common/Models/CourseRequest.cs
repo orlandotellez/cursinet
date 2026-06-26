@@ -41,5 +41,7 @@ public record CourseFilter(
     CourseLevel? Level = null,
     bool? IsPublished = null,
     bool? IsFeatured = null,
-    string? Search = null
+    string? Search = null,
+    bool? IncludeDeleted = null,
+    Guid? InstructorId = null
 );

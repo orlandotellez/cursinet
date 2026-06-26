@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle, Play } from 'lucide-react';
 import type { Course } from '@/src/shared/types';
 import styles from './LessonSidebar.module.css';
 
@@ -10,9 +10,10 @@ interface LessonSidebarProps {
   expandedModules: string[];
   toggleModule: (id: string) => void;
   lessonId: string;
+  isWelcomeActive?: boolean;
 }
 
-export function LessonSidebar({ course, expandedModules, toggleModule, lessonId }: LessonSidebarProps) {
+export function LessonSidebar({ course, expandedModules, toggleModule, lessonId, isWelcomeActive }: LessonSidebarProps) {
   return (
     <div className={styles.sidebar}>
       <div className={styles.header}>
@@ -24,6 +25,16 @@ export function LessonSidebar({ course, expandedModules, toggleModule, lessonId 
           <span className={styles.progressLabel}>45%</span>
         </div>
       </div>
+
+      {course.previewVideoUrl && (
+        <Link
+          href={`/aprender/${course.id}/${lessonId}?welcome=1`}
+          className={`${styles.welcomeItem} ${isWelcomeActive ? styles.lessonActive : ''}`}
+        >
+          <Play size={14} className={styles.welcomeIcon} />
+          <span className={styles.lessonName}>Video de bienvenida</span>
+        </Link>
+      )}
 
       <div className={styles.curriculum}>
         {course.modules.map((mod) => (

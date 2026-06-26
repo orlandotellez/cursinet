@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, BookOpen, BarChart3, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Users, BookOpen, BarChart3, Compass, Loader2 } from 'lucide-react';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './layout.module.css';
 
 const adminSidebarItems = [
+  { label: 'Explorar Cursos', href: '/cursos', icon: Compass },
   { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { label: 'Usuarios', href: '/admin/usuarios', icon: Users },
   { label: 'Cursos', href: '/admin/cursos', icon: BookOpen },
