@@ -13,6 +13,14 @@ public class EnrollmentRepository : IEnrollmentRepository
         _context = context;
     }
 
+    public async Task<List<Enrollment>> GetAllAsync()
+    {
+        return await _context.Enrollments
+            .Where(e => e.DeletedAt == null)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<Enrollment?> GetByCourseAndUserAsync(Guid courseId, Guid userId)
     {
         return await _context.Enrollments
@@ -35,7 +43,7 @@ public class EnrollmentRepository : IEnrollmentRepository
 
     public async Task<Enrollment> CreateAsync(Enrollment enrollment, Guid courseId)
     {
-        // Get tracked course to atomically increment StudentsCount
+
         var course = await _context.Courses.FindAsync(courseId);
         if (course != null)
         {
@@ -45,7 +53,6 @@ public class EnrollmentRepository : IEnrollmentRepository
         await _context.Enrollments.AddAsync(enrollment);
         await _context.SaveChangesAsync();
 
-        // Reload with includes for the response
         return (await _context.Enrollments
             .Include(e => e.Course)
                 .ThenInclude(c => c.Instructor)

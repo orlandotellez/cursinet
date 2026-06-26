@@ -1,5 +1,6 @@
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Domain.Entities;
+using Cursinet.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cursinet.Infrastructure.Persistence.Repositories;
@@ -27,6 +28,14 @@ public class PaymentRepository : IPaymentRepository
             .Include(p => p.Course)
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<List<Payment>> GetAllCompletedAsync()
+    {
+        return await _context.Payments
+            .Where(p => p.Status == PaymentStatus.Completed)
             .AsNoTracking()
             .ToListAsync();
     }
