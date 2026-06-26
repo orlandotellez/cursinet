@@ -34,6 +34,7 @@ public class LessonRepository : ILessonRepository
     public async Task<Lesson?> GetByIdAsync(Guid id)
     {
         return await _context.Lessons
+            .Include(l => l.Module)
             .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
     }
 

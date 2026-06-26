@@ -14,17 +14,20 @@ public class LessonService : ILessonService
     private readonly IModuleRepository _moduleRepository;
     private readonly ILessonProgressRepository _lessonProgressRepository;
     private readonly ICourseRepository _courseRepository;
+    private readonly IEnrollmentRepository _enrollmentRepository;
 
     public LessonService(
         ILessonRepository lessonRepository,
         IModuleRepository moduleRepository,
         ILessonProgressRepository lessonProgressRepository,
-        ICourseRepository courseRepository)
+        ICourseRepository courseRepository,
+        IEnrollmentRepository enrollmentRepository)
     {
         _lessonRepository = lessonRepository;
         _moduleRepository = moduleRepository;
         _lessonProgressRepository = lessonProgressRepository;
         _courseRepository = courseRepository;
+        _enrollmentRepository = enrollmentRepository;
     }
 
     public async Task<List<LessonSummary>> GetAllAsync(Guid moduleId, Guid? currentUserId, UserRole? role)
@@ -235,7 +238,41 @@ public class LessonService : ILessonService
         };
 
         var result = await _lessonProgressRepository.UpsertAsync(progress);
+
+        // Recalcular progreso del curso en la inscripción
+        if (request.IsCompleted)
+        {
+            await RecalculateCourseProgressAsync(lessonId, userId);
+        }
+
         return result.MapToProgressDto();
+    }
+
+    private async Task RecalculateCourseProgressAsync(Guid lessonId, Guid userId)
+    {
+        var lesson = await _lessonRepository.GetByIdAsync(lessonId);
+        if (lesson?.Module == null) return;
+
+        var courseId = lesson.Module.CourseId;
+
+        var enrollment = await _enrollmentRepository.GetByCourseAndUserAsync(courseId, userId);
+        if (enrollment == null) return;
+
+        var totalLessons = (await _lessonRepository.GetByCourseAsync(courseId))
+            .Count(l => l.IsPublished && l.DeletedAt == null);
+
+        if (totalLessons == 0) return;
+
+        var allProgress = await _lessonProgressRepository.GetByUserAndCourseAsync(userId, courseId);
+        var completedCount = allProgress.Count(p => p.IsCompleted);
+
+        enrollment.ProgressPercentage = Math.Round((decimal)completedCount / totalLessons * 100, 2);
+        enrollment.LastAccessedAt = DateTime.UtcNow;
+
+        if (enrollment.ProgressPercentage >= 100)
+            enrollment.CompletedAt ??= DateTime.UtcNow;
+
+        await _enrollmentRepository.UpdateAsync(enrollment);
     }
 
     private static string GenerateSlug(string title)
