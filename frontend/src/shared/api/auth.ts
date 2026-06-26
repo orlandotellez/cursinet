@@ -2,6 +2,7 @@ import { API_URL } from "../lib/constants";
 import { validateOrThrow } from "../lib/validation";
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from "../validations";
 import { AuthResponse, LoginPayload, RegisterPayload } from "../types";
+import { UserDTO } from "./users";
 
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   validateOrThrow(loginSchema, payload);
@@ -66,6 +67,23 @@ export async function logout(): Promise<void> {
     const error = await res.json().catch(() => ({ message: 'Error al cerrar sesión' }));
     throw new Error(error.message || 'Error al cerrar sesión');
   }
+}
+
+/**
+ * Obtiene el perfil del usuario autenticado.
+ * No requiere permisos especiales — solo estar autenticado.
+ */
+export async function getMyProfile(): Promise<UserDTO> {
+  const res = await fetch(`${API_URL}/auth/me`, {
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: 'Error al cargar perfil' }));
+    throw new Error(error.message || 'Error al cargar perfil');
+  }
+
+  return res.json();
 }
 
 export async function verifyEmail(identifier: string, code: string): Promise<{ message: string }> {

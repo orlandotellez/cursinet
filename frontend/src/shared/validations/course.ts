@@ -1,9 +1,10 @@
 import { z } from 'zod';
 
 export const courseLevelSchema = z.enum([
-  'beginner',
-  'intermediate',
-  'advanced',
+  'Begginer',
+  'Intermediate',
+  'Advanced',
+  'Expert',
 ]);
 
 export const courseStatusSchema = z.enum([

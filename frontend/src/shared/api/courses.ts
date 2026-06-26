@@ -34,6 +34,9 @@ export interface CourseDTO {
   publishedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  deletedAt: string | null;
+  deletedByUserId: string | null;
+  deletedByName: string | null;
 }
 
 export interface CreateCoursePayload {
@@ -88,6 +91,8 @@ export async function getCourses(params?: {
   isPublished?: boolean;
   isFeatured?: boolean;
   search?: string;
+  includeDeleted?: boolean;
+  instructorId?: string;
 }): Promise<CourseDTO[]> {
   const searchParams = new URLSearchParams();
   if (params?.categoryId) searchParams.set('categoryId', params.categoryId);
@@ -95,6 +100,8 @@ export async function getCourses(params?: {
   if (params?.isPublished !== undefined) searchParams.set('isPublished', String(params.isPublished));
   if (params?.isFeatured !== undefined) searchParams.set('isFeatured', String(params.isFeatured));
   if (params?.search) searchParams.set('search', params.search);
+  if (params?.includeDeleted !== undefined) searchParams.set('includeDeleted', String(params.includeDeleted));
+  if (params?.instructorId) searchParams.set('instructorId', params.instructorId);
 
   const qs = searchParams.toString();
   const url = `${API_URL}/courses${qs ? `?${qs}` : ''}`;
@@ -151,6 +158,14 @@ export async function deleteCourse(id: string): Promise<void> {
 
 export async function publishCourse(id: string): Promise<CourseDTO> {
   const res = await authedFetch(`${API_URL}/courses/${id}/publish`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return handleResponse<CourseDTO>(res);
+}
+
+export async function unpublishCourse(id: string): Promise<CourseDTO> {
+  const res = await authedFetch(`${API_URL}/courses/${id}/unpublish`, {
     method: 'POST',
     credentials: 'include',
   });
