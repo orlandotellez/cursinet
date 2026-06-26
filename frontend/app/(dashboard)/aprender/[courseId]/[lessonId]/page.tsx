@@ -124,6 +124,7 @@ function LessonViewerContent() {
                 courseId={v.courseId}
                 prevLesson={v.prevLesson}
                 nextLesson={v.nextLesson}
+                onNext={v.handleMarkComplete}
               />
             </div>
 

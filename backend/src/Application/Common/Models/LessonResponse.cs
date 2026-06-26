@@ -10,6 +10,7 @@ public class LessonSummary
     public int SortOrder { get; init; }
     public bool IsPublished { get; init; }
     public bool IsPreview { get; init; }
+    public bool IsCompleted { get; set; }
     public int? VideoDurationSeconds { get; init; }
 }
 

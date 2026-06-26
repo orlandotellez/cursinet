@@ -19,13 +19,13 @@ const LessonTypeMap: Record<CurriculumLesson['type'], Lesson['type']> = {
   Resource: 'resource',
 };
 
-export function toLesson(l: CurriculumLesson, isCompleted = false): Lesson {
+export function toLesson(l: CurriculumLesson, isCompleted?: boolean): Lesson {
   return {
     id: l.id,
     title: l.title,
     type: LessonTypeMap[l.type],
     duration: Math.floor((l.videoDurationSeconds ?? 0) / 60),
-    isCompleted,
+    isCompleted: isCompleted ?? l.isCompleted ?? false,
   };
 }
 

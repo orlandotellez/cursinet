@@ -16,7 +16,9 @@ namespace Cursinet.Infrastructure.Migrations
     [Migration("20260624152117_Init")]
     partial class Init
     {
-        /
+        /// <summary>
+        /// Builds the target model.
+        /// </summary>
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
