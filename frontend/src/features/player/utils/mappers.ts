@@ -37,6 +37,7 @@ export function toCourse(dto: CourseDTO, curriculum: CurriculumResponse): Course
     shortDescription: dto.shortDescription ?? '',
     description: dto.description ?? '',
     thumbnail: dto.thumbnailUrl ?? '',
+    previewVideoUrl: dto.previewVideoUrl ?? null,
     instructor: {
       id: dto.instructorId,
       name: dto.instructorName,

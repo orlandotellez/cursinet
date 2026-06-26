@@ -1,15 +1,14 @@
 'use client'
 
-import { useState } from 'react';
-import { Bell, CheckCheck } from 'lucide-react';
-import { mockNotifications } from '@/src/features/courses/data';
-import type { Notification as NotificationType } from '@/src/shared/types';
+import { useState, useEffect } from 'react';
+import { Bell, CheckCheck, Loader2 } from 'lucide-react';
+import type { Notification } from '@/src/shared/types';
 import { NotificationCard } from '@/src/features/notifications/components/NotificationCard';
 import styles from './page.module.css';
 
 export default function NotificacionesPage() {
-  const [notifications, setNotifications] =
-    useState<NotificationType[]>(mockNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -24,6 +23,24 @@ export default function NotificacionesPage() {
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
   };
+
+  useEffect(() => {
+    // TODO: Reemplazar con llamada real a API de notificaciones cuando exista
+    // const notifications = await getMyNotifications();
+    // setNotifications(notifications);
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Notificaciones</h1>
+          <Loader2 size={20} className={styles.loadingSpinner} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>

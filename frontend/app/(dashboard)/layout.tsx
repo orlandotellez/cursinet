@@ -9,6 +9,7 @@ import {
   Heart,
   Bell,
   Settings,
+  Compass,
   Loader2,
 } from 'lucide-react';
 import styles from './layout.module.css';
@@ -18,6 +19,7 @@ import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { redirectByRole } from '@/src/shared/lib/authUtils';
 
 const sidebarItems = [
+  { label: 'Explorar Cursos', href: '/cursos', icon: Compass },
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Mis Cursos', href: '/mis-cursos', icon: BookOpen },
   { label: 'Certificados', href: '/certificados', icon: Award },

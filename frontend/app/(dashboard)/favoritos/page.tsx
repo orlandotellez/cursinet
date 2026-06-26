@@ -1,18 +1,35 @@
 'use client'
 
-import { useState } from 'react';
-import { Heart } from 'lucide-react';
-import { featuredCourses } from '@/src/features/courses/data';
+import { useEffect } from 'react';
+import { Heart, Loader2 } from 'lucide-react';
 import type { CourseCardData } from '@/src/shared/types';
 import { FavoriteCard } from '@/src/features/courses/favorites/FavoriteCard';
+import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
 import styles from './page.module.css';
 
 export default function FavoritosPage() {
-  const [favorites, setFavorites] = useState<CourseCardData[]>(featuredCourses);
+  const { bookmarks, isLoading, loadBookmarks, getFavoriteCourses, toggleBookmark } = useBookmarkStore();
 
-  const removeFavorite = (id: string) => {
-    setFavorites((prev) => prev.filter((c) => c.id !== id));
+  useEffect(() => {
+    loadBookmarks();
+  }, [loadBookmarks]);
+
+  const favorites: CourseCardData[] = getFavoriteCourses();
+
+  const handleRemove = (id: string) => {
+    toggleBookmark(id);
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Favoritos</h1>
+          <Loader2 size={20} className={styles.loadingSpinner} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -37,7 +54,7 @@ export default function FavoritosPage() {
             <FavoriteCard
               key={course.id}
               course={course}
-              onRemove={removeFavorite}
+              onRemove={handleRemove}
             />
           ))}
         </div>

@@ -1,17 +1,23 @@
 'use client'
 
-import { useState } from 'react';
-import { Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Save, Loader2 } from 'lucide-react';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
+import { getMyProfile } from '@/src/shared/api/auth';
+import { updateUser } from '@/src/shared/api/users';
 import { ProfileSection } from '@/src/features/settings/components/ProfileSection';
 import { PasswordSection } from '@/src/features/settings/components/PasswordSection';
 import { NotificationPreferences } from '@/src/features/settings/components/NotificationPreferences';
 import styles from './page.module.css';
 
 export default function ConfiguracionPage() {
+  const user = useAuthStore((s) => s.user);
+  const isDemoMode = useAuthStore((s) => s.isDemoMode);
+
   const [profile, setProfile] = useState({
-    name: 'Sofia Martínez',
-    email: 'sofia@email.com',
-    bio: 'Full-stack developer en formación',
+    name: user?.name ?? '',
+    email: user?.email ?? '',
+    bio: user?.bio ?? '',
   });
 
   const [password, setPassword] = useState({
@@ -29,7 +35,44 @@ export default function ConfiguracionPage() {
     marketing: false,
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Cargar perfil completo desde la API
+  useEffect(() => {
+    const userId = user?.id;
+    if (!userId || isDemoMode) {
+      setIsLoading(false);
+      return;
+    }
+
+    let mounted = true;
+
+    async function loadProfile() {
+      try {
+        const userData = await getMyProfile();
+        if (mounted) {
+          setProfile({
+            name: userData.name ?? '',
+            email: userData.email ?? '',
+            bio: userData.bio ?? '',
+          });
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
+        // Si falla la API, nos quedamos con lo que tenemos del auth store
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    loadProfile();
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id, isDemoMode]);
 
   const handleProfileChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -43,19 +86,56 @@ export default function ConfiguracionPage() {
     setPassword((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setError(null);
+
+    if (!user?.id) {
+      setError('Debes iniciar sesión para guardar cambios');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await updateUser(user.id, {
+        name: profile.name,
+        email: profile.email,
+        bio: profile.bio || null,
+      });
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al guardar cambios';
+      setError(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleNotification = (key: keyof typeof notifications) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <h1 className={styles.title}>Configuración</h1>
+        <p className={styles.loading}>Cargando configuración...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Configuración</h1>
+
+      {error && (
+        <div className={styles.error}>
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSave} className={styles.form}>
         <ProfileSection profile={profile} onChange={handleProfileChange} />
@@ -70,9 +150,17 @@ export default function ConfiguracionPage() {
           onToggle={toggleNotification}
         />
 
-        <button type="submit" className={styles.saveBtn}>
-          <Save size={16} />
-          {saved ? 'Guardado' : 'Guardar cambios'}
+        <button
+          type="submit"
+          className={styles.saveBtn}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <Loader2 size={16} className={styles.spinner} />
+          ) : (
+            <Save size={16} />
+          )}
+          {isSaving ? 'Guardando...' : saved ? 'Guardado ✓' : 'Guardar cambios'}
         </button>
       </form>
     </div>

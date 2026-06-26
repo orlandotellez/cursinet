@@ -16,6 +16,21 @@
   gap: 32px;
 }
 
+.loading {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.error {
+  padding: 12px 16px;
+  background: var(--danger-bg, #fef2f2);
+  border: 1px solid var(--danger-border, #fecaca);
+  border-radius: var(--radius-input, 8px);
+  color: var(--danger, #dc2626);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
 .saveBtn {
   display: inline-flex;
   align-items: center;
@@ -29,10 +44,30 @@
   font-weight: 500;
   transition: background var(--transition-fast);
   align-self: flex-start;
+  cursor: pointer;
+  border: none;
 }
 
 .saveBtn:hover {
   background: var(--accent-hover);
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 480px) {

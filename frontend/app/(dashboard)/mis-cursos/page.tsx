@@ -5,6 +5,7 @@ import { BookOpen } from 'lucide-react';
 import { FilterTabs } from '@/src/features/courses/mycourses/FilterTabs';
 import { EnrolledCard } from '@/src/features/courses/mycourses/EnrolledCard';
 import { useEnrollmentStore } from '@/src/shared/store/useEnrollmentStore';
+import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
 import styles from './page.module.css';
 
 type Filter = 'all' | 'in-progress' | 'completed';
@@ -12,10 +13,12 @@ type Filter = 'all' | 'in-progress' | 'completed';
 export default function MisCursosPage() {
   const [filter, setFilter] = useState<Filter>('all');
   const { enrollments, loadMyEnrollments, isLoading } = useEnrollmentStore();
+  const loadBookmarks = useBookmarkStore((s) => s.loadBookmarks);
 
   useEffect(() => {
     loadMyEnrollments();
-  }, [loadMyEnrollments]);
+    loadBookmarks();
+  }, [loadMyEnrollments, loadBookmarks]);
 
   const filtered = enrollments.filter((e) => {
     if (filter === 'in-progress') return e.progress > 0 && e.progress < 100;
