@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { redirectByRole } from '@/src/shared/lib/authUtils';
+import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
 import { validateShape } from '@/src/shared/lib/validation';
 import { loginSchema } from '@/src/shared/validations';
 import styles from './page.module.css';
@@ -14,28 +15,14 @@ import { useSubscriptionStore } from '@/src/shared/store/useSubscriptionStore';
 
 export default function IniciarSesionPage() {
   const router = useRouter();
-  const { isAuthenticated, login, isLoading, error, clearError } = useAuthStore();
-  // Guard: esperar a que Zustand hidrate desde localStorage
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    const persist = useAuthStore.persist;
-    if (!persist) { setHydrated(true); return; }
-    const unsub = persist.onFinishHydration(() => setHydrated(true));
-    if (persist.hasHydrated()) setHydrated(true);
-    return unsub;
-  }, []);
-
-  // Si ya tiene sesión y el store ya hidrató, redirigir según rol
-  useEffect(() => {
-    if (hydrated && isAuthenticated) {
-      const role = useAuthStore.getState().user?.role;
-      redirectByRole(role, router.replace);
-    }
-  }, [hydrated, isAuthenticated, router]);
+  const { isLoading: guardLoading } = useAuthGuard({ requireAuth: false });
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  if (guardLoading) return null;
 
   function validate() {
     const result = validateShape(loginSchema, { email, password });
@@ -119,7 +106,7 @@ export default function IniciarSesionPage() {
         <button className={styles.submitBtn} type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className={styles.btnLoading}>
-              <Loader2 size={18} className={styles.spinner} />
+              <Spinner size="sm" className={styles.spinner} />
               Iniciando sesión…
             </span>
           ) : (
