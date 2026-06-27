@@ -36,3 +36,19 @@ public record ResetPasswordRequest(
 public record ResendVerificationRequest(
     string Email
 );
+
+public record UpdateMyProfileRequest(
+    string? Name = null,
+    string? Bio = null,
+    string? Phone = null,
+    string? UserName = null,
+    string? WebsiteUrl = null,
+    string? GithubUrl = null,
+    string? LinkedinUrl = null,
+    string? Image = null
+);
+
+public record ChangePasswordRequest(
+    string CurrentPassword,
+    string NewPassword
+);

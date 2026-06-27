@@ -12,4 +12,6 @@ public interface IAuthService
     Task<ForgotPasswordResponse> ForgotPasswordAsync(string email);
     Task<ResetPasswordResponse> ResetPasswordAsync(string email, string code, string newPassword);
     Task ResendVerificationAsync(string email);
+    Task<UserDto> UpdateMyProfileAsync(Guid userId, UpdateMyProfileRequest request);
+    Task<UserDto> ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
 }

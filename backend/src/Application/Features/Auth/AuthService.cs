@@ -342,6 +342,61 @@ public class AuthService : IAuthService
         };
     }
 
+    public async Task<UserDto> UpdateMyProfileAsync(Guid userId, UpdateMyProfileRequest request)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+            throw AppExceptions.NotFound("User not found");
+
+        if (request.Name != null)
+            user.Name = request.Name;
+        if (request.Bio != null)
+            user.Bio = request.Bio;
+        if (request.Phone != null)
+            user.Phone = request.Phone;
+        if (request.UserName != null)
+            user.UserName = request.UserName;
+        if (request.WebsiteUrl != null)
+            user.WebsiteUrl = request.WebsiteUrl;
+        if (request.GithubUrl != null)
+            user.GithubUrl = request.GithubUrl;
+        if (request.LinkedinUrl != null)
+            user.LinkedinUrl = request.LinkedinUrl;
+        if (request.Image != null)
+            user.Image = request.Image;
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        // Email update needs special handling (re-verification)
+        // For now, email is not updatable via this endpoint
+
+        var updated = await _userRepository.UpdateAsync(user);
+        return updated.MapUserToDto();
+    }
+
+    public async Task<UserDto> ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+            throw AppExceptions.NotFound("User not found");
+
+        var account = await _accountRepository.GetCredentialsByUserIdAsync(userId);
+        if (account == null)
+            throw AppExceptions.NotFound("Password account not found");
+
+        if (account.Password == null || !_passwordService.VerifyPassword(request.CurrentPassword, account.Password))
+            throw AppExceptions.BadRequest("Current password is incorrect");
+
+        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 8)
+            throw AppExceptions.BadRequest("New password must be at least 8 characters");
+
+        account.Password = _passwordService.HashPassword(request.NewPassword);
+        account.UpdatedAt = DateTime.UtcNow;
+        await _accountRepository.UpdateAsync(account);
+
+        return user.MapUserToDto();
+    }
+
     private static string GenerateVerificationCode()
     {
         const string chars = "0123456789";
