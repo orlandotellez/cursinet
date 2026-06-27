@@ -25,14 +25,34 @@ const proFeatures = [
 
 export default function SuscripcionPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { subscription, setFreePlan, upgradeToPro, cancelSubscription } = useSubscriptionStore();
+  const { subscription, loading, fetchSubscription, setFreePlan, upgradeToPro, cancelMySubscription, reactivateMySubscription } = useSubscriptionStore();
   const [ready, setReady] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    if (!subscription) setFreePlan();
+    fetchSubscription();
     setReady(true);
-  }, [isAuthenticated, subscription, setFreePlan]);
+  }, [isAuthenticated, fetchSubscription]);
+
+  async function handleCancel() {
+    setCancelling(true);
+    try {
+      await cancelMySubscription();
+    } catch {
+      // error handled by store
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  async function handleReactivate() {
+    try {
+      await reactivateMySubscription();
+    } catch {
+      // error handled by store
+    }
+  }
 
   if (!ready) {
     return <SuscripcionSkeleton />;
@@ -105,13 +125,13 @@ export default function SuscripcionPage() {
           )}
 
           {isPro && !isCancelled && (
-            <button className={styles.cancelBtn} onClick={cancelSubscription}>
-              Cancelar suscripción
+            <button className={styles.cancelBtn} onClick={handleCancel} disabled={cancelling}>
+              {cancelling ? 'Cancelando...' : 'Cancelar suscripción'}
             </button>
           )}
 
           {isPro && isCancelled && (
-            <button className={styles.upgradeBtn} onClick={upgradeToPro}>
+            <button className={styles.upgradeBtn} onClick={handleReactivate}>
               Reactivar suscripción
             </button>
           )}

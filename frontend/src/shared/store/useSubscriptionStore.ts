@@ -2,14 +2,25 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Subscription, SubscriptionPlan } from '../types';
+import * as subscriptionsApi from '../api/subscriptions';
+import type { SubscriptionPlan } from '../types';
 
 interface SubscriptionState {
-  subscription: Subscription | null;
+  subscription: {
+    plan: string;
+    status: string;
+    currentPeriodStart?: string;
+    currentPeriodEnd?: string;
+    cancelAtPeriodEnd?: boolean;
+  } | null;
+  loading: boolean;
+  error: string | null;
 
+  fetchSubscription: () => Promise<void>;
   setFreePlan: () => void;
   upgradeToPro: () => void;
-  cancelSubscription: () => void;
+  cancelMySubscription: () => Promise<void>;
+  reactivateMySubscription: () => Promise<void>;
   isOnPlan: (plan: SubscriptionPlan) => boolean;
 }
 
@@ -17,13 +28,35 @@ export const useSubscriptionStore = create<SubscriptionState>()(
   persist(
     (set, get) => ({
       subscription: null,
+      loading: false,
+      error: null,
+
+      fetchSubscription: async () => {
+        set({ loading: true, error: null });
+        try {
+          const data = await subscriptionsApi.getMySubscription();
+          set({
+            subscription: {
+              plan: data.plan,
+              status: data.status,
+              currentPeriodStart: data.currentPeriodStart ?? undefined,
+              currentPeriodEnd: data.currentPeriodEnd ?? undefined,
+              cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+            },
+            loading: false,
+          });
+        } catch {
+          // If API fails, fall back to free plan
+          set({
+            subscription: { plan: 'free', status: 'active' },
+            loading: false,
+          });
+        }
+      },
 
       setFreePlan: () => {
         set({
-          subscription: {
-            plan: 'free',
-            status: 'active',
-          },
+          subscription: { plan: 'free', status: 'active' },
         });
       },
 
@@ -40,12 +73,43 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         });
       },
 
-      cancelSubscription: () => {
-        const current = get().subscription;
-        if (current) {
+      cancelMySubscription: async () => {
+        set({ error: null });
+        try {
+          const data = await subscriptionsApi.cancelSubscription();
           set({
-            subscription: { ...current, status: 'cancelled' },
+            subscription: {
+              plan: data.plan,
+              status: data.status,
+              currentPeriodStart: data.currentPeriodStart ?? undefined,
+              currentPeriodEnd: data.currentPeriodEnd ?? undefined,
+              cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+            },
           });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Error al cancelar suscripción';
+          set({ error: message });
+          throw err;
+        }
+      },
+
+      reactivateMySubscription: async () => {
+        set({ error: null });
+        try {
+          const data = await subscriptionsApi.reactivateSubscription();
+          set({
+            subscription: {
+              plan: data.plan,
+              status: data.status,
+              currentPeriodStart: data.currentPeriodStart ?? undefined,
+              currentPeriodEnd: data.currentPeriodEnd ?? undefined,
+              cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+            },
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Error al reactivar suscripción';
+          set({ error: message });
+          throw err;
         }
       },
 

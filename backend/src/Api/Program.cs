@@ -16,6 +16,7 @@ using Cursinet.Application.Features.Bookmarks;
 using Cursinet.Application.Features.Comments;
 using Cursinet.Application.Features.LessonNotes;
 using Cursinet.Application.Features.NotificationPreferences;
+using Cursinet.Application.Features.Subscriptions;
 using Cursinet.Domain.Enums;
 using Cursinet.Api.Middleware;
 using Cursinet.Infrastructure.Persistence;
@@ -133,6 +134,8 @@ builder.Services.AddScoped<ILessonNoteService, LessonNoteService>();
 builder.Services.AddScoped<ILessonNoteRepository, LessonNoteRepository>();
 builder.Services.AddScoped<INotificationPreferenceService, NotificationPreferenceService>();
 builder.Services.AddScoped<IUserNotificationPreferenceRepository, UserNotificationPreferenceRepository>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 
 builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 

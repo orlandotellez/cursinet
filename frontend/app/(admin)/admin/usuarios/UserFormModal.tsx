@@ -47,6 +47,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
   const [websiteUrl, setWebsiteUrl] = useState(user?.websiteUrl ?? '');
   const [githubUrl, setGithubUrl] = useState(user?.githubUrl ?? '');
   const [linkedinUrl, setLinkedinUrl] = useState(user?.linkedinUrl ?? '');
+  const [isActive, setIsActive] = useState(user?.isActive ?? true);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +70,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
           websiteUrl: websiteUrl || null,
           githubUrl: githubUrl || null,
           linkedinUrl: linkedinUrl || null,
+          isActive,
         };
         await onSave(payload);
       } else {
@@ -155,6 +157,23 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
               <label htmlFor="linkedin">LinkedIn</label>
               <input id="linkedin" value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/..." />
             </div>
+
+            {isEdit && (
+              <div className={styles.formFieldFull}>
+                <label className={styles.toggleLabel}>
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                    style={{ marginRight: 8 }}
+                  />
+                  Usuario activo
+                </label>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  {isActive ? 'El usuario puede acceder a la plataforma' : 'El usuario no podrá iniciar sesión'}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className={styles.formActions}>
