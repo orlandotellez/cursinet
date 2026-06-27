@@ -32,11 +32,18 @@
   --border: #15171d;
   --border-strong: #1e2028;
 
-  /* Radii */
-  --radius-card: 5px;
-  --radius-input: 5px;
-  --radius-badge: 5px;
-  --radius-modal: 5px;
+  /* Radii — jerarquía */
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Radii — alias semánticos (mapean a la jerarquía) */
+  --radius-card: var(--radius-md);
+  --radius-input: var(--radius-md);
+  --radius-badge: var(--radius-sm);
+  --radius-modal: var(--radius-lg);
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -55,13 +62,13 @@
   --plyr-menu-background: rgba(15, 23, 42, 0.96);
   --plyr-menu-color: var(--text-primary);
   --plyr-menu-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --plyr-menu-radius: 5px;
+  --plyr-menu-radius: var(--radius-lg);
   --plyr-menu-border-color: var(--border-strong);
   --plyr-menu-border-shadow-color: transparent;
   --plyr-tooltip-background: rgba(15, 23, 42, 0.96);
   --plyr-tooltip-color: var(--text-primary);
   --plyr-tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --plyr-tooltip-radius: 5px;
+  --plyr-tooltip-radius: var(--radius-md);
   --plyr-range-thumb-background: #fff;
   --plyr-range-thumb-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   --plyr-range-fill-background: var(--accent);
@@ -79,7 +86,7 @@
   --plyr-line-height: 1.5;
   --plyr-control-spacing: 12px;
   --plyr-control-icon-size: 20px;
-  --plyr-control-radius: 5px;
+  --plyr-control-radius: var(--radius-sm);
 }
 
 *,
