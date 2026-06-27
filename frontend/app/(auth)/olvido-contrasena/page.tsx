@@ -2,39 +2,34 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { forgotPasswordSchema } from '@/src/shared/validations';
+import { useAuthForm } from '@/src/shared/hooks/useAuthForm';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
 export default function OlvidoContrasenaPage() {
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ message: string; code?: string } | null>(null);
+  const [success, setSuccess] = useState<{ message: string } | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const { isLoading, error, execute, clearError } = useAuthForm();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const validation = validateShape(forgotPasswordSchema, { email });
     if (!validation.success) {
-      setError(validation.fieldErrors.email ?? 'Error de validación');
+      setValidationError(validation.fieldErrors.email ?? 'Error de validación');
       return;
     }
+    setValidationError(null);
 
-    setIsLoading(true);
-    setError(null);
     setSuccess(null);
-
-    try {
-      const result = await authApi.forgotPassword(email.trim());
+    const result = await execute(() => authApi.forgotPassword(email.trim()));
+    if (result) {
       setSuccess({ message: result.message });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al solicitar restablecimiento');
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -74,7 +69,7 @@ export default function OlvidoContrasenaPage() {
         Ingresá tu correo y te enviaremos un código para restablecerla
       </p>
 
-      {error && <ErrorBanner error={error} clearError={() => setError(null)} />}
+      {(error || validationError) && <ErrorBanner error={error ?? validationError ?? ''} clearError={() => { clearError(); setValidationError(null); }} />}
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
@@ -87,7 +82,7 @@ export default function OlvidoContrasenaPage() {
             type="email"
             placeholder="tu@correo.com"
             value={email}
-            onChange={(e) => { setEmail(e.target.value); setError(null); }}
+            onChange={(e) => { setEmail(e.target.value); clearError(); }}
             autoComplete="email"
             disabled={isLoading}
           />
@@ -96,7 +91,7 @@ export default function OlvidoContrasenaPage() {
         <button className={styles.submitBtn} type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className={styles.btnLoading}>
-              <Loader2 size={18} className={styles.spinner} />
+              <Spinner size="sm" className={styles.spinner} />
               Enviando…
             </span>
           ) : (
