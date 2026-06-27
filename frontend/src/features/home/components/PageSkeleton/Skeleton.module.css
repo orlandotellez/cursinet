@@ -148,7 +148,7 @@
 .catBadge {
   width: 50px;
   height: 18px;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .catGridTitle {
@@ -173,7 +173,7 @@
 .catIconBox {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 
@@ -329,7 +329,7 @@
 .metaCategory {
   width: 80px;
   height: 14px;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .metaLevel {
@@ -421,7 +421,7 @@
 .categoryIconBox {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 
@@ -446,7 +446,7 @@
 .categoryArrowBox {
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 

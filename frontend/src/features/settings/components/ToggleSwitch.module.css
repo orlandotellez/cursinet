@@ -33,7 +33,7 @@
   position: absolute;
   inset: 0;
   background: var(--bg-elevated);
-  border-radius: 12px;
+  border-radius: 5px;
   transition: background var(--transition-fast);
   cursor: pointer;
 }

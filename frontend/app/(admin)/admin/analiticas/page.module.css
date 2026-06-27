@@ -37,7 +37,7 @@
 .statIcon {
   width: 48px;
   height: 48px;
-  border-radius: 10px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,14 +108,14 @@
   display: flex;
   gap: 4px;
   background: var(--bg-elevated);
-  border-radius: 8px;
+  border-radius: 5px;
   padding: 2px;
 }
 
 .rangeTab {
   padding: 6px 12px;
   border: none;
-  border-radius: 6px;
+  border-radius: 5px;
   background: transparent;
   color: var(--text-secondary);
   font-size: 12px;
@@ -167,7 +167,7 @@
   width: 100%;
   max-width: 36px;
   background: #2563EB;
-  border-radius: 4px 4px 0 0;
+  border-radius: 5px 5px 0 0;
   min-height: 4px;
   transition: height var(--transition-panel);
 }
@@ -250,14 +250,14 @@
   flex: 1;
   height: 8px;
   background: var(--bg-elevated);
-  border-radius: 4px;
+  border-radius: 5px;
   overflow: hidden;
 }
 
 .catBar {
   height: 100%;
   background: #2563EB;
-  border-radius: 4px;
+  border-radius: 5px;
   transition: width var(--transition-panel);
   min-width: 4px;
 }

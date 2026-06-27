@@ -90,7 +90,7 @@
   position: relative;
   padding-bottom: 56.25%;
 
-  border-radius: 12px;
+  border-radius: 5px;
   overflow: hidden;
   background: var(--bg-elevated);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
@@ -122,7 +122,7 @@
   color: #fff;
   background: var(--accent, #6366f1);
   border: none;
-  border-radius: var(--radius-input, 8px);
+  border-radius: var(--radius-input, 5px);
   cursor: pointer;
   transition: opacity var(--transition-fast);
 }
@@ -163,7 +163,7 @@
   );
   background-size: 800px 100%;
   animation: shimmer 1.8s ease-in-out infinite;
-  border-radius: 6px;
+  border-radius: 5px;
 }
 
 .pageSkeleton {
@@ -190,7 +190,7 @@
 .videoSkeleton {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 12px;
+  border-radius: 5px;
 }
 
 .navSkeleton {
@@ -247,7 +247,7 @@
 .sidebarProgressSkeleton {
   height: 6px;
   width: 100%;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 .moduleSkeleton {
@@ -261,7 +261,7 @@
 .moduleChevronSkeleton {
   height: 16px;
   width: 16px;
-  border-radius: 4px;
+  border-radius: 5px;
   flex-shrink: 0;
 }
 
@@ -273,6 +273,6 @@
 .moduleCountSkeleton {
   height: 18px;
   width: 24px;
-  border-radius: 10px;
+  border-radius: 5px;
   flex-shrink: 0;
 }

@@ -4,6 +4,10 @@
 }
 
 .heroInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   max-width: 720px;
   margin: 0 auto;
 }
@@ -18,6 +22,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  align-items: center;
 }
 
 .heroTitle {
@@ -62,6 +67,7 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  justify-content: center;
 }
 
 .heroBtnPrimary {
@@ -81,23 +87,5 @@
 .heroBtnPrimary:hover {
   background: var(--accent-hover);
 }
-
-.heroBtnGhost {
-  display: inline-flex;
-  align-items: center;
-  padding: 14px 4px;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-bottom: 1px solid transparent;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
-  text-decoration: none;
-}
-
-.heroBtnGhost:hover {
-  color: var(--text-primary);
-  border-color: var(--text-primary);
-}
-
 
 

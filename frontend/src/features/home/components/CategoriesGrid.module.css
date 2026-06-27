@@ -116,7 +116,7 @@
 .categoryIcon {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: 5px;
   background: var(--accent-light);
   color: var(--accent-text);
   display: flex;

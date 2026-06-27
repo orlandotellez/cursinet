@@ -73,7 +73,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
-  border-radius: 4px;
+  border-radius: 5px;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
@@ -244,7 +244,7 @@
   gap: 4px;
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 5px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
@@ -312,7 +312,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   color: var(--text-secondary);
@@ -351,7 +351,7 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 5px;
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   color: var(--text-secondary);
