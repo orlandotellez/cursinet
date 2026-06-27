@@ -1,5 +1,6 @@
 'use client'
 
+import { Film } from 'lucide-react';
 import { VideoPlayer } from '@/src/shared/components/VideoPlayer';
 import styles from './VideoContent.module.css';
 
@@ -14,7 +15,11 @@ export function VideoContent({ videoUrl, title, emptyMessage }: VideoContentProp
     return (
       <section className={styles.wrapper}>
         <div className={styles.emptyState}>
-          {emptyMessage ?? 'No hay URL de video configurada.'}
+          <Film size={36} className={styles.emptyIcon} />
+          <p className={styles.emptyTitle}>{emptyMessage ?? 'Material en preparación'}</p>
+          <p className={styles.emptyDesc}>
+            El video de esta lección aún no está disponible. Pronto vas a poder acceder a todo el contenido.
+          </p>
         </div>
       </section>
     );
