@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Save, Loader2, AlertCircle } from 'lucide-react';
+import { X, Save, AlertCircle } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import styles from '../page.module.css';
 
 const LESSON_TYPES = [
@@ -231,7 +232,7 @@ export function LessonFormModal({
             <button type="submit" className={styles.submitBtn} disabled={saving}>
               {saving ? (
                 <>
-                  <Loader2 size={16} className={styles.spinner} />
+                  <Spinner size="sm" className={styles.spinner} />
                   Guardando...
                 </>
               ) : (

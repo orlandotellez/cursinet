@@ -19,43 +19,6 @@
   height: 100%;
 }
 
-/* Thumbnail */
-.thumbnail {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-}
-
-.thumbnailPlaceholder {
-  width: 100%;
-  height: 100%;
-  background: var(--bg-elevated);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.thumbnailText {
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-radius: var(--radius-badge);
-  background: var(--accent);
-  color: white;
-}
-
 /* Content */
 .content {
   padding: 20px;
@@ -79,29 +42,6 @@
   color: var(--accent-text);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.level {
-  font-size: 11px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: var(--radius-badge);
-  text-transform: capitalize;
-}
-
-.beginner {
-  background: var(--success-bg);
-  color: var(--success);
-}
-
-.intermediate {
-  background: var(--warning-bg);
-  color: var(--warning);
-}
-
-.advanced {
-  background: var(--danger-bg);
-  color: var(--danger);
 }
 
 /* Title */
@@ -150,25 +90,6 @@
 .instructorName {
   font-size: 13px;
   color: var(--text-secondary);
-}
-
-/* Stats */
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.stat svg {
-  flex-shrink: 0;
 }
 
 /* Footer */

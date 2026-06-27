@@ -1,20 +1,16 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Search, Eye, Edit, Trash2, Ghost, AlertCircle, RotateCw, Plus, Send, EyeOff, BookOpen } from 'lucide-react';
-import { getCourses, deleteCourse, publishCourse, unpublishCourse, type CourseDTO } from '@/src/shared/api/courses';
-import { getCategories, type CategoryDTO } from '@/src/shared/api/categories';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, Eye, Edit, Trash2, Ghost, AlertCircle, Plus, Send, EyeOff, BookOpen } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
+import { useCourseCrud, type StatusFilter } from '@/src/features/admin/hooks/useCourseCrud';
 import { ConfirmDialog } from '@/src/shared/components/ConfirmDialog';
-import CourseFormModal, { type CourseFormData } from '@/src/features/courses/components/CourseFormModal';
+import CourseFormModal from '@/src/features/courses/components/CourseFormModal';
+import { courseToFormData } from '@/src/features/courses/utils/courseToFormData';
 import CourseDetailModal from './CourseDetailModal';
 import styles from './page.module.css';
-
-interface DeleteTarget {
-  id: string;
-  title: string;
-}
-
-type StatusFilter = 'all' | 'published' | 'draft' | 'deleted';
+import type { CourseDTO } from '@/src/shared/api/courses';
+import type { CourseFormData } from '@/src/features/courses/components/CourseFormModal';
 
 function statusInfo(course: CourseDTO): { label: string; className: string } {
   if (course.deletedAt) return { label: 'Eliminado', className: 'statusRejected' };
@@ -22,134 +18,49 @@ function statusInfo(course: CourseDTO): { label: string; className: string } {
   return { label: 'Borrador', className: 'statusDraft' };
 }
 
-function courseToFormData(course: CourseDTO): CourseFormData {
-  return {
-    title: course.title,
-    shortDescription: course.shortDescription ?? '',
-    description: course.description ?? '',
-    categoryId: course.categoryId,
-    level: course.level,
-    price: String(course.price),
-    previewVideoUrl: course.previewVideoUrl ?? '',
-    durationMinutes: String(course.durationMinutes),
-    requirements: (course.requirements ?? []).join('\n'),
-    learningObjectives: (course.learningObjectives ?? []).join('\n'),
-    isFree: course.isFree,
-  };
-}
+const statusTabs: { key: StatusFilter; label: string }[] = [
+  { key: 'all', label: 'Todos' },
+  { key: 'published', label: 'Publicados' },
+  { key: 'draft', label: 'Borradores' },
+  { key: 'deleted', label: 'Eliminados' },
+];
 
 export default function AdminCursos() {
-  const [courses, setCourses] = useState<CourseDTO[]>([]);
-  const [categories, setCategories] = useState<CategoryDTO[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [instructorFilter, setInstructorFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const crud = useCourseCrud();
   const [detailCourse, setDetailCourse] = useState<CourseDTO | null>(null);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
   const [editingCourseId, setEditingCourseId] = useState<string | undefined>();
   const [editingFormData, setEditingFormData] = useState<CourseFormData | undefined>();
-  const [publishingId, setPublishingId] = useState<string | null>(null);
-  const deleteIdRef = useRef<string | null>(null);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [coursesData, categoriesData] = await Promise.all([
-        getCourses({ includeDeleted: true }),
-        getCategories(),
-      ]);
-      setCourses(coursesData);
-      setCategories(categoriesData);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al cargar datos';
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    crud.fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Extract unique instructors from course data
+  // Extract unique instructors
   const instructors = useMemo(() => {
     const map = new Map<string, string>();
-    courses.forEach((c) => {
-      if (!map.has(c.instructorId)) {
-        map.set(c.instructorId, c.instructorName);
-      }
+    crud.courses.forEach((c) => {
+      if (!map.has(c.instructorId)) map.set(c.instructorId, c.instructorName);
     });
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [courses]);
+  }, [crud.courses]);
 
   const filtered = useMemo(() => {
-    return courses.filter((course) => {
-      // Search filter
-      if (search && !course.title.toLowerCase().includes(search.toLowerCase())) {
-        return false;
-      }
-      // Category filter
-      if (categoryFilter !== 'all' && course.categoryId !== categoryFilter) {
-        return false;
-      }
-      // Instructor filter
-      if (instructorFilter !== 'all' && course.instructorId !== instructorFilter) {
-        return false;
-      }
-      // Status filter
-      if (statusFilter === 'published' && (!course.isPublished || course.deletedAt)) {
-        return false;
-      }
-      if (statusFilter === 'draft' && (course.isPublished || course.deletedAt)) {
-        return false;
-      }
-      if (statusFilter === 'deleted' && !course.deletedAt) {
-        return false;
-      }
-      // 'all' shows active courses only (published + draft)
-      if (statusFilter === 'all' && course.deletedAt) {
-        return false;
-      }
+    return crud.courses.filter((course) => {
+      if (crud.search && !course.title.toLowerCase().includes(crud.search.toLowerCase())) return false;
+      if (crud.categoryFilter !== 'all' && course.categoryId !== crud.categoryFilter) return false;
+      if (crud.instructorFilter !== 'all' && course.instructorId !== crud.instructorFilter) return false;
+      if (crud.statusFilter === 'published' && (!course.isPublished || course.deletedAt)) return false;
+      if (crud.statusFilter === 'draft' && (course.isPublished || course.deletedAt)) return false;
+      if (crud.statusFilter === 'deleted' && !course.deletedAt) return false;
+      if (crud.statusFilter === 'all' && course.deletedAt) return false;
       return true;
     });
-  }, [search, categoryFilter, instructorFilter, statusFilter, courses]);
-
-  async function handleConfirmDelete() {
-    const id = deleteIdRef.current;
-    if (!id) return;
-
-    console.log('[Admin] Deleting course:', id);
-    setDeletingId(id);
-    try {
-      await deleteCourse(id);
-      console.log('[Admin] Delete success:', id);
-      await fetchData();
-      setDeleteTarget(null);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al eliminar';
-      console.log('[Admin] Delete FAILED:', msg);
-      alert(msg);
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
-  const statusTabs: { key: StatusFilter; label: string }[] = [
-    { key: 'all', label: 'Todos' },
-    { key: 'published', label: 'Publicados' },
-    { key: 'draft', label: 'Borradores' },
-    { key: 'deleted', label: 'Eliminados' },
-  ];
+  }, [crud.courses, crud.search, crud.categoryFilter, crud.instructorFilter, crud.statusFilter]);
 
   function openCreate() {
     setFormModalMode('create');
@@ -165,44 +76,14 @@ export default function AdminCursos() {
     setFormModalOpen(true);
   }
 
-  function openDetail(course: CourseDTO) {
-    setDetailCourse(course);
-  }
-
   function handleFormSaved(updated: CourseDTO) {
     setFormModalOpen(false);
-    fetchData();
+    crud.fetchData();
   }
 
-  async function handlePublish(id: string) {
-    setPublishingId(id);
-    try {
-      await publishCourse(id);
-      await fetchData();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al publicar';
-      alert(msg);
-    } finally {
-      setPublishingId(null);
-    }
-  }
+  // ─── Render ──
 
-  async function handleUnpublish(id: string) {
-    setPublishingId(id);
-    try {
-      await unpublishCourse(id);
-      await fetchData();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error al despublicar';
-      alert(msg);
-    } finally {
-      setPublishingId(null);
-    }
-  }
-
-  // ─── Render ──────────────────────────────────────────────
-
-  if (loading) {
+  if (crud.loading) {
     return (
       <div className={styles.page}>
         <div className={styles.header}>
@@ -210,14 +91,14 @@ export default function AdminCursos() {
           <p className={styles.subtitle}>Cargando cursos...</p>
         </div>
         <div className={styles.loadingState}>
-          <RotateCw size={32} className={styles.spinner} />
+          <Spinner size="lg" className={styles.spinner} />
           <p>Cargando cursos...</p>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (crud.error) {
     return (
       <div className={styles.page}>
         <div className={styles.header}>
@@ -226,10 +107,8 @@ export default function AdminCursos() {
         </div>
         <div className={styles.errorState}>
           <AlertCircle size={32} />
-          <p>{error}</p>
-          <button className={styles.retryBtn} onClick={fetchData}>
-            Reintentar
-          </button>
+          <p>{crud.error}</p>
+          <button className={styles.retryBtn} onClick={crud.fetchData}>Reintentar</button>
         </div>
       </div>
     );
@@ -247,59 +126,45 @@ export default function AdminCursos() {
         </button>
       </div>
 
-      {/* ── Filters row ── */}
+      {/* Filters */}
       <div className={styles.toolbar}>
         <div className={styles.searchWrap}>
           <Search size={16} className={styles.searchIcon} />
           <input
             className={styles.searchInput}
             placeholder="Buscar por título..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={crud.search}
+            onChange={(e) => crud.setSearch(e.target.value)}
           />
         </div>
-
-        <select
-          className={styles.filterSelect}
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
+        <select className={styles.filterSelect} value={crud.categoryFilter} onChange={(e) => crud.setCategoryFilter(e.target.value)}>
           <option value="all">Todas las categorías</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
+          {crud.categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
-
-        <select
-          className={styles.filterSelect}
-          value={instructorFilter}
-          onChange={(e) => setInstructorFilter(e.target.value)}
-        >
+        <select className={styles.filterSelect} value={crud.instructorFilter} onChange={(e) => crud.setInstructorFilter(e.target.value)}>
           <option value="all">Todos los instructores</option>
           {instructors.map((inst) => (
-            <option key={inst.id} value={inst.id}>
-              {inst.name}
-            </option>
+            <option key={inst.id} value={inst.id}>{inst.name}</option>
           ))}
         </select>
       </div>
 
-      {/* ── Status tabs ── */}
+      {/* Status tabs */}
       <div className={styles.tabBar}>
         {statusTabs.map((tab) => (
           <button
             key={tab.key}
-            className={`${styles.filterTab} ${statusFilter === tab.key ? styles.filterTabActive : ''}`}
-            onClick={() => setStatusFilter(tab.key)}
+            className={`${styles.filterTab} ${crud.statusFilter === tab.key ? styles.filterTabActive : ''}`}
+            onClick={() => crud.setStatusFilter(tab.key)}
           >
             {tab.label}
           </button>
         ))}
       </div>
 
-      {/* ── Table ── */}
+      {/* Table */}
       <div className={styles.tableCard}>
         {filtered.length === 0 ? (
           <div className={styles.emptyState}>
@@ -324,91 +189,31 @@ export default function AdminCursos() {
                 {filtered.map((course) => {
                   const status = statusInfo(course);
                   return (
-                    <tr
-                      key={course.id}
-                      className={`${styles.cursorRow} ${course.deletedAt ? styles.rowDeleted : ''}`}
-                      onClick={() => openDetail(course)}
-                    >
-                      <td className={styles.titleCell}>
-                        <span className={styles.titleText}>{course.title}</span>
-                      </td>
+                    <tr key={course.id} className={`${styles.cursorRow} ${course.deletedAt ? styles.rowDeleted : ''}`} onClick={() => setDetailCourse(course)}>
+                      <td className={styles.titleCell}><span className={styles.titleText}>{course.title}</span></td>
                       <td className={styles.catCell}>{course.categoryName}</td>
                       <td className={styles.instructorCell}>{course.instructorName}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${styles[status.className]}`}>
-                          {status.label}
-                          {course.deletedAt && course.deletedByName && (
-                            <> por {course.deletedByName}</>
-                          )}
+                          {status.label}{course.deletedAt && course.deletedByName && <> por {course.deletedByName}</>}
                         </span>
                       </td>
-                      <td className={styles.numCell}>
-                        {course.isFree ? 'Gratis' : `$${course.price.toFixed(2)}`}
-                      </td>
+                      <td className={styles.numCell}>{course.isFree ? 'Gratis' : `$${course.price.toFixed(2)}`}</td>
                       <td className={styles.numCell}>{course.studentsCount.toLocaleString()}</td>
                       <td>
                         <div className={styles.actions}>
-                          <button
-                            className={styles.actionBtn}
-                            title="Ver detalles"
-                            onClick={(e) => { e.stopPropagation(); openDetail(course); }}
-                          >
-                            <Eye size={15} />
-                          </button>
+                          <button className={styles.actionBtn} title="Ver detalles" onClick={(e) => { e.stopPropagation(); setDetailCourse(course); }}><Eye size={15} /></button>
                           {!course.deletedAt && (
                             <>
-                              <a
-                                className={styles.actionBtn}
-                                title="Currículum"
-                                href={`/instructor/cursos/${course.id}/curriculum`}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <BookOpen size={15} />
-                              </a>
-                              <button
-                                className={styles.actionBtn}
-                                title="Editar"
-                                onClick={(e) => { e.stopPropagation(); openEdit(course); }}
-                              >
-                                <Edit size={15} />
-                              </button>
+                              <a className={styles.actionBtn} title="Currículum" href={`/instructor/cursos/${course.id}/curriculum`} onClick={(e) => e.stopPropagation()}><BookOpen size={15} /></a>
+                              <button className={styles.actionBtn} title="Editar" onClick={(e) => { e.stopPropagation(); openEdit(course); }}><Edit size={15} /></button>
                               {!course.isPublished && (
-                                <button
-                                  className={styles.actionBtn}
-                                  title="Publicar"
-                                  disabled={publishingId === course.id}
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    await handlePublish(course.id);
-                                  }}
-                                >
-                                  <Send size={15} />
-                                </button>
+                                <button className={styles.actionBtn} title="Publicar" disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handlePublish(course.id); }}><Send size={15} /></button>
                               )}
                               {course.isPublished && (
-                                <button
-                                  className={styles.actionBtn}
-                                  title="Despublicar"
-                                  disabled={publishingId === course.id}
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    await handleUnpublish(course.id);
-                                  }}
-                                >
-                                  <EyeOff size={15} />
-                                </button>
+                                <button className={styles.actionBtn} title="Despublicar" disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handleUnpublish(course.id); }}><EyeOff size={15} /></button>
                               )}
-                              <button
-                                className={`${styles.actionBtn} ${styles.actionDelete}`}
-                                title="Eliminar"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteIdRef.current = course.id;
-                                  setDeleteTarget({ id: course.id, title: course.title });
-                                }}
-                              >
-                                <Trash2 size={15} />
-                              </button>
+                              <button className={`${styles.actionBtn} ${styles.actionDelete}`} title="Eliminar" onClick={(e) => { e.stopPropagation(); crud.confirmDelete(course.id, course.title); }}><Trash2 size={15} /></button>
                             </>
                           )}
                         </div>
@@ -418,22 +223,15 @@ export default function AdminCursos() {
                 })}
               </tbody>
             </table>
-
-            {/* ── Mobile list ── */}
+            {/* Mobile list */}
             <div className={styles.mobileList}>
               {filtered.map((course) => {
                 const status = statusInfo(course);
                 return (
-                  <div
-                    key={course.id}
-                    className={`${styles.mobileItem} ${course.deletedAt ? styles.rowDeleted : ''}`}
-                    onClick={() => openDetail(course)}
-                  >
+                  <div key={course.id} className={`${styles.mobileItem} ${course.deletedAt ? styles.rowDeleted : ''}`} onClick={() => setDetailCourse(course)}>
                     <div className={styles.mobileItemHeader}>
                       <span className={styles.mobileTitle}>{course.title}</span>
-                      <span className={`${styles.statusBadge} ${styles[status.className]}`}>
-                        {status.label}
-                      </span>
+                      <span className={`${styles.statusBadge} ${styles[status.className]}`}>{status.label}</span>
                     </div>
                     <div className={styles.mobileItemBody}>
                       <span>{course.categoryName}</span>
@@ -442,61 +240,14 @@ export default function AdminCursos() {
                       <span>{course.studentsCount.toLocaleString()} estudiantes</span>
                     </div>
                     <div className={styles.mobileItemActions}>
-                      <button
-                        className={styles.actionBtn}
-                        onClick={(e) => { e.stopPropagation(); openDetail(course); }}
-                      >
-                        <Eye size={14} /> Ver
-                      </button>
+                      <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); setDetailCourse(course); }}><Eye size={14} /> Ver</button>
                       {!course.deletedAt && (
                         <>
-                          <a
-                            className={styles.actionBtn}
-                            href={`/instructor/cursos/${course.id}/curriculum`}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <BookOpen size={14} /> Currículum
-                          </a>
-                          <button
-                            className={styles.actionBtn}
-                            onClick={(e) => { e.stopPropagation(); openEdit(course); }}
-                          >
-                            <Edit size={14} /> Editar
-                          </button>
-                          {!course.isPublished && (
-                            <button
-                              className={styles.actionBtn}
-                              disabled={publishingId === course.id}
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                await handlePublish(course.id);
-                              }}
-                            >
-                              <Send size={14} /> Publicar
-                            </button>
-                          )}
-                          {course.isPublished && (
-                            <button
-                              className={styles.actionBtn}
-                              disabled={publishingId === course.id}
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                await handleUnpublish(course.id);
-                              }}
-                            >
-                              <EyeOff size={14} /> Despublicar
-                            </button>
-                          )}
-                          <button
-                            className={`${styles.actionBtn} ${styles.actionDelete}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteIdRef.current = course.id;
-                              setDeleteTarget({ id: course.id, title: course.title });
-                            }}
-                          >
-                            <Trash2 size={14} /> Eliminar
-                          </button>
+                          <a className={styles.actionBtn} href={`/instructor/cursos/${course.id}/curriculum`} onClick={(e) => e.stopPropagation()}><BookOpen size={14} /> Currículum</a>
+                          <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); openEdit(course); }}><Edit size={14} /> Editar</button>
+                          {!course.isPublished && <button className={styles.actionBtn} disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handlePublish(course.id); }}><Send size={14} /> Publicar</button>}
+                          {course.isPublished && <button className={styles.actionBtn} disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handleUnpublish(course.id); }}><EyeOff size={14} /> Despublicar</button>}
+                          <button className={`${styles.actionBtn} ${styles.actionDelete}`} onClick={(e) => { e.stopPropagation(); crud.confirmDelete(course.id, course.title); }}><Trash2 size={14} /> Eliminar</button>
                         </>
                       )}
                     </div>
@@ -509,27 +260,23 @@ export default function AdminCursos() {
       </div>
 
       <ConfirmDialog
-        open={!!deleteTarget}
+        open={!!crud.deleteTarget}
         title="Eliminar curso"
-        message={deleteTarget ? `¿Estás seguro de que querés eliminar "${deleteTarget.title}"? Esta acción no se puede deshacer.` : ''}
-        confirmLabel={deletingId === deleteTarget?.id ? 'Eliminando...' : 'Eliminar'}
-        loading={deletingId === deleteTarget?.id}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => { setDeleteTarget(null); setDeletingId(null); }}
+        message={crud.deleteTarget ? `¿Estás seguro de que querés eliminar "${crud.deleteTarget.title}"? Esta acción no se puede deshacer.` : ''}
+        confirmLabel={crud.deletingId === crud.deleteTarget?.id ? 'Eliminando...' : 'Eliminar'}
+        loading={crud.deletingId === crud.deleteTarget?.id}
+        onConfirm={crud.handleConfirmDelete}
+        onCancel={crud.cancelDelete}
       />
 
       <CourseDetailModal
         course={detailCourse}
         onClose={() => setDetailCourse(null)}
         onEdit={openEdit}
-        onPublish={handlePublish}
-        onUnpublish={handleUnpublish}
-        onDelete={(course) => {
-          setDetailCourse(null);
-          deleteIdRef.current = course.id;
-          setDeleteTarget({ id: course.id, title: course.title });
-        }}
-        publishingId={publishingId}
+        onPublish={crud.handlePublish}
+        onUnpublish={crud.handleUnpublish}
+        onDelete={(course) => { setDetailCourse(null); crud.confirmDelete(course.id, course.title); }}
+        publishingId={crud.publishingId}
       />
 
       <CourseFormModal

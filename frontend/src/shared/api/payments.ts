@@ -1,4 +1,5 @@
 import { API_URL } from '../lib/constants';
+import { authedFetch } from '../lib/api';
 import type {
   CreatePaymentRequest,
   CreatePaymentResponse,
@@ -7,51 +8,29 @@ import type {
 } from '../types/payment.types';
 import { validateOrThrow } from '../lib/validation';
 import { createPaymentSchema, confirmPaymentSchema } from '../validations';
+import { handleJsonResponse } from './helpers';
 
 export async function createPayment(data: CreatePaymentRequest): Promise<CreatePaymentResponse> {
   validateOrThrow(createPaymentSchema, data);
-  const res = await fetch(`${API_URL}/payments/create`, {
+  const res = await authedFetch(`${API_URL}/payments/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al crear pago' }));
-    throw new Error(error.message || 'Error al crear pago');
-  }
-
-  return res.json();
+  return handleJsonResponse<CreatePaymentResponse>(res);
 }
 
 export async function confirmPayment(data: ConfirmPaymentRequest): Promise<PaymentResponse> {
   validateOrThrow(confirmPaymentSchema, data);
-  const res = await fetch(`${API_URL}/payments/confirm`, {
+  const res = await authedFetch(`${API_URL}/payments/confirm`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(data),
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al confirmar pago' }));
-    throw new Error(error.message || 'Error al confirmar pago');
-  }
-
-  return res.json();
+  return handleJsonResponse<PaymentResponse>(res);
 }
 
 export async function getMyPayments(): Promise<PaymentResponse[]> {
-  const res = await fetch(`${API_URL}/payments/mine`, {
-    method: 'GET',
-    credentials: 'include',
-  });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al obtener pagos' }));
-    throw new Error(error.message || 'Error al obtener pagos');
-  }
-
-  return res.json();
+  const res = await authedFetch(`${API_URL}/payments/mine`);
+  return handleJsonResponse<PaymentResponse[]>(res);
 }

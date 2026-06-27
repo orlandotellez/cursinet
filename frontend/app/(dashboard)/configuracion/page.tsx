@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2 } from 'lucide-react';
+import { Save } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { getMyProfile } from '@/src/shared/api/auth';
 import { updateUser } from '@/src/shared/api/users';
@@ -150,7 +151,7 @@ export default function ConfiguracionPage() {
           disabled={isSaving}
         >
           {isSaving ? (
-            <Loader2 size={16} className={styles.spinner} />
+            <Spinner size="sm" className={styles.spinner} />
           ) : (
             <Save size={16} />
           )}

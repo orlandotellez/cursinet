@@ -4,8 +4,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import * as enrollmentApi from '../api/enrollment';
 import type { Enrollment } from '../types';
-import { enrollments as mockEnrollments } from '@/src/features/courses/data/enrollments.data';
-import { allCourseCards } from '@/src/features/courses/data/course-cards.data';
+import { enrollments as mockEnrollments } from '@/src/shared/mock/enrollments.data';
+import { allCourseCards } from '@/src/shared/mock/course-cards.data';
 
 function mapApiResponseToEnrollment(resp: enrollmentApi.EnrollmentResponse): Enrollment {
   const courseCard = allCourseCards.find((c) => c.id === resp.courseId);

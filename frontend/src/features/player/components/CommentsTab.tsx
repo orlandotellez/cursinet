@@ -1,7 +1,7 @@
 'use client'
 
 import { Send } from 'lucide-react';
-import { mockComments } from '@/src/features/player/data/mock-comments';
+import { mockComments } from '@/src/shared/mock/mock-comments';
 import styles from './CommentsTab.module.css';
 
 interface CommentsTabProps {

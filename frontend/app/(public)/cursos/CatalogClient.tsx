@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, X } from 'lucide-react';
@@ -22,14 +22,7 @@ interface CatalogClientProps {
   categories: Category[];
 }
 
-function useDebounce<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const id = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(id);
-  }, [value, delay]);
-  return debounced;
-}
+import { useDebounce } from '@/src/shared/hooks/useDebounce';
 
 export function CatalogClient({ allCards, categories }: CatalogClientProps) {
   const searchParams = useSearchParams();

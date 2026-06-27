@@ -1,21 +1,13 @@
 import { API_URL } from "../lib/constants";
+import { authedFetch } from "../lib/api";
 import type { Review } from "../types";
 import { validateOrThrow } from "../lib/validation";
 import { reviewPayloadSchema } from "../validations";
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ message: 'Error del servidor' }));
-    throw new Error(body.message || body.title || 'Error del servidor');
-  }
-  return res.json();
-}
+import { handleJsonResponse, assertOk } from "./helpers";
 
 export async function getCourseReviews(courseId: string): Promise<Review[]> {
-  const res = await fetch(`${API_URL}/courses/${courseId}/reviews`, {
-    credentials: 'include',
-  });
-  return handleResponse<Review[]>(res);
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/reviews`);
+  return handleJsonResponse<Review[]>(res);
 }
 
 export async function createReview(
@@ -23,13 +15,12 @@ export async function createReview(
   payload: { rating: number; comment?: string },
 ): Promise<Review> {
   validateOrThrow(reviewPayloadSchema, payload);
-  const res = await fetch(`${API_URL}/courses/${courseId}/reviews`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/reviews`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<Review>(res);
+  return handleJsonResponse<Review>(res);
 }
 
 export async function updateReview(
@@ -38,23 +29,17 @@ export async function updateReview(
   payload: { rating: number; comment?: string },
 ): Promise<Review> {
   validateOrThrow(reviewPayloadSchema, payload);
-  const res = await fetch(`${API_URL}/courses/${courseId}/reviews/${reviewId}`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/reviews/${reviewId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<Review>(res);
+  return handleJsonResponse<Review>(res);
 }
 
 export async function deleteReview(courseId: string, reviewId: string): Promise<void> {
-  const res = await fetch(`${API_URL}/courses/${courseId}/reviews/${reviewId}`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/reviews/${reviewId}`, {
     method: 'DELETE',
-    credentials: 'include',
   });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ message: 'Error al eliminar reseña' }));
-    throw new Error(body.message || 'Error al eliminar reseña');
-  }
+  await assertOk(res, 'Error al eliminar reseña');
 }

@@ -1,6 +1,6 @@
 import { API_URL } from "../lib/constants";
-
-// ─── Types aligned with backend ─────────────────────────────────────────────
+import { authedFetch } from "../lib/api";
+import { handleJsonResponse } from "./helpers";
 
 export interface CurriculumLesson {
   id: string;
@@ -30,19 +30,7 @@ export interface CurriculumResponse {
   modules: CurriculumModule[];
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error del servidor' }));
-    throw new Error(body.detail || body.title || 'Error del servidor');
-  }
-  return res.json();
-}
-
-// ─── API functions ──────────────────────────────────────────────────────────
-
 export async function getCurriculum(courseId: string): Promise<CurriculumResponse> {
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules/curriculum`, { credentials: 'include' });
-  return handleResponse<CurriculumResponse>(res);
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules/curriculum`);
+  return handleJsonResponse<CurriculumResponse>(res);
 }

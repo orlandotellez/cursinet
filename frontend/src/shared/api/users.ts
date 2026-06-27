@@ -1,7 +1,6 @@
-import { API_URL } from "../lib/constants";
-import { authedFetch } from "../lib/api";
-
-// ─── Types aligned with backend ───────────────────────────────────────────
+import { API_URL } from '../lib/constants';
+import { authedFetch } from '../lib/api';
+import { handleJsonResponse, assertOk } from './helpers';
 
 export interface UserDTO {
   id: string;
@@ -24,8 +23,6 @@ export interface UserDTO {
   deletedByName: string | null;
 }
 
-// ─── Create / Update payloads ──────────────────────────────────────────────
-
 export interface CreateUserPayload {
   name: string;
   email: string;
@@ -47,8 +44,6 @@ export interface UpdateUserPayload {
   isActive?: boolean;
 }
 
-// ─── API functions ─────────────────────────────────────────────────────────
-
 export async function getUsers(params?: {
   search?: string;
   role?: string;
@@ -65,14 +60,14 @@ export async function getUsers(params?: {
   const res = await authedFetch(`${API_URL}/users${q ? `?${q}` : ''}`, {
     credentials: 'include',
   });
-  return res.json();
+  return handleJsonResponse<UserDTO[]>(res);
 }
 
 export async function getUserById(id: string): Promise<UserDTO> {
   const res = await authedFetch(`${API_URL}/users/${id}`, {
     credentials: 'include',
   });
-  return res.json();
+  return handleJsonResponse<UserDTO>(res);
 }
 
 export async function createUser(payload: CreateUserPayload): Promise<UserDTO> {
@@ -82,17 +77,20 @@ export async function createUser(payload: CreateUserPayload): Promise<UserDTO> {
     credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return res.json();
+  return handleJsonResponse<UserDTO>(res);
 }
 
-export async function updateUser(id: string, payload: UpdateUserPayload): Promise<UserDTO> {
+export async function updateUser(
+  id: string,
+  payload: UpdateUserPayload,
+): Promise<UserDTO> {
   const res = await authedFetch(`${API_URL}/users/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return res.json();
+  return handleJsonResponse<UserDTO>(res);
 }
 
 export async function deleteUser(id: string): Promise<void> {
@@ -100,10 +98,7 @@ export async function deleteUser(id: string): Promise<void> {
     method: 'DELETE',
     credentials: 'include',
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al eliminar el usuario' }));
-    throw new Error(body.detail || body.title || 'Error al eliminar el usuario');
-  }
+  return assertOk(res, 'Error al eliminar el usuario');
 }
 
 export async function restoreUser(id: string): Promise<UserDTO> {
@@ -111,5 +106,5 @@ export async function restoreUser(id: string): Promise<UserDTO> {
     method: 'POST',
     credentials: 'include',
   });
-  return res.json();
+  return handleJsonResponse<UserDTO>(res);
 }

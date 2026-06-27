@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { resetPasswordSchema } from '@/src/shared/validations';
+import { useAuthForm } from '@/src/shared/hooks/useAuthForm';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -19,7 +20,6 @@ export default function RestablecerPage() {
 }
 
 function RestablecerForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const emailParam = searchParams.get('email') || '';
@@ -29,9 +29,9 @@ function RestablecerForm() {
   const [code, setCode] = useState(codeParam);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const { isLoading, error, execute, clearError } = useAuthForm();
 
   // Si viene de un link con parámetros, pre-llenar
   useEffect(() => {
@@ -49,21 +49,14 @@ function RestablecerForm() {
       confirmPassword,
     });
     if (!validation.success) {
-      const firstError = Object.values(validation.fieldErrors)[0] ?? 'Error de validación';
-      setError(firstError);
+      setValidationError(Object.values(validation.fieldErrors)[0] ?? 'Error de validación');
       return;
     }
+    setValidationError(null);
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await authApi.resetPassword(email.trim(), code.trim(), password);
+    const result = await execute(() => authApi.resetPassword(email.trim(), code.trim(), password));
+    if (result !== null) {
       setSuccess(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al restablecer contraseña');
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -97,7 +90,7 @@ function RestablecerForm() {
         Ingresá el código que recibiste y tu nueva contraseña
       </p>
 
-      {error && <ErrorBanner error={error} clearError={() => setError(null)} />}
+      {(error || validationError) && <ErrorBanner error={error ?? validationError ?? ''} clearError={() => { clearError(); setValidationError(null); }} />}
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
@@ -110,7 +103,7 @@ function RestablecerForm() {
             type="email"
             placeholder="tu@correo.com"
             value={email}
-            onChange={(e) => { setEmail(e.target.value); setError(null); }}
+            onChange={(e) => { setEmail(e.target.value); clearError(); }}
             autoComplete="email"
             disabled={isLoading || !!emailParam}
           />
@@ -126,7 +119,7 @@ function RestablecerForm() {
             type="text"
             placeholder="000000"
             value={code}
-            onChange={(e) => { setCode(e.target.value); setError(null); }}
+            onChange={(e) => { setCode(e.target.value); clearError(); }}
             disabled={isLoading || !!codeParam}
             maxLength={6}
           />
@@ -142,7 +135,7 @@ function RestablecerForm() {
             type="password"
             placeholder="Mínimo 8 caracteres"
             value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(null); }}
+            onChange={(e) => { setPassword(e.target.value); clearError(); }}
             autoComplete="new-password"
             disabled={isLoading}
           />
@@ -158,7 +151,7 @@ function RestablecerForm() {
             type="password"
             placeholder="Repetí la contraseña"
             value={confirmPassword}
-            onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
+            onChange={(e) => { setConfirmPassword(e.target.value); clearError(); }}
             autoComplete="new-password"
             disabled={isLoading}
           />
@@ -167,7 +160,7 @@ function RestablecerForm() {
         <button className={styles.submitBtn} type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className={styles.btnLoading}>
-              <Loader2 size={18} className={styles.spinner} />
+              <Spinner size="sm" className={styles.spinner} />
               Restableciendo…
             </span>
           ) : (

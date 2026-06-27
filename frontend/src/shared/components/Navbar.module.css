@@ -4,8 +4,7 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: color-mix(in srgb, var(--bg-base) 80%, transparent);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--bg-base) 100%, transparent);
   padding-inline: 20px;
   border-bottom: 1px solid var(--border);
 }
@@ -171,12 +170,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--bg-surface);
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
   animation: fadeIn 200ms ease;
+  height: 300px;
+  z-index: 99;
+  background: color-mix(in srgb, var(--bg-base) 100%, transparent);
 }
 
 @keyframes fadeIn {
@@ -195,6 +196,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+
 }
 
 .mobileNavLink {

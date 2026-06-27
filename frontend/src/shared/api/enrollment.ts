@@ -1,7 +1,8 @@
-import { API_URL } from "../lib/constants";
-import { authedFetch } from "../lib/api";
-import { validateOrThrow } from "../lib/validation";
-import { createPaymentSchema } from "../validations";
+import { API_URL } from '../lib/constants';
+import { authedFetch } from '../lib/api';
+import { handleJsonResponse } from './helpers';
+import { validateOrThrow } from '../lib/validation';
+import { createPaymentSchema } from '../validations';
 
 export interface EnrollmentResponse {
   id: string;
@@ -34,13 +35,7 @@ export async function enrollFree(courseId: string): Promise<EnrollmentResponse> 
     credentials: 'include',
     body: JSON.stringify({ courseId }),
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al inscribirse' }));
-    throw new Error(error.message || 'Error al inscribirse');
-  }
-
-  return res.json();
+  return handleJsonResponse<EnrollmentResponse>(res);
 }
 
 export async function getMyEnrollments(): Promise<EnrollmentResponse[]> {
@@ -48,25 +43,15 @@ export async function getMyEnrollments(): Promise<EnrollmentResponse[]> {
     method: 'GET',
     credentials: 'include',
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al obtener inscripciones' }));
-    throw new Error(error.message || 'Error al obtener inscripciones');
-  }
-
-  return res.json();
+  return handleJsonResponse<EnrollmentResponse[]>(res);
 }
 
-export async function getEnrollmentStatus(courseId: string): Promise<EnrollmentStatusResponse> {
+export async function getEnrollmentStatus(
+  courseId: string,
+): Promise<EnrollmentStatusResponse> {
   const res = await authedFetch(`${API_URL}/enrollments/${courseId}/status`, {
     method: 'GET',
     credentials: 'include',
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al obtener estado de inscripción' }));
-    throw new Error(error.message || 'Error al obtener estado de inscripción');
-  }
-
-  return res.json();
+  return handleJsonResponse<EnrollmentStatusResponse>(res);
 }

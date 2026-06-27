@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { getCourseById } from '@/src/shared/api/courses';
 import { getCurriculum } from '@/src/shared/api/curriculum';
 import styles from './[lessonId]/page.module.css';
@@ -53,7 +54,7 @@ export default function AprenderCoursePage() {
     return (
       <div className={styles.page}>
         <div className={styles.centerState}>
-          <Loader2 size={32} className={styles.spinner} />
+          <Spinner size="lg" className={styles.spinner} />
           <p>Cargando curso...</p>
         </div>
       </div>

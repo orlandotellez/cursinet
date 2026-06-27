@@ -3,10 +3,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { verifyEmailSchema, resendVerificationSchema } from '@/src/shared/validations';
+import { useAuthForm } from '@/src/shared/hooks/useAuthForm';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -24,12 +25,12 @@ function VerificarEmailForm() {
   const identifierParam = searchParams.get('identifier') || '';
   const codeParam = searchParams.get('code') || '';
 
+  const { isLoading, error, execute, clearError } = useAuthForm();
+  const resend = useAuthForm();
   const [email, setEmail] = useState(identifierParam);
   const [code, setCode] = useState(codeParam);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Auto-verify if params are present
   useEffect(() => {
@@ -42,41 +43,23 @@ function VerificarEmailForm() {
 
     const validation = validateShape(verifyEmailSchema, { identifier: email, code });
     if (!validation.success) {
-      const firstError = Object.values(validation.fieldErrors)[0] ?? 'Completá todos los campos';
-      setError(firstError);
+      setValidationError(Object.values(validation.fieldErrors)[0] ?? 'Completá todos los campos');
       return;
     }
+    setValidationError(null);
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      await authApi.verifyEmail(email.trim(), code.trim());
+    const result = await execute(() => authApi.verifyEmail(email.trim(), code.trim()));
+    if (result !== null) {
       setSuccess(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al verificar email');
-    } finally {
-      setIsLoading(false);
     }
   }
 
   async function handleResend() {
     const validation = validateShape(resendVerificationSchema, { email });
     if (!validation.success) {
-      setError(validation.fieldErrors.email ?? 'Ingresá tu correo primero');
       return;
     }
-
-    setIsResending(true);
-    setError(null);
-
-    try {
-      await authApi.resendVerification(email.trim());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al reenviar código');
-    } finally {
-      setIsResending(false);
-    }
+    await resend.execute(() => authApi.resendVerification(email.trim()));
   }
 
   if (success) {
@@ -109,7 +92,7 @@ function VerificarEmailForm() {
         Ingresá el código de 6 dígitos que enviamos a tu correo
       </p>
 
-      {error && <ErrorBanner error={error} clearError={() => setError(null)} />}
+      {(error || validationError) && <ErrorBanner error={error ?? validationError ?? ''} clearError={() => { clearError(); setValidationError(null); }} />}
 
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <div className={styles.field}>
@@ -122,7 +105,7 @@ function VerificarEmailForm() {
             type="email"
             placeholder="tu@correo.com"
             value={email}
-            onChange={(e) => { setEmail(e.target.value); setError(null); }}
+            onChange={(e) => { setEmail(e.target.value); clearError(); }}
             autoComplete="email"
             disabled={isLoading}
           />
@@ -138,7 +121,7 @@ function VerificarEmailForm() {
             type="text"
             placeholder="000000"
             value={code}
-            onChange={(e) => { setCode(e.target.value); setError(null); }}
+            onChange={(e) => { setCode(e.target.value); clearError(); }}
             maxLength={6}
             disabled={isLoading}
           />
@@ -147,7 +130,7 @@ function VerificarEmailForm() {
         <button className={styles.submitBtn} type="submit" disabled={isLoading}>
           {isLoading ? (
             <span className={styles.btnLoading}>
-              <Loader2 size={18} className={styles.spinner} />
+              <Spinner size="sm" className={styles.spinner} />
               Verificando…
             </span>
           ) : (
@@ -160,9 +143,9 @@ function VerificarEmailForm() {
         <button
           className={styles.resendBtn}
           onClick={handleResend}
-          disabled={isResending}
+          disabled={resend.isLoading}
         >
-          {isResending ? 'Reenviando…' : 'Reenviar código'}
+          {resend.isLoading ? 'Reenviando…' : 'Reenviar código'}
         </button>
       </div>
 

@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import type { Lesson } from '@/src/shared/types';
 import styles from './LessonNavigation.module.css';
 
@@ -60,7 +61,7 @@ export function LessonNavigation({ courseId, prevLesson, nextLesson, completed, 
           disabled={savingProgress}
         >
           {savingProgress ? (
-            <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+            <Spinner size="sm" />
           ) : (
             <Check size={16} />
           )}

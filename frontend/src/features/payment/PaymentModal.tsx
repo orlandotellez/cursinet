@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, CheckCircle2, AlertCircle, X, Shield } from 'lucide-react';
+import { CheckCircle2, AlertCircle, X, Shield } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { createPayment, confirmPayment } from '@/src/shared/api/payments';
 import styles from './PaymentModal.module.css';
 
@@ -22,10 +23,8 @@ export function PaymentModal({ courseId, courseTitle, price, onSuccess, onClose 
     setError(null);
 
     try {
-      // 1. Create payment
       const payment = await createPayment({ courseId });
 
-      // 2. Confirm payment (dev mode: instant; production: would use Stripe)
       await confirmPayment({ paymentId: payment.paymentId });
 
       setStep('success');
@@ -68,7 +67,7 @@ export function PaymentModal({ courseId, courseTitle, price, onSuccess, onClose 
         {step === 'processing' && (
           <div className={styles.body}>
             <div className={styles.centerState}>
-              <Loader2 size={32} className={styles.spinner} />
+              <Spinner size="lg" className={styles.spinner} />
               <p>Procesando pago...</p>
             </div>
           </div>

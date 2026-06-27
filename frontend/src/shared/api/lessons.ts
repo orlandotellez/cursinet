@@ -1,8 +1,8 @@
 import { API_URL } from "../lib/constants";
 import { validateOrThrow } from "../lib/validation";
 import { createLessonSchema, updateLessonSchema, reorderLessonsSchema, upsertProgressSchema } from "../validations";
-
-// ─── Types aligned with backend ─────────────────────────────────────────────
+import { authedFetch } from "../lib/api";
+import { handleJsonResponse, assertOk } from "./helpers";
 
 export interface LessonResponse {
   id: string;
@@ -57,30 +57,14 @@ export interface ReorderPayload {
   items: { id: string; sortOrder: number }[];
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error del servidor' }));
-    throw new Error(body.detail || body.title || 'Error del servidor');
-  }
-  return res.json();
-}
-
-// ─── Lessons API (routes match backend: /api/v1/modules/{moduleId}/lessons) ─
-
 export async function getLessons(moduleId: string): Promise<LessonResponse[]> {
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons`, {
-    credentials: 'include',
-  });
-  return handleResponse<LessonResponse[]>(res);
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons`);
+  return handleJsonResponse<LessonResponse[]>(res);
 }
 
 export async function getLesson(moduleId: string, lessonId: string): Promise<LessonResponse> {
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`, {
-    credentials: 'include',
-  });
-  return handleResponse<LessonResponse>(res);
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`);
+  return handleJsonResponse<LessonResponse>(res);
 }
 
 export async function createLesson(
@@ -88,13 +72,12 @@ export async function createLesson(
   payload: CreateLessonPayload,
 ): Promise<LessonResponse> {
   validateOrThrow(createLessonSchema, payload);
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons`, {
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<LessonResponse>(res);
+  return handleJsonResponse<LessonResponse>(res);
 }
 
 export async function updateLesson(
@@ -103,27 +86,22 @@ export async function updateLesson(
   payload: UpdateLessonPayload,
 ): Promise<LessonResponse> {
   validateOrThrow(updateLessonSchema, payload);
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`, {
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<LessonResponse>(res);
+  return handleJsonResponse<LessonResponse>(res);
 }
 
 export async function deleteLesson(
   moduleId: string,
   lessonId: string,
 ): Promise<void> {
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`, {
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}`, {
     method: 'DELETE',
-    credentials: 'include',
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al eliminar lección' }));
-    throw new Error(body.detail || body.title || 'Error al eliminar lección');
-  }
+  await assertOk(res, 'Error al eliminar lección');
 }
 
 export async function reorderLessons(
@@ -131,29 +109,18 @@ export async function reorderLessons(
   payload: ReorderPayload,
 ): Promise<void> {
   validateOrThrow(reorderLessonsSchema, payload);
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/reorder`, {
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al reordenar' }));
-    throw new Error(body.detail || body.title || 'Error al reordenar');
-  }
+  await assertOk(res, 'Error al reordenar');
 }
 
-// ─── Progress API (routes: /api/v1/modules/{moduleId}/lessons/{id}/progress) ─
-
 export async function getProgress(moduleId: string, lessonId: string): Promise<LessonProgressResponse | null> {
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}/progress`, {
-    credentials: 'include',
-  });
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}/progress`);
   if (res.status === 404) return null;
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al obtener progreso' }));
-    throw new Error(body.detail || body.title || 'Error al obtener progreso');
-  }
+  await assertOk(res, 'Error al obtener progreso');
   return res.json();
 }
 
@@ -163,11 +130,10 @@ export async function upsertProgress(
   payload: UpsertProgressPayload,
 ): Promise<LessonProgressResponse> {
   validateOrThrow(upsertProgressSchema, payload);
-  const res = await fetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}/progress`, {
+  const res = await authedFetch(`${API_URL}/modules/${moduleId}/lessons/${lessonId}/progress`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<LessonProgressResponse>(res);
+  return handleJsonResponse<LessonProgressResponse>(res);
 }

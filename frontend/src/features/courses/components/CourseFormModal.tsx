@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { getCategories, type CategoryDTO } from '@/src/shared/api/categories';
 import { createCourse, updateCourse, type CourseDTO } from '@/src/shared/api/courses';
 import styles from './CourseFormModal.module.css';
@@ -431,7 +432,7 @@ export default function CourseFormModal({
             <button type="submit" className={styles.submitBtn} disabled={loading || loadingCategories}>
               {loading ? (
                 <>
-                  <Loader2 size={16} className={styles.spinner} />
+                  <Spinner size="sm" className={styles.spinner} />
                   Guardando...
                 </>
               ) : (
