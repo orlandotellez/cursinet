@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { Bell, CheckCheck, Loader2 } from 'lucide-react';
+import { Bell, CheckCheck } from 'lucide-react';
 import type { Notification } from '@/src/shared/types';
 import { NotificationCard } from '@/src/features/notifications/components/NotificationCard';
+import { NotificacionesSkeleton } from './loading';
 import styles from './page.module.css';
 
 export default function NotificacionesPage() {
@@ -31,16 +32,7 @@ export default function NotificacionesPage() {
     setIsLoading(false);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Notificaciones</h1>
-          <Loader2 size={20} className={styles.loadingSpinner} />
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <NotificacionesSkeleton />;
 
   return (
     <div className={styles.page}>
