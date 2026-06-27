@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { getPublishedCourses, getPublicCategories } from '@/src/shared/api/public-data';
 import { CatalogClient } from './CatalogClient';
 
@@ -9,5 +10,9 @@ export default async function CatalogPage() {
     getPublicCategories(),
   ]);
 
-  return <CatalogClient allCards={allCards} categories={categories} />;
+  return (
+    <Suspense fallback={null}>
+      <CatalogClient allCards={allCards} categories={categories} />
+    </Suspense>
+  );
 }

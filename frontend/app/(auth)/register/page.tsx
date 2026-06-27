@@ -10,6 +10,7 @@ import { validateShape } from '@/src/shared/lib/validation';
 import { registerSchema } from '@/src/shared/validations';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
+import { useSubscriptionStore } from '@/src/shared/store/useSubscriptionStore';
 
 export default function RegistrarsePage() {
   const router = useRouter();
@@ -64,6 +65,8 @@ export default function RegistrarsePage() {
         email: form.email.trim(),
         password: form.password,
       });
+
+      useSubscriptionStore.getState().setFreePlan();
 
       const role = useAuthStore.getState().user?.role;
       redirectByRole(role, router.replace);
@@ -172,25 +175,6 @@ export default function RegistrarsePage() {
           )}
         </button>
       </form>
-
-      {/* ── Demo Credentials ── */}
-      <div className={styles.demoBox}>
-        <span className={styles.demoLabel}>
-          🧪 ¿Ya tenés cuenta? Usá:
-        </span>
-        <div className={styles.demoRow}>
-          <span className={styles.demoRole}>Estudiante:</span>
-          <code className={styles.demoCode}>sofia@email.com / 123456</code>
-        </div>
-        <div className={styles.demoRow}>
-          <span className={styles.demoRole}>Instructor:</span>
-          <code className={styles.demoCode}>martin@cursinet.com / 123456</code>
-        </div>
-        <div className={styles.demoRow}>
-          <span className={styles.demoRole}>Admin:</span>
-          <code className={styles.demoCode}>admin@cursinet.com / 123456</code>
-        </div>
-      </div>
 
       <p className={styles.footer}>
         ¿Ya tenés cuenta?

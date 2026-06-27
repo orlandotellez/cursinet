@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { Loader2, AlertCircle } from 'lucide-react';
 import { getCourseBySlug, type CourseDTO } from '@/src/shared/api/courses';
 import { getCurriculum, type CurriculumResponse, type CurriculumModule, type CurriculumLesson } from '@/src/shared/api/curriculum';
 import { ErrorState } from '@/src/shared/components/ErrorState';
@@ -16,6 +16,7 @@ import { InstructorCard } from '@/src/features/courses/detail/InstructorCard';
 import { ReviewSection } from '@/src/features/courses/detail/ReviewSection';
 import { PaymentModal } from '@/src/features/payment/PaymentModal';
 import type { Course, Instructor, Category, CourseModule, Lesson } from '@/src/shared/types';
+import s from '@/src/shared/styles/skeleton.module.css';
 import styles from './page.module.css';
 
 // ─── Adapter: map API data to the mock Course shape ───────────────────────
@@ -91,6 +92,98 @@ function mapLesson(lesson: CurriculumLesson): Lesson {
   };
 }
 
+// ─── Skeleton ─────────────────────────────────────────────────────────────
+
+function CourseDetailSkeleton() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.container}>
+
+        {/* Breadcrumb — always visible */}
+        <nav className={styles.breadcrumb}>
+          <Link href="/cursos">Cursos</Link>
+          <span className={styles.breadcrumbSep}>/</span>
+          <span className={s.base} style={{ width: 220, height: 15, display: 'inline-block', borderRadius: 4 }} />
+        </nav>
+
+        {/* Hero skeleton */}
+        <div className={styles.heroSkeleton}>
+          <div className={styles.heroSkeletonBody}>
+            <div className={s.base} style={{ width: 80, height: 22, borderRadius: 100 }} />
+            <div className={s.base} style={{ width: '90%', height: 34, marginTop: 4 }} />
+            <div className={s.base} style={{ width: '70%', height: 34 }} />
+            <div className={s.base} style={{ width: '100%', height: 16, marginTop: 8 }} />
+            <div className={s.base} style={{ width: '60%', height: 16 }} />
+            <div className={styles.heroSkeletonMeta}>
+              <div className={s.base} style={{ width: 120, height: 16 }} />
+              <div className={s.base} style={{ width: 100, height: 16 }} />
+              <div className={s.base} style={{ width: 60, height: 16 }} />
+            </div>
+            <div className={styles.heroSkeletonMeta}>
+              <div className={s.base} style={{ width: 160, height: 40, borderRadius: 8 }} />
+              <div className={s.base} style={{ width: 140, height: 48, borderRadius: 8 }} />
+            </div>
+          </div>
+          <div className={styles.heroSkeletonThumb}>
+            <div className={s.base} style={{ width: '100%', height: '100%', borderRadius: 12 }} />
+          </div>
+        </div>
+
+        {/* Description section skeleton */}
+        <section className={styles.section}>
+          <div className={s.base} style={{ width: 120, height: 22, marginBottom: 20 }} />
+          <div className={s.base} style={{ width: '100%', height: 14, marginBottom: 10 }} />
+          <div className={s.base} style={{ width: '100%', height: 14, marginBottom: 10 }} />
+          <div className={s.base} style={{ width: '70%', height: 14 }} />
+        </section>
+
+        {/* What you'll learn skeleton */}
+        <section className={styles.section}>
+          <div className={s.base} style={{ width: 180, height: 22, marginBottom: 20 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div className={s.base} style={{ width: 18, height: 18, borderRadius: 4, flexShrink: 0 }} />
+                <div className={s.base} style={{ flex: 1, height: 14 }} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Curriculum skeleton */}
+        <section className={styles.section}>
+          <div className={s.base} style={{ width: 200, height: 22, marginBottom: 20 }} />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className={s.base}
+              style={{
+                width: '100%',
+                height: 48,
+                borderRadius: 8,
+                marginBottom: 8,
+              }}
+            />
+          ))}
+        </section>
+
+        {/* Instructor skeleton */}
+        <section className={styles.section}>
+          <div className={s.base} style={{ width: 120, height: 22, marginBottom: 20 }} />
+          <div
+            className={s.base}
+            style={{
+              width: '100%',
+              height: 120,
+              borderRadius: 12,
+            }}
+          />
+        </section>
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────
 
 export default function CourseDetailPage() {
@@ -126,18 +219,13 @@ export default function CourseDetailPage() {
     if (slug) fetchData();
   }, [slug, fetchData]);
 
+  // ── Loading ──
+
   if (loading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.centerState}>
-            <Loader2 size={32} className={styles.spinner} />
-            <p>Cargando curso...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <CourseDetailSkeleton />;
   }
+
+  // ── Error ──
 
   if (error) {
     return (
@@ -159,14 +247,16 @@ export default function CourseDetailPage() {
     );
   }
 
+  // ── Ready ──
+
   const firstLessonId = course.modules[0]?.lessons[0]?.id;
-  // Ir a la página de bienvenida que muestra el video de preview o redirige a la 1ra lección
-  const firstLessonHref = `/aprender/${course.id}`;
+  const firstLessonHref = firstLessonId
+    ? `/aprender/${course.id}/${firstLessonId}`
+    : `/aprender/${course.id}`;
 
   const handleEnroll = async () => {
     if (!course) return;
 
-    // Paid courses go through the payment modal first (requires auth)
     if (course.price > 0) {
       if (!isAuthenticated) {
         router.push(`/login?redirect=/cursos/${course.slug}`);
@@ -176,7 +266,6 @@ export default function CourseDetailPage() {
       return;
     }
 
-    // Free courses enroll directly
     try {
       await enroll(course.id);
       router.push(firstLessonHref);
@@ -187,8 +276,6 @@ export default function CourseDetailPage() {
 
   const handlePaymentSuccess = async () => {
     setShowPayment(false);
-    // Payment already created the enrollment on the backend (ConfirmPaymentAsync
-    // creates it atomically). We just mark it locally and navigate.
     demoEnroll(course!.id);
     router.push(firstLessonHref);
   };
@@ -196,6 +283,12 @@ export default function CourseDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>
+        <nav className={styles.breadcrumb}>
+          <Link href="/cursos">Cursos</Link>
+          <span className={styles.breadcrumbSep}>/</span>
+          <span className={styles.breadcrumbCurrent}>{course.title}</span>
+        </nav>
+
         <CourseHero
           course={course}
           enrolled={enrolled}

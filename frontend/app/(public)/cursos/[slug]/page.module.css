@@ -7,6 +7,35 @@
   margin: 0 auto;
 }
 
+/* ── Breadcrumb ── */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.breadcrumb a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb a:hover {
+  color: var(--text-primary);
+}
+
+.breadcrumbSep {
+  color: var(--text-muted);
+}
+
+.breadcrumbCurrent {
+  color: var(--text-primary);
+}
+
 /* ── Shared section layout ── */
 
 .section {
@@ -18,6 +47,44 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 20px;
+}
+
+/* ── Skeleton hero ── */
+
+.heroSkeleton {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  margin-bottom: 64px;
+}
+
+@media (min-width: 768px) {
+  .heroSkeleton {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.heroSkeletonBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.heroSkeletonMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.heroSkeletonThumb {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .heroSkeletonThumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+  }
 }
 
 /* ── Curriculum hint ── */
