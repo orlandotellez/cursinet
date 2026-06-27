@@ -1,5 +1,6 @@
-import { API_URL } from "../lib/constants";
-import { authedFetch } from "../lib/api";
+import { API_URL } from '../lib/constants';
+import { authedFetch } from '../lib/api';
+import { handleJsonResponse, assertOk } from './helpers';
 
 export interface BookmarkResponse {
   courseId: string;
@@ -19,25 +20,13 @@ export interface BookmarkResponse {
   createdAt: string;
 }
 
-/**
- * Obtiene los cursos favoritos del usuario con datos completos.
- */
 export async function getMyBookmarks(): Promise<BookmarkResponse[]> {
   const res = await authedFetch(`${API_URL}/bookmarks`, {
     credentials: 'include',
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al obtener favoritos' }));
-    throw new Error(error.message || 'Error al obtener favoritos');
-  }
-
-  return res.json();
+  return handleJsonResponse<BookmarkResponse[]>(res);
 }
 
-/**
- * Agrega un curso a favoritos.
- */
 export async function addBookmark(courseId: string): Promise<void> {
   const res = await authedFetch(`${API_URL}/bookmarks`, {
     method: 'POST',
@@ -45,24 +34,13 @@ export async function addBookmark(courseId: string): Promise<void> {
     credentials: 'include',
     body: JSON.stringify({ courseId }),
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al agregar favorito' }));
-    throw new Error(error.message || 'Error al agregar favorito');
-  }
+  return assertOk(res, 'Error al agregar favorito');
 }
 
-/**
- * Elimina un curso de favoritos.
- */
 export async function removeBookmark(courseId: string): Promise<void> {
   const res = await authedFetch(`${API_URL}/bookmarks/${courseId}`, {
     method: 'DELETE',
     credentials: 'include',
   });
-
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: 'Error al eliminar favorito' }));
-    throw new Error(error.message || 'Error al eliminar favorito');
-  }
+  return assertOk(res, 'Error al eliminar favorito');
 }
