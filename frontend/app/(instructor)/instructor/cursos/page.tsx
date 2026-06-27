@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Edit, Trash2, Search, Loader2, AlertCircle, BookOpen, Send } from 'lucide-react';
+import { Edit, Trash2, Search, AlertCircle, BookOpen, Send } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import Link from 'next/link';
 import { getCourses, deleteCourse, publishCourse, type CourseDTO } from '@/src/shared/api/courses';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
-import CourseFormModal, { type CourseFormData } from '@/src/features/courses/components/CourseFormModal';
+import CourseFormModal from '@/src/features/courses/components/CourseFormModal';
+import { courseToFormData } from '@/src/features/courses/utils/courseToFormData';
+import type { CourseFormData } from '@/src/features/courses/components/CourseFormModal';
 import { ConfirmDialog } from '@/src/shared/components/ConfirmDialog';
 import styles from './page.module.css';
 
@@ -13,22 +16,6 @@ const STATUS_LABELS: Record<string, string> = {
   published: 'Publicado',
   draft: 'Borrador',
 };
-
-function courseToFormData(course: CourseDTO): CourseFormData {
-  return {
-    title: course.title,
-    shortDescription: course.shortDescription ?? '',
-    description: course.description ?? '',
-    categoryId: course.categoryId,
-    level: course.level,
-    price: String(course.price),
-    previewVideoUrl: course.previewVideoUrl ?? '',
-    durationMinutes: String(course.durationMinutes),
-    requirements: (course.requirements ?? []).join('\n'),
-    learningObjectives: (course.learningObjectives ?? []).join('\n'),
-    isFree: course.isFree,
-  };
-}
 
 export default function InstructorCursos() {
   const userId = useAuthStore((s) => s.user?.id);
@@ -186,7 +173,7 @@ export default function InstructorCursos() {
         {/* Loading */}
         {loading && (
           <div className={styles.centerState}>
-            <Loader2 size={32} className={styles.spinner} />
+            <Spinner size="lg" className={styles.spinner} />
             <p>Cargando cursos...</p>
           </div>
         )}
@@ -265,7 +252,7 @@ export default function InstructorCursos() {
                                   disabled={publishingId === course.id}
                                 >
                                   {publishingId === course.id ? (
-                                    <Loader2 size={15} className={styles.spinner} />
+                                    <Spinner size="sm" className={styles.spinner} />
                                   ) : (
                                     <Send size={15} />
                                   )}
@@ -286,7 +273,7 @@ export default function InstructorCursos() {
                                 disabled={deletingId === course.id || publishingId === course.id}
                               >
                                 {deletingId === course.id ? (
-                                  <Loader2 size={15} className={styles.spinner} />
+                          <Spinner size="sm" className={styles.spinner} />
                                 ) : (
                                   <Trash2 size={15} />
                                 )}
@@ -340,7 +327,7 @@ export default function InstructorCursos() {
                               disabled={publishingId === course.id}
                             >
                               {publishingId === course.id ? (
-                                <Loader2 size={15} className={styles.spinner} />
+                                <Spinner size="sm" className={styles.spinner} />
                               ) : (
                                 <Send size={15} />
                               )}{' '}
@@ -360,7 +347,7 @@ export default function InstructorCursos() {
                             disabled={deletingId === course.id || publishingId === course.id}
                           >
                             {deletingId === course.id ? (
-                              <Loader2 size={15} className={styles.spinner} />
+                              <Spinner size="sm" className={styles.spinner} />
                             ) : (
                               <Trash2 size={15} />
                             )}{' '}
