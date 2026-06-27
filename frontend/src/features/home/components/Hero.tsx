@@ -7,22 +7,12 @@ export const HeroSection = () => {
     <section className={styles.hero}>
       <div className={styles.heroInner}>
         <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>
-            Aprende tecnología construyendo{' '}
-            <span className={styles.heroHighlight}>sistemas reales.</span>
-          </h1>
-          <p className={styles.heroSubtitle}>
-            Cursos de backend, frontend, arquitectura y cloud. Domina la
-            tecnología construyendo proyectos que importan, no siguiendo
-            tutoriales vacíos.
-          </p>
+          <h1 className={styles.heroTitle}>Aprende. Crea. Avanza.</h1>
+          <p className={styles.heroSubtitle}>Cursos online diseñados para que desarrolles habilidades reales mediante proyectos prácticos.</p>
           <div className={styles.heroCta}>
             <Link href="/cursos" className={styles.heroBtnPrimary}>
               Explorar cursos
               <ArrowRight size={18} />
-            </Link>
-            <Link href="#pricing" className={styles.heroBtnGhost}>
-              Ver demo gratis &rarr;
             </Link>
           </div>
         </div>
