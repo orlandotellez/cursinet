@@ -2,17 +2,17 @@
 
 :root {
   /* Backgrounds */
-  --bg-base: #020617;
-  --bg-surface: #0F172A;
-  --bg-card: #111827;
-  --bg-elevated: #1E293B;
-  --bg-hover: #1E293B;
+  --bg-base: #040609;
+  --bg-surface: #090b0f;
+  --bg-card: #090b0f;
+  --bg-elevated: #0d0f14;
+  --bg-hover: #0d0f14;
 
   /* Text */
-  --text-primary: #F8FAFC;
-  --text-secondary: #94A3B8;
-  --text-muted: #64748B;
-  --text-disabled: #475569;
+  --text-primary: #eeeeee;
+  --text-secondary: #43454a;
+  --text-muted: #5a5c62;
+  --text-disabled: #2a2c32;
 
   /* Accent */
   --accent: #2563EB;
@@ -29,8 +29,8 @@
   --danger-bg: #2D0A0A;
 
   /* Borders */
-  --border: #1E293B;
-  --border-strong: #334155;
+  --border: #15171d;
+  --border-strong: #1e2028;
 
   /* Radii */
   --radius-card: 8px;
