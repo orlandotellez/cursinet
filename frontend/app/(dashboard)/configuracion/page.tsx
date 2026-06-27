@@ -8,6 +8,7 @@ import { updateUser } from '@/src/shared/api/users';
 import { ProfileSection } from '@/src/features/settings/components/ProfileSection';
 import { PasswordSection } from '@/src/features/settings/components/PasswordSection';
 import { NotificationPreferences } from '@/src/features/settings/components/NotificationPreferences';
+import { ConfiguracionSkeleton } from './loading';
 import styles from './page.module.css';
 
 export default function ConfiguracionPage() {
@@ -118,14 +119,7 @@ export default function ConfiguracionPage() {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <h1 className={styles.title}>Configuración</h1>
-        <p className={styles.loading}>Cargando configuración...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <ConfiguracionSkeleton />;
 
   return (
     <div className={styles.page}>
