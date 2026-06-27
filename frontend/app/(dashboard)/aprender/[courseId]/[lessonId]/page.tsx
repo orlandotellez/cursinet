@@ -124,6 +124,8 @@ function LessonViewerContent() {
                 courseId={v.courseId}
                 prevLesson={v.prevLesson}
                 nextLesson={v.nextLesson}
+                completed={v.completed}
+                savingProgress={v.savingProgress}
                 onNext={v.handleMarkComplete}
               />
             </div>

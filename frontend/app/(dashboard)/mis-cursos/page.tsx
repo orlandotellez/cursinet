@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import { FilterTabs } from '@/src/features/courses/mycourses/FilterTabs';
 import { EnrolledCard } from '@/src/features/courses/mycourses/EnrolledCard';
+import { MisCursosSkeleton } from './loading';
 import { useEnrollmentStore } from '@/src/shared/store/useEnrollmentStore';
 import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
 import styles from './page.module.css';
@@ -19,6 +20,8 @@ export default function MisCursosPage() {
     loadMyEnrollments();
     loadBookmarks();
   }, [loadMyEnrollments, loadBookmarks]);
+
+  if (isLoading) return <MisCursosSkeleton />;
 
   const filtered = enrollments.filter((e) => {
     if (filter === 'in-progress') return e.progress > 0 && e.progress < 100;
