@@ -14,6 +14,9 @@ export interface EnrollmentResponse {
   enrolledAt: string;
   lastAccessedAt?: string;
   progressPercentage: number;
+  totalLessons: number;
+  completedLessons: number;
+  courseDurationMinutes: number;
 }
 
 export interface EnrollmentStatusResponse {

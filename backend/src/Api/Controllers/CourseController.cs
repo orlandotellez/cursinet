@@ -25,7 +25,6 @@ public class CourseController : ControllerBase
         _logger = logger;
     }
 
-    /
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult<List<CourseResponse>>> GetAll(
@@ -42,7 +41,6 @@ public class CourseController : ControllerBase
         return Ok(courses);
     }
 
-    /
     [HttpGet("{id:guid}")]
     [AllowAnonymous]
     public async Task<ActionResult<CourseResponse>> GetById(Guid id)
@@ -51,7 +49,6 @@ public class CourseController : ControllerBase
         return Ok(course);
     }
 
-    /
     [HttpGet("by-slug/{slug}")]
     [AllowAnonymous]
     public async Task<ActionResult<CourseResponse>> GetBySlug(string slug)
@@ -60,7 +57,6 @@ public class CourseController : ControllerBase
         return Ok(course);
     }
 
-    /
     [HttpPost]
     [RequirePermission(Permissions.CourseCreate)]
     public async Task<ActionResult<CourseResponse>> Create([FromBody] CreateCourseRequest request)
@@ -73,7 +69,6 @@ public class CourseController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = course.Id }, course);
     }
 
-    /
     [HttpPut("{id:guid}")]
     [RequirePermission(Permissions.CourseUpdate)]
     public async Task<ActionResult<CourseResponse>> Update(Guid id, [FromBody] UpdateCourseRequest request)
@@ -87,7 +82,6 @@ public class CourseController : ControllerBase
         return Ok(course);
     }
 
-    /
     [HttpDelete("{id:guid}")]
     [RequirePermission(Permissions.CourseDelete)]
     public async Task<ActionResult> Delete(Guid id)
@@ -111,7 +105,6 @@ public class CourseController : ControllerBase
         return Ok(new { message = "Course deleted successfully" });
     }
 
-    /
     [HttpPost("{id:guid}/publish")]
     [RequirePermission(Permissions.CoursePublish)]
     public async Task<ActionResult<CourseResponse>> Publish(Guid id)
@@ -125,7 +118,6 @@ public class CourseController : ControllerBase
         return Ok(course);
     }
 
-    /
     [HttpPost("{id:guid}/unpublish")]
     [RequirePermission(Permissions.CoursePublish)]
     public async Task<ActionResult<CourseResponse>> Unpublish(Guid id)

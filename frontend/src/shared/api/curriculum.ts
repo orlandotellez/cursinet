@@ -11,6 +11,7 @@ export interface CurriculumLesson {
   sortOrder: number;
   isPublished: boolean;
   isPreview: boolean;
+  isCompleted?: boolean;
   videoDurationSeconds: number | null;
   videoUrl?: string | null;
   contentMarkdown?: string | null;

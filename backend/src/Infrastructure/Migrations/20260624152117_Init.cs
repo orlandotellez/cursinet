@@ -6,10 +6,14 @@ using NpgsqlTypes;
 
 namespace Cursinet.Infrastructure.Migrations
 {
-    /
+    /// <summary>
+    /// Initial migration.
+    /// </summary>
     public partial class Init : Migration
     {
-        /
+        /// <summary>
+        /// Applies the migration.
+        /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -1285,8 +1289,9 @@ namespace Cursinet.Infrastructure.Migrations
                 table: "Verification",
                 column: "value");
         }
-
-        /
+        /// <summary>
+        /// Reverts the migration.
+        /// </summary>
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

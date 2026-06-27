@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useLessonViewer } from '@/src/features/player/hooks/useLessonViewer';
 import { LessonHeader } from '@/src/features/player/components/LessonHeader';
 import { LessonContentRenderer } from '@/src/features/player/components/LessonContentRenderer';
@@ -17,16 +17,43 @@ import { NotesTab } from '@/src/features/player/components/NotesTab';
 import type { Lesson } from '@/src/shared/types';
 import styles from './page.module.css';
 
+function LessonSkeleton() {
+  return (
+    <div className={styles.pageSkeleton}>
+      <div className={styles.mainSkeleton}>
+        <div className={`${styles.skeleton} ${styles.headerSkeleton}`} />
+        <div className={`${styles.skeleton} ${styles.videoSkeleton}`} />
+        <div className={styles.navSkeleton}>
+          <div className={`${styles.skeleton} ${styles.navBtnSkeleton}`} />
+          <div className={`${styles.skeleton} ${styles.navBtnSkeleton}`} />
+        </div>
+        <div className={styles.tabsSkeleton}>
+          <div className={`${styles.skeleton} ${styles.tabSkeleton}`} />
+          <div className={`${styles.skeleton} ${styles.tabSkeleton}`} />
+          <div className={`${styles.skeleton} ${styles.tabSkeleton}`} />
+        </div>
+        <div className={`${styles.skeleton} ${styles.tabContentSkeleton}`} />
+      </div>
+      <div className={styles.sidebarSkeleton}>
+        <div className={styles.sidebarHeaderSkeleton}>
+          <div className={`${styles.skeleton} ${styles.sidebarTitleSkeleton}`} />
+          <div className={`${styles.skeleton} ${styles.sidebarProgressSkeleton}`} />
+        </div>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className={styles.moduleSkeleton}>
+            <div className={`${styles.skeleton} ${styles.moduleChevronSkeleton}`} />
+            <div className={`${styles.skeleton} ${styles.moduleTitleSkeleton}`} />
+            <div className={`${styles.skeleton} ${styles.moduleCountSkeleton}`} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function LessonViewerPage() {
   return (
-    <Suspense fallback={
-      <div className={styles.page}>
-        <div className={styles.centerState}>
-          <Loader2 size={32} className={styles.spinner} />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<LessonSkeleton />}>
       <LessonViewerContent />
     </Suspense>
   );
@@ -47,14 +74,7 @@ function LessonViewerContent() {
   };
 
   if (v.loading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.centerState}>
-          <Loader2 size={32} className={styles.spinner} />
-          <p>Cargando lección...</p>
-        </div>
-      </div>
-    );
+    return <LessonSkeleton />;
   }
 
   if (v.error) {
@@ -104,6 +124,7 @@ function LessonViewerContent() {
                 courseId={v.courseId}
                 prevLesson={v.prevLesson}
                 nextLesson={v.nextLesson}
+                onNext={v.handleMarkComplete}
               />
             </div>
 

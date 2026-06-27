@@ -20,9 +20,6 @@ public class BookmarksController : ControllerBase
         _authHelper = authHelper;
     }
 
-    /
-    /
-    /
     [HttpGet]
     public async Task<ActionResult<List<BookmarkResponse>>> GetMyBookmarks()
     {
@@ -34,9 +31,6 @@ public class BookmarksController : ControllerBase
         return Ok(bookmarks);
     }
 
-    /
-    /
-    /
     [HttpPost]
     public async Task<ActionResult> AddBookmark([FromBody] AddBookmarkRequest request)
     {
@@ -48,9 +42,6 @@ public class BookmarksController : ControllerBase
         return CreatedAtAction(nameof(GetMyBookmarks), null);
     }
 
-    /
-    /
-    /
     [HttpDelete("{courseId:guid}")]
     public async Task<ActionResult> RemoveBookmark(Guid courseId)
     {

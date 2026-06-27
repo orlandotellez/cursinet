@@ -6,6 +6,8 @@
   border-radius: var(--radius-card);
   overflow: hidden;
   background: #000;
+  aspect-ratio: 16 / 9;
+  width: 100%;
 }
 
 .emptyState {

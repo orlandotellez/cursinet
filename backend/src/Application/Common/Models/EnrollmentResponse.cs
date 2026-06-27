@@ -17,6 +17,9 @@ public record EnrollmentResponse
     public DateTime EnrolledAt { get; init; }
     public DateTime? LastAccessedAt { get; init; }
     public decimal ProgressPercentage { get; init; }
+    public int TotalLessons { get; init; }
+    public int CompletedLessons { get; init; }
+    public int CourseDurationMinutes { get; init; }
 }
 
 public record EnrollmentStatusResponse

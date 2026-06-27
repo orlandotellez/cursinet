@@ -10,11 +10,19 @@ public class EnrollmentService : IEnrollmentService
 {
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly ICourseRepository _courseRepository;
+    private readonly ILessonRepository _lessonRepository;
+    private readonly ILessonProgressRepository _lessonProgressRepository;
 
-    public EnrollmentService(IEnrollmentRepository enrollmentRepository, ICourseRepository courseRepository)
+    public EnrollmentService(
+        IEnrollmentRepository enrollmentRepository,
+        ICourseRepository courseRepository,
+        ILessonRepository lessonRepository,
+        ILessonProgressRepository lessonProgressRepository)
     {
         _enrollmentRepository = enrollmentRepository;
         _courseRepository = courseRepository;
+        _lessonRepository = lessonRepository;
+        _lessonProgressRepository = lessonProgressRepository;
     }
 
     public async Task<EnrollmentResponse> EnrollAsync(Guid userId, Guid courseId)
@@ -57,7 +65,28 @@ public class EnrollmentService : IEnrollmentService
     public async Task<List<EnrollmentResponse>> GetMyEnrollmentsAsync(Guid userId)
     {
         var enrollments = await _enrollmentRepository.GetByUserAsync(userId);
-        return enrollments.Select(e => e.MapToDto()).ToList();
+
+        var results = new List<EnrollmentResponse>();
+        foreach (var enrollment in enrollments)
+        {
+            var dto = enrollment.MapToDto();
+
+            var totalLessons = (await _lessonRepository.GetByCourseAsync(enrollment.CourseId))
+                .Count(l => l.IsPublished && l.DeletedAt == null);
+
+            var completedLessons = (await _lessonProgressRepository.GetByUserAndCourseAsync(userId, enrollment.CourseId))
+                .Count(p => p.IsCompleted);
+
+            dto = dto with
+            {
+                TotalLessons = totalLessons,
+                CompletedLessons = completedLessons,
+            };
+
+            results.Add(dto);
+        }
+
+        return results;
     }
 
     public async Task<EnrollmentStatusResponse> GetStatusAsync(Guid userId, Guid courseId)

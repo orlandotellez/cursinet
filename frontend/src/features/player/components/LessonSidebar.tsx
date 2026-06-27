@@ -14,15 +14,23 @@ interface LessonSidebarProps {
 }
 
 export function LessonSidebar({ course, expandedModules, toggleModule, lessonId, isWelcomeActive }: LessonSidebarProps) {
+  const totalLessons = course.modules.reduce((sum, m) => sum + m.lessons.length, 0);
+  const completedLessons = course.modules.reduce(
+    (sum, m) => sum + m.lessons.filter((l) => l.isCompleted).length, 0,
+  );
+  const progressPercent = totalLessons > 0
+    ? Math.round((completedLessons / totalLessons) * 100)
+    : 0;
+
   return (
     <div className={styles.sidebar}>
       <div className={styles.header}>
         <h3 className={styles.courseTitle}>{course.title}</h3>
         <div className={styles.progress}>
           <div className={styles.progressBar}>
-            <div className={styles.progressFill} style={{ width: '45%' }} />
+            <div className={styles.progressFill} style={{ width: `${progressPercent}%` }} />
           </div>
-          <span className={styles.progressLabel}>45%</span>
+          <span className={styles.progressLabel}>{progressPercent}%</span>
         </div>
       </div>
 

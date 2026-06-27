@@ -141,4 +141,138 @@
   .page {
     flex-direction: column;
   }
+  .sidebarSkeleton {
+    width: 100%;
+    min-height: 300px;
+  }
+}
+
+/* ── Skeleton (shimmer placeholder) ── */
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-elevated) 25%,
+    var(--bg-hover) 50%,
+    var(--bg-elevated) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+.pageSkeleton {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+}
+
+.mainSkeleton {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.headerSkeleton {
+  height: 32px;
+  width: 60%;
+}
+
+.videoSkeleton {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+}
+
+.navSkeleton {
+  display: flex;
+  gap: 12px;
+}
+
+.navBtnSkeleton {
+  height: 40px;
+  width: 140px;
+}
+
+.tabsSkeleton {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.tabSkeleton {
+  height: 32px;
+  width: 100px;
+}
+
+.tabContentSkeleton {
+  height: 160px;
+  width: 100%;
+}
+
+.sidebarSkeleton {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.sidebarHeaderSkeleton {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebarTitleSkeleton {
+  height: 16px;
+  width: 70%;
+}
+
+.sidebarProgressSkeleton {
+  height: 6px;
+  width: 100%;
+  border-radius: 3px;
+}
+
+.moduleSkeleton {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.moduleChevronSkeleton {
+  height: 16px;
+  width: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.moduleTitleSkeleton {
+  height: 14px;
+  flex: 1;
+}
+
+.moduleCountSkeleton {
+  height: 18px;
+  width: 24px;
+  border-radius: 10px;
+  flex-shrink: 0;
 }

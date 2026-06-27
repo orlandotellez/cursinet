@@ -4,9 +4,9 @@ using Cursinet.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cursinet.Infrastructure.Persistence;
-
-/
-/
+/// <summary>
+/// Seeds initial data for development.
+/// </summary>
 public class DataSeeder
 {
     private readonly ApplicationDbContext _context;

@@ -22,7 +22,6 @@ public class ModuleController : ControllerBase
         _authHelper = authHelper;
     }
 
-    /
     [HttpGet]
     [RequirePermission(Permissions.ModuleRead)]
     public async Task<ActionResult<List<ModuleResponse>>> GetAll(Guid courseId)
@@ -34,7 +33,6 @@ public class ModuleController : ControllerBase
         return Ok(modules);
     }
 
-    /
     [HttpGet("{id:guid}")]
     [RequirePermission(Permissions.ModuleRead)]
     public async Task<ActionResult<ModuleResponse>> GetById(Guid courseId, Guid id)
@@ -46,7 +44,6 @@ public class ModuleController : ControllerBase
         return Ok(module);
     }
 
-    /
     [HttpGet("curriculum")]
     [AllowAnonymous]
     public async Task<ActionResult<CurriculumResponse>> GetCurriculum(Guid courseId)
@@ -58,7 +55,6 @@ public class ModuleController : ControllerBase
         return Ok(curriculum);
     }
 
-    /
     [HttpPost]
     [RequirePermission(Permissions.ModuleCreate)]
     public async Task<ActionResult<ModuleResponse>> Create(Guid courseId, [FromBody] CreateModuleRequest request)
@@ -72,7 +68,6 @@ public class ModuleController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { courseId, id = module.Id }, module);
     }
 
-    /
     [HttpPut("{id:guid}")]
     [RequirePermission(Permissions.ModuleUpdate)]
     public async Task<ActionResult<ModuleResponse>> Update(Guid courseId, Guid id, [FromBody] UpdateModuleRequest request)
@@ -86,7 +81,6 @@ public class ModuleController : ControllerBase
         return Ok(module);
     }
 
-    /
     [HttpDelete("{id:guid}")]
     [RequirePermission(Permissions.ModuleDelete)]
     public async Task<ActionResult> Delete(Guid courseId, Guid id)
@@ -100,7 +94,6 @@ public class ModuleController : ControllerBase
         return Ok(new { message = "Module deleted successfully" });
     }
 
-    /
     [HttpPut("reorder")]
     [RequirePermission(Permissions.ModuleUpdate)]
     public async Task<ActionResult> Reorder(Guid courseId, [FromBody] ReorderRequest request)

@@ -17,7 +17,6 @@ public class AnalyticsController : ControllerBase
         _analyticsService = analyticsService;
     }
 
-    /
     [HttpGet("dashboard")]
     [RequirePermission(Permissions.AdminPanel)]
     public async Task<ActionResult<DashboardResponse>> GetDashboard([FromQuery] string? range = "30d")
@@ -26,7 +25,6 @@ public class AnalyticsController : ControllerBase
         return Ok(data);
     }
 
-    /
     [HttpGet("analytics")]
     [RequirePermission(Permissions.AdminPanel)]
     public async Task<ActionResult<AnalyticsResponse>> GetAnalytics([FromQuery] string? range = "1a")

@@ -21,7 +21,6 @@ public class UsersController : ControllerBase
         _authHelper = authHelper;
     }
 
-    /
     [HttpGet]
     [RequirePermission(Permissions.UserRead)]
     public async Task<ActionResult<List<UserDto>>> GetAll(
@@ -42,7 +41,6 @@ public class UsersController : ControllerBase
         return Ok(users);
     }
 
-    /
     [HttpGet("{id:guid}")]
     [RequirePermission(Permissions.UserRead)]
     public async Task<ActionResult<UserDto>> GetById(Guid id)
@@ -51,7 +49,6 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    /
     [HttpPost]
     [RequirePermission(Permissions.UserUpdate)]
     public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserRequest request)
@@ -64,7 +61,6 @@ public class UsersController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
     }
 
-    /
     [HttpPut("{id:guid}")]
     [RequirePermission(Permissions.UserUpdate)]
     public async Task<ActionResult<UserDto>> Update(Guid id, [FromBody] UpdateUserRequest request)
@@ -77,7 +73,6 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    /
     [HttpDelete("{id:guid}")]
     [RequirePermission(Permissions.UserDelete)]
     public async Task<ActionResult> Delete(Guid id)
@@ -91,7 +86,6 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
-    /
     [HttpPost("{id:guid}/restore")]
     [RequirePermission(Permissions.UserUpdate)]
     public async Task<ActionResult<UserDto>> Restore(Guid id)

@@ -13,17 +13,20 @@ public class ModuleService : IModuleService
     private readonly ILessonRepository _lessonRepository;
     private readonly ICourseRepository _courseRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ILessonProgressRepository _lessonProgressRepository;
 
     public ModuleService(
         IModuleRepository moduleRepository,
         ILessonRepository lessonRepository,
         ICourseRepository courseRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        ILessonProgressRepository lessonProgressRepository)
     {
         _moduleRepository = moduleRepository;
         _lessonRepository = lessonRepository;
         _courseRepository = courseRepository;
         _userRepository = userRepository;
+        _lessonProgressRepository = lessonProgressRepository;
     }
 
     public async Task<List<ModuleResponse>> GetAllAsync(Guid courseId, Guid? currentUserId, UserRole? role)
@@ -92,6 +95,25 @@ public class ModuleService : IModuleService
                 .Where(m => m.IsPublished)
                 .Select(m => m.MapToCurriculumDto(includeUnpublished: false))
                 .ToList();
+
+        // Inyectar progreso del alumno si está autenticado
+        if (currentUserId.HasValue)
+        {
+            var progress = await _lessonProgressRepository.GetByUserAndCourseAsync(currentUserId.Value, courseId);
+            var completedIds = progress
+                .Where(p => p.IsCompleted)
+                .Select(p => p.LessonId)
+                .ToHashSet();
+
+            foreach (var mod in curriculumModules)
+            {
+                foreach (var lesson in mod.Lessons)
+                {
+                    if (completedIds.Contains(lesson.Id))
+                        lesson.IsCompleted = true;
+                }
+            }
+        }
 
         return new CurriculumResponse
         {

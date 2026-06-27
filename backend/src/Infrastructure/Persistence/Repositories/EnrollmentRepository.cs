@@ -58,4 +58,11 @@ public class EnrollmentRepository : IEnrollmentRepository
                 .ThenInclude(c => c.Instructor)
             .FirstAsync(e => e.Id == enrollment.Id))!;
     }
+
+    public async Task UpdateAsync(Enrollment enrollment)
+    {
+        enrollment.UpdatedAt = DateTime.UtcNow;
+        _context.Enrollments.Update(enrollment);
+        await _context.SaveChangesAsync();
+    }
 }

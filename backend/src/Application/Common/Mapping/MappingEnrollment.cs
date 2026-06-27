@@ -19,6 +19,7 @@ public static class MappingEnrollment
             EnrolledAt = enrollment.EnrolledAt,
             LastAccessedAt = enrollment.LastAccessedAt,
             ProgressPercentage = enrollment.ProgressPercentage,
+            CourseDurationMinutes = enrollment.Course?.DurationMinutes ?? 0,
         };
     }
 

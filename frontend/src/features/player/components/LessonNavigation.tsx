@@ -9,9 +9,10 @@ interface LessonNavigationProps {
   courseId: string;
   prevLesson: Lesson | null;
   nextLesson: Lesson | null;
+  onNext?: () => void;
 }
 
-export function LessonNavigation({ courseId, prevLesson, nextLesson }: LessonNavigationProps) {
+export function LessonNavigation({ courseId, prevLesson, nextLesson, onNext }: LessonNavigationProps) {
   return (
     <div className={styles.nav}>
       {prevLesson ? (
@@ -25,7 +26,11 @@ export function LessonNavigation({ courseId, prevLesson, nextLesson }: LessonNav
       ) : <div />}
 
       {nextLesson ? (
-        <Link href={`/aprender/${courseId}/${nextLesson.id}`} className={`${styles.btn} ${styles.btnRight}`}>
+        <Link
+          href={`/aprender/${courseId}/${nextLesson.id}`}
+          className={`${styles.btn} ${styles.btnRight}`}
+          onClick={onNext}
+        >
           <div>
             <span className={styles.label}>Siguiente</span>
             <span className={styles.title}>{nextLesson.title}</span>
