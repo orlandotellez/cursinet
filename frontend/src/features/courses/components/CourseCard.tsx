@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import { Clock, Star, Users, BookOpen } from 'lucide-react';
+import { CourseThumbnail } from './CourseThumbnail';
+import { CourseLevelBadge } from './CourseLevelBadge';
+import { CourseStats } from './CourseStats';
 import styles from './CourseCard.module.css';
 import { CourseCardData } from '@/src/shared/types';
 
@@ -11,39 +13,17 @@ export function CourseCard({ course }: CourseCardProps) {
   return (
     <article className={styles.card}>
       <Link href={`/cursos/${course.slug}`} className={styles.link}>
-        {/* Thumbnail */}
-        <div className={styles.thumbnail}>
-          <div className={styles.thumbnailPlaceholder}>
-            <span className={styles.thumbnailText}>
-              {course.title.charAt(0)}
-            </span>
-          </div>
-          {course.badge && (
-            <span className={styles.badge}>{course.badge}</span>
-          )}
-        </div>
+        <CourseThumbnail title={course.title} badge={course.badge} />
 
-        {/* Content */}
         <div className={styles.content}>
-          {/* Meta */}
           <div className={styles.meta}>
             <span className={styles.category}>{course.category.name}</span>
-            <span className={`${styles.level} ${styles[course.level]}`}>
-              {course.level === 'beginner'
-                ? 'Principiante'
-                : course.level === 'intermediate'
-                  ? 'Intermedio'
-                  : 'Avanzado'}
-            </span>
+            <CourseLevelBadge level={course.level} />
           </div>
 
-          {/* Title */}
           <h3 className={styles.title}>{course.title}</h3>
-
-          {/* Description */}
           <p className={styles.description}>{course.shortDescription}</p>
 
-          {/* Instructor */}
           <div className={styles.instructor}>
             <div className={styles.instructorAvatar}>
               {course.instructor.name.charAt(0)}
@@ -53,27 +33,13 @@ export function CourseCard({ course }: CourseCardProps) {
             </span>
           </div>
 
-          {/* Stats */}
-          <div className={styles.stats}>
-            <div className={styles.stat}>
-              <Clock size={14} />
-              <span>{course.duration}h</span>
-            </div>
-            <div className={styles.stat}>
-              <BookOpen size={14} />
-              <span>{course.lessonsCount} lecciones</span>
-            </div>
-            <div className={styles.stat}>
-              <Star size={14} />
-              <span>{course.rating}</span>
-            </div>
-            <div className={styles.stat}>
-              <Users size={14} />
-              <span>{course.studentsCount.toLocaleString()}</span>
-            </div>
-          </div>
+          <CourseStats
+            duration={course.duration}
+            lessonsCount={course.lessonsCount}
+            rating={course.rating}
+            studentsCount={course.studentsCount}
+          />
 
-          {/* Price */}
           <div className={styles.footer}>
             <span className={styles.price}>
               {course.price === 0

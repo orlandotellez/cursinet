@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Play, Heart } from 'lucide-react';
+import { CourseThumbnail } from '@/src/features/courses/components/CourseThumbnail';
+import { CourseLevelBadge } from '@/src/features/courses/components/CourseLevelBadge';
 import type { Enrollment } from '@/src/shared/types';
 import type { CurriculumResponse } from '@/src/shared/api/curriculum';
 import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
@@ -12,12 +14,6 @@ import styles from './EnrolledCard.module.css';
 interface EnrolledCardProps {
   enrollment: Enrollment;
 }
-
-const levelLabels: Record<string, string> = {
-  beginner: 'Principiante',
-  intermediate: 'Intermedio',
-  advanced: 'Avanzado',
-};
 
 // ─── Module-level curriculum cache ──────────────────────────────────────────
 const curriculumCache = new Map<string, CurriculumResponse>();
@@ -39,7 +35,6 @@ function getNextLessonUrl(
     .flatMap((m) => m.lessons)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
-  // Si completedLessons es 3, la próxima lección es la del índice 3 (0-based)
   const target = allLessons[completedLessons] ?? allLessons[0] ?? null;
   if (!target) return null;
 
@@ -109,9 +104,7 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
           <span className={styles.category}>
             {enrollment.course.category.name}
           </span>
-          <span className={`${styles.levelBadge} ${styles[enrollment.course.level]}`}>
-            {levelLabels[enrollment.course.level] || enrollment.course.level}
-          </span>
+          <CourseLevelBadge level={enrollment.course.level} />
         </div>
         <h3 className={styles.title}>{enrollment.course.title}</h3>
         <p className={styles.instructor}>{enrollment.course.instructor.name}</p>
