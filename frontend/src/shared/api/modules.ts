@@ -1,8 +1,8 @@
 import { API_URL } from "../lib/constants";
 import { validateOrThrow } from "../lib/validation";
 import { createModuleSchema, updateModuleSchema, reorderModulesSchema } from "../validations";
-
-// ─── Types aligned with backend ─────────────────────────────────────────────
+import { authedFetch } from "../lib/api";
+import { handleJsonResponse, assertOk } from "./helpers";
 
 export interface ModuleResponse {
   id: string;
@@ -43,71 +43,49 @@ export interface ReorderPayload {
   items: { id: string; sortOrder: number }[];
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error del servidor' }));
-    throw new Error(body.detail || body.title || 'Error del servidor');
-  }
-  return res.json();
-}
-
-// ─── API functions ──────────────────────────────────────────────────────────
-
 export async function getModules(courseId: string): Promise<ModuleResponse[]> {
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules`, { credentials: 'include' });
-  return handleResponse<ModuleResponse[]>(res);
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules`);
+  return handleJsonResponse<ModuleResponse[]>(res);
 }
 
 export async function getModule(courseId: string, moduleId: string): Promise<ModuleResponse> {
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`, { credentials: 'include' });
-  return handleResponse<ModuleResponse>(res);
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`);
+  return handleJsonResponse<ModuleResponse>(res);
 }
 
 export async function createModule(courseId: string, payload: CreateModulePayload): Promise<ModuleResponse> {
   validateOrThrow(createModuleSchema, payload);
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<ModuleResponse>(res);
+  return handleJsonResponse<ModuleResponse>(res);
 }
 
 export async function updateModule(courseId: string, moduleId: string, payload: UpdateModulePayload): Promise<ModuleResponse> {
   validateOrThrow(updateModuleSchema, payload);
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<ModuleResponse>(res);
+  return handleJsonResponse<ModuleResponse>(res);
 }
 
 export async function deleteModule(courseId: string, moduleId: string): Promise<void> {
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules/${moduleId}`, {
     method: 'DELETE',
-    credentials: 'include',
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al eliminar módulo' }));
-    throw new Error(body.detail || body.title || 'Error al eliminar módulo');
-  }
+  await assertOk(res, 'Error al eliminar módulo');
 }
 
 export async function reorderModules(courseId: string, payload: ReorderPayload): Promise<void> {
   validateOrThrow(reorderModulesSchema, payload);
-  const res = await fetch(`${API_URL}/courses/${courseId}/modules/reorder`, {
+  const res = await authedFetch(`${API_URL}/courses/${courseId}/modules/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify(payload),
   });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al reordenar' }));
-    throw new Error(body.detail || body.title || 'Error al reordenar');
-  }
+  await assertOk(res, 'Error al reordenar');
 }

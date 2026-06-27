@@ -2,8 +2,7 @@ import { API_URL } from "../lib/constants";
 import { authedFetch } from "../lib/api";
 import { validateOrThrow } from "../lib/validation";
 import { createCourseSchema, updateCourseSchema } from "../validations";
-
-// ─── Types aligned with backend ───────────────────────────────────────────
+import { handleJsonResponse, assertOk } from "./helpers";
 
 export interface CourseDTO {
   id: string;
@@ -73,18 +72,6 @@ export interface UpdateCoursePayload {
   learningObjectives?: string[] | null;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error del servidor' }));
-    throw new Error(body.detail || body.title || 'Error del servidor');
-  }
-  return res.json();
-}
-
-// ─── API functions ────────────────────────────────────────────────────────
-
 export async function getCourses(params?: {
   categoryId?: string;
   level?: string;
@@ -107,19 +94,19 @@ export async function getCourses(params?: {
   const url = `${API_URL}/courses${qs ? `?${qs}` : ''}`;
 
   const res = await authedFetch(url, { credentials: 'include' });
-  return handleResponse<CourseDTO[]>(res);
+  return handleJsonResponse<CourseDTO[]>(res);
 }
 
 export async function getCourseById(id: string): Promise<CourseDTO> {
   const res = await authedFetch(`${API_URL}/courses/${id}`, { credentials: 'include' });
-  return handleResponse<CourseDTO>(res);
+  return handleJsonResponse<CourseDTO>(res);
 }
 
 export async function getCourseBySlug(slug: string): Promise<CourseDTO> {
   const res = await authedFetch(`${API_URL}/courses/by-slug/${encodeURIComponent(slug)}`, {
     credentials: 'include',
   });
-  return handleResponse<CourseDTO>(res);
+  return handleJsonResponse<CourseDTO>(res);
 }
 
 export async function createCourse(payload: CreateCoursePayload): Promise<CourseDTO> {
@@ -130,7 +117,7 @@ export async function createCourse(payload: CreateCoursePayload): Promise<Course
     credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<CourseDTO>(res);
+  return handleJsonResponse<CourseDTO>(res);
 }
 
 export async function updateCourse(id: string, payload: UpdateCoursePayload): Promise<CourseDTO> {
@@ -141,7 +128,7 @@ export async function updateCourse(id: string, payload: UpdateCoursePayload): Pr
     credentials: 'include',
     body: JSON.stringify(payload),
   });
-  return handleResponse<CourseDTO>(res);
+  return handleJsonResponse<CourseDTO>(res);
 }
 
 export async function deleteCourse(id: string): Promise<void> {
@@ -150,10 +137,7 @@ export async function deleteCourse(id: string): Promise<void> {
     credentials: 'include',
   });
 
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({ detail: 'Error al eliminar el curso' }));
-    throw new Error(body.detail || body.title || 'Error al eliminar el curso');
-  }
+  await assertOk(res, 'Error al eliminar el curso')
 }
 
 export async function publishCourse(id: string): Promise<CourseDTO> {
@@ -161,7 +145,7 @@ export async function publishCourse(id: string): Promise<CourseDTO> {
     method: 'POST',
     credentials: 'include',
   });
-  return handleResponse<CourseDTO>(res);
+  return handleJsonResponse<CourseDTO>(res);
 }
 
 export async function unpublishCourse(id: string): Promise<CourseDTO> {
@@ -169,5 +153,5 @@ export async function unpublishCourse(id: string): Promise<CourseDTO> {
     method: 'POST',
     credentials: 'include',
   });
-  return handleResponse<CourseDTO>(res);
+  return handleJsonResponse<CourseDTO>(res);
 }
