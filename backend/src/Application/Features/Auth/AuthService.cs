@@ -52,6 +52,7 @@ public class AuthService : IAuthService
             Name = request.Name,
             Email = request.Email,
             Role = request.Role ?? UserRole.Student,
+            IsActive = true,
             EmailVerified = false,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
