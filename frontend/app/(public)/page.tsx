@@ -1,6 +1,5 @@
-import { landingStats } from '@/src/shared/api/mappers';
 import { pricingPlans } from '@/src/features/courses/data';
-import { getFeaturedCourses, getPublicCategories } from '@/src/shared/api/public-data';
+import { getFeaturedCourses, getPublicCategories, getLandingStats } from '@/src/shared/api/public-data';
 import { CategoriesGrid } from '@/src/features/home/components/CategoriesGrid';
 import { FeaturedCourses } from '@/src/features/home/components/FeaturedCourses';
 import { FinalCta } from '@/src/features/home/components/FinalCta';
@@ -11,15 +10,16 @@ import { StatsBar } from '@/src/features/home/components/StatsBar';
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [featured, categories] = await Promise.all([
+  const [featured, categories, stats] = await Promise.all([
     getFeaturedCourses(),
     getPublicCategories(),
+    getLandingStats(),
   ]);
 
   return (
     <>
       <HeroSection />
-      <StatsBar stats={landingStats} />
+      <StatsBar stats={stats} />
       {featured.length > 0 && <FeaturedCourses featuredCourses={featured} />}
       {categories.length > 0 && <CategoriesGrid categories={categories} />}
       <PricingSection pricingPlans={pricingPlans} />

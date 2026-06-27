@@ -10,3 +10,4 @@ export type * from './revenue.types';
 export type * from './activity.types';
 export type * from './auth.types';
 export type * from './payment.types';
+export type * from './subscription.types';
