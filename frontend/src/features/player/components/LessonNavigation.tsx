@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight, Check, Loader2 } from 'lucide-react';
 import type { Lesson } from '@/src/shared/types';
 import styles from './LessonNavigation.module.css';
 
@@ -9,10 +10,20 @@ interface LessonNavigationProps {
   courseId: string;
   prevLesson: Lesson | null;
   nextLesson: Lesson | null;
+  completed: boolean;
+  savingProgress: boolean;
   onNext?: () => void;
 }
 
-export function LessonNavigation({ courseId, prevLesson, nextLesson, onNext }: LessonNavigationProps) {
+export function LessonNavigation({ courseId, prevLesson, nextLesson, completed, savingProgress, onNext }: LessonNavigationProps) {
+  const router = useRouter();
+
+  const handleCompleteAndRedirect = async () => {
+    if (!onNext) return;
+    await onNext();
+    router.push('/mis-cursos');
+  };
+
   return (
     <div className={styles.nav}>
       {prevLesson ? (
@@ -37,7 +48,25 @@ export function LessonNavigation({ courseId, prevLesson, nextLesson, onNext }: L
           </div>
           <ArrowRight size={16} />
         </Link>
-      ) : <div />}
+      ) : completed ? (
+        <Link href="/mis-cursos" className={`${styles.completeBtn}`}>
+          <Check size={16} />
+          Ir a Mis Cursos
+        </Link>
+      ) : (
+        <button
+          className={styles.completeBtn}
+          onClick={handleCompleteAndRedirect}
+          disabled={savingProgress}
+        >
+          {savingProgress ? (
+            <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+          ) : (
+            <Check size={16} />
+          )}
+          {savingProgress ? 'Completando...' : 'Completar lección final'}
+        </button>
+      )}
     </div>
   );
 }
