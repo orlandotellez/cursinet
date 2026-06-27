@@ -8,6 +8,7 @@ import { DashboardHeader } from '@/src/features/dashboard/components/DashboardHe
 import { ContinueLearning } from '@/src/features/dashboard/components/ContinueLearning';
 import { StatsCards } from '@/src/features/dashboard/components/StatsCards';
 import { RecentCertificates } from '@/src/features/dashboard/components/RecentCertificates';
+import { DashboardSkeleton } from './loading';
 import type { Certificate } from '@/src/shared/types';
 import type { EnrollmentResponse } from '@/src/shared/api/enrollment';
 import type { Enrollment } from '@/src/shared/types';
@@ -91,12 +92,7 @@ export default function DashboardPage() {
   }, []);
 
   if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <DashboardHeader name={name} />
-        <div className={styles.loading}>Cargando dashboard...</div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
