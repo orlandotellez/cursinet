@@ -11,4 +11,7 @@ export interface User {
   phone?: string | null;
   bio?: string | null;
   userName?: string | null;
+  websiteUrl?: string | null;
+  githubUrl?: string | null;
+  linkedinUrl?: string | null;
 }

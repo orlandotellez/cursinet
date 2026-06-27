@@ -29,6 +29,7 @@ interface AuthState {
   logout: () => Promise<void>;
   clearError: () => void;
   tryDemoCredentials: (email: string, password: string) => boolean;
+  setUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -117,6 +118,8 @@ export const useAuthStore = create<AuthState>()(
           clearAllStorage();
         }
       },
+
+      setUser: (user) => set({ user }),
 
       clearError: () => set({ error: null }),
     }),
