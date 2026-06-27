@@ -1,7 +1,7 @@
 'use client'
 
 import { FileBox, Download } from 'lucide-react';
-import { mockResources } from '@/src/features/player/data/mock-resources';
+import { mockResources } from '@/src/shared/mock/mock-resources';
 import styles from './ResourcesTab.module.css';
 
 export function ResourcesTab() {

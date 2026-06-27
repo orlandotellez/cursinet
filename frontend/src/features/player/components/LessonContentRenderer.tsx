@@ -1,7 +1,7 @@
 'use client'
 
 import type { CurriculumLesson } from '@/src/shared/api/curriculum';
-import { getLessonContent } from '@/src/features/courses/data/lesson-content';
+import { getLessonContent } from '@/src/shared/mock/lesson-content';
 import { VideoContent } from './VideoContent';
 import { TextContent } from './TextContent';
 import { CodeContent } from './CodeContent';

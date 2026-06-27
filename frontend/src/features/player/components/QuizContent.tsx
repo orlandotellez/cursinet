@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import type { LessonContent } from '@/src/features/courses/data/lesson-content';
+import type { LessonContent } from '@/src/shared/mock/lesson-content';
 import styles from './QuizContent.module.css';
 
 interface QuizContentProps {
