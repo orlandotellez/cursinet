@@ -34,7 +34,7 @@
   height: 32px;
   background: var(--accent);
   color: white;
-  border-radius: 8px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,6 +73,11 @@
 
 .navLink:hover {
   color: var(--text-primary);
+}
+
+.navLinkActive {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 /* Actions */
@@ -206,6 +211,12 @@
 .mobileNavLink:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+.mobileNavLinkActive {
+  color: var(--text-primary);
+  font-weight: 600;
+  background: var(--bg-hover);
 }
 
 .mobileActions {

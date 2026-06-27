@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import styles from './Navbar.module.css';
 
@@ -18,7 +19,14 @@ const DASHBOARD_CONFIG: Record<string, { label: string; href: string }> = {
   admin: { label: 'Ir al panel de administración', href: '/admin/dashboard' },
 };
 
+function isActive(href: string, pathname: string): boolean {
+  if (href === '/') return pathname === '/';
+  if (href.startsWith('/#')) return false; // anchor links
+  return pathname.startsWith(href);
+}
+
 export function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -45,7 +53,10 @@ export function Navbar() {
         <ul className={styles.desktopNav}>
           {NAV_ITEMS.map((item) => (
             <li key={item.label}>
-              <Link href={item.href} className={styles.navLink}>
+              <Link
+                href={item.href}
+                className={`${styles.navLink} ${isActive(item.href, pathname) ? styles.navLinkActive : ''}`}
+              >
                 {item.label}
               </Link>
             </li>
@@ -86,7 +97,7 @@ export function Navbar() {
               <li key={item.label}>
                 <Link
                   href={item.href}
-                  className={styles.mobileNavLink}
+                  className={`${styles.mobileNavLink} ${isActive(item.href, pathname) ? styles.mobileNavLinkActive : ''}`}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.label}

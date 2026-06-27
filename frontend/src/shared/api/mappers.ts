@@ -1,4 +1,4 @@
-import type { CourseCardData, Category as MockCategory, Stat } from '@/src/shared/types';
+import type { CourseCardData, Category as MockCategory } from '@/src/shared/types';
 import type { CourseDTO } from './courses';
 import type { CategoryDTO } from './categories';
 
@@ -30,13 +30,13 @@ export function courseToCard(dto: CourseDTO): CourseCardData {
 }
 
 /** Map CategoryDTO to the mock Category type */
-export function categoryToMock(dto: CategoryDTO): MockCategory {
+export function categoryToMock(dto: CategoryDTO, coursesCount = 0): MockCategory {
   return {
     id: dto.id,
     name: dto.name,
     slug: dto.slug,
     icon: dto.iconName ?? dto.name.charAt(0),
-    coursesCount: 0, // Backend doesn't return this yet
+    coursesCount,
   };
 }
 
@@ -59,11 +59,3 @@ export function coursesToCards(dtos: CourseDTO[]): CourseCardData[] {
 export function categoriesToMock(dtos: CategoryDTO[]): MockCategory[] {
   return dtos.filter((d) => d.isActive).map(categoryToMock);
 }
-
-/** Hardcoded stats for now — no backend endpoint exists */
-export const landingStats: Stat[] = [
-  { value: '12K+', label: 'Estudiantes activos' },
-  { value: '320+', label: 'Cursos' },
-  { value: '4.9 ★', label: 'Rating promedio' },
-  { value: '95%', label: 'Tasa de completitud' },
-];

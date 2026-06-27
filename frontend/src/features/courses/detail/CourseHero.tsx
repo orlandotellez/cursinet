@@ -22,12 +22,6 @@ export function CourseHero({ course, enrolled, firstLessonHref, onEnroll }: Cour
   return (
     <section className={styles.hero}>
       <div className={styles.heroBody}>
-        <div className={styles.heroBreadcrumb}>
-          <Link href="/cursos">Cursos</Link>
-          <span>/</span>
-          <span>{course.title}</span>
-        </div>
-
         <div className={styles.heroBadge}>{levelLabel(course.level)}</div>
 
         <h1 className={styles.heroTitle}>{course.title}</h1>

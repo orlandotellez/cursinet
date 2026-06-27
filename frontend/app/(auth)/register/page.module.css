@@ -108,52 +108,6 @@
   }
 }
 
-/* ── Demo credentials ── */
-
-.demoBox {
-  margin-top: 24px;
-  padding: 16px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.demoLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
-}
-
-.demoRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.demoRole {
-  color: var(--text-secondary);
-  font-weight: 500;
-  min-width: 72px;
-  flex-shrink: 0;
-}
-
-.demoCode {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--accent-text);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  padding: 3px 10px;
-  border-radius: var(--radius-badge);
-  user-select: all;
-}
-
 .footer {
   text-align: center;
   margin-top: 24px;

@@ -1,8 +1,13 @@
+'use client';
+
 import { ArrowRight } from "lucide-react";
 import styles from "./FinalCta.module.css"
 import Link from "next/link";
+import { useAuthStore } from "@/src/shared/store/useAuthStore";
 
 export const FinalCta = () => {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   return (
     <section className={styles.ctaSection}>
       <div className={styles.ctaInner}>
@@ -13,8 +18,11 @@ export const FinalCta = () => {
           Únete a miles de ingenieros que ya están aprendiendo con proyectos
           reales.
         </p>
-        <Link href="/registrarse" className={styles.ctaBtn}>
-          Crear cuenta gratis
+        <Link
+          href={isAuthenticated ? '/cursos' : '/register'}
+          className={styles.ctaBtn}
+        >
+          {isAuthenticated ? 'Explorar cursos' : 'Crear cuenta gratis'}
           <ArrowRight size={18} />
         </Link>
       </div>

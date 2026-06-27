@@ -21,7 +21,7 @@ export const CategoriesGrid = ({ categories }: CategoriesGridProps) => {
           {categories.map((cat) => (
             <Link
               key={cat.id}
-              href={`/categorias/${cat.slug}`}
+              href={`/cursos?categoria=${encodeURIComponent(cat.name)}`}
               className={styles.categoryCard}
             >
               <span className={styles.categoryIcon}>{cat.name.charAt(0)}</span>

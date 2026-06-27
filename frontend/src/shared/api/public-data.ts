@@ -1,7 +1,7 @@
-import type { CourseCardData, Category } from '@/src/shared/types';
+import type { CourseCardData, Category, Stat } from '@/src/shared/types';
 import type { CourseDTO } from './courses';
 import type { CategoryDTO } from './categories';
-import { coursesToCards, categoriesToMock } from './mappers';
+import { coursesToCards, categoryToMock } from './mappers';
 
 const API_URL =
   process.env.API_URL ??
@@ -35,7 +35,55 @@ export async function getPublishedCourses(): Promise<CourseCardData[]> {
 }
 
 export async function getPublicCategories(): Promise<Category[]> {
-  const data = await fetchPublicJson<CategoryDTO[]>('/categories');
-  if (!data) return [];
-  return categoriesToMock(data);
+  const [categoriesData, coursesData] = await Promise.all([
+    fetchPublicJson<CategoryDTO[]>('/categories'),
+    fetchPublicJson<CourseDTO[]>('/courses?isPublished=true'),
+  ]);
+  if (!categoriesData) return [];
+
+  // Count published courses per category
+  const counts = new Map<string, number>();
+  if (coursesData) {
+    for (const course of coursesData) {
+      const catId = course.categoryId;
+      counts.set(catId, (counts.get(catId) || 0) + 1);
+    }
+  }
+
+  return categoriesData
+    .filter((d) => d.isActive)
+    .map((d) => categoryToMock(d, counts.get(d.id) || 0));
+}
+
+function formatStat(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M+`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K+`;
+  return `${n}`;
+}
+
+export async function getLandingStats(): Promise<Stat[]> {
+  const courses = await getPublishedCourses();
+  if (courses.length === 0) {
+    return [
+      { value: '0', label: 'Cursos publicados' },
+      { value: '0', label: 'Estudiantes' },
+      { value: '0', label: 'Instructores' },
+      { value: '0h', label: 'Contenido' },
+    ];
+  }
+
+  const totalStudents = courses.reduce((s, c) => s + c.studentsCount, 0);
+  const totalHours = Math.round(
+    courses.reduce((s, c) => s + c.duration, 0) / 60,
+  );
+  const uniqueInstructors = new Set(
+    courses.map((c) => c.instructor.name),
+  ).size;
+
+  return [
+    { value: formatStat(courses.length), label: 'Cursos publicados' },
+    { value: formatStat(totalStudents), label: 'Estudiantes' },
+    { value: formatStat(uniqueInstructors), label: 'Instructores' },
+    { value: `${totalHours}h`, label: 'Contenido' },
+  ];
 }

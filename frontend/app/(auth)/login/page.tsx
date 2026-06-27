@@ -8,30 +8,13 @@ import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { redirectByRole } from '@/src/shared/lib/authUtils';
 import { validateShape } from '@/src/shared/lib/validation';
 import { loginSchema } from '@/src/shared/validations';
-import { UserRole } from '@/src/shared/types';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
-
-// ─── Demo credentials ─────────────────────────────────────────────
-
-interface DemoCredential {
-  role: string;
-  label: string;
-  email: string;
-  password: string;
-}
-
-const DEMO_CREDENTIALS: DemoCredential[] = [
-  { role: 'Estudiante', label: 'student', email: 'sofia@email.com', password: '123456' },
-  { role: 'Instructor', label: 'instructor', email: 'martin@cursinet.com', password: '123456' },
-  { role: 'Admin', label: 'admin', email: 'admin@cursinet.com', password: '123456' },
-];
-
-// ─── Page ─────────────────────────────────────────────────────────
+import { useSubscriptionStore } from '@/src/shared/store/useSubscriptionStore';
 
 export default function IniciarSesionPage() {
   const router = useRouter();
-  const { isAuthenticated, login, isLoading, error, clearError, tryDemoCredentials } = useAuthStore();
+  const { isAuthenticated, login, isLoading, error, clearError } = useAuthStore();
   // Guard: esperar a que Zustand hidrate desde localStorage
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
@@ -66,37 +49,18 @@ export default function IniciarSesionPage() {
     clearError();
 
     try {
-      // Intentar login vía API real
       await login({ email: email.trim(), password });
       redirectAfterLogin();
     } catch {
-      // Si falla la API, ofrecer demo mode como fallback
-      const matched = tryDemoCredentials(email.trim(), password);
-      if (matched) {
-        redirectAfterLogin();
-      }
-      // Si no matcheó ningún demo user, el error ya está en el store
+      // error ya está en el store
     }
   }
 
   function redirectAfterLogin() {
     const role = useAuthStore.getState().user?.role;
+    const sub = useSubscriptionStore.getState().subscription;
+    if (!sub) useSubscriptionStore.getState().setFreePlan();
     redirectByRole(role, router.replace);
-  }
-
-  /** Loguea directo con demo mode sin llamar a la API */
-  function handleDemoLogin(cred: DemoCredential) {
-    clearError();
-    useAuthStore.getState().demoLogin(cred.label as UserRole);
-    redirectByRole(cred.label as UserRole, router.replace);
-  }
-
-  /** Rellena los campos con la credencial demo */
-  function fillDemoCredentials(cred: DemoCredential) {
-    clearError();
-    setEmail(cred.email);
-    setPassword(cred.password);
-    setErrors({});
   }
 
   return (
@@ -163,42 +127,6 @@ export default function IniciarSesionPage() {
           )}
         </button>
       </form>
-
-      {/* ── Demo Credentials ── */}
-      <div className={styles.demoBox}>
-        <span className={styles.demoLabel}>
-          🧪 Credenciales demo
-          <span className={styles.demoHint}> — hacé clic para acceder al instante</span>
-        </span>
-        {DEMO_CREDENTIALS.map((cred) => (
-          <div key={cred.label} className={styles.demoRow}>
-            <span className={styles.demoRole}>{cred.role}:</span>
-            <button
-              type="button"
-              className={styles.demoCta}
-              onClick={() => handleDemoLogin(cred)}
-              title="Ingresar como demo"
-            >
-              <code className={styles.demoCode}>
-                {cred.email} / {cred.password}
-              </code>
-              <span className={styles.demoArrow}>→</span>
-            </button>
-          </div>
-        ))}
-        <p className={styles.demoNote}>
-          ¿Tenés el backend corriendo? Usá el formulario de arriba con{' '}
-          <button
-            type="button"
-            className={styles.demoLink}
-            onClick={() => fillDemoCredentials(DEMO_CREDENTIALS[1])}
-          >
-            instructor@cursinet.com
-          </button>
-          {' / '}
-          <strong>password123</strong> (seed por defecto).
-        </p>
-      </div>
 
       <p className={styles.footer}>
         ¿No tenés cuenta?

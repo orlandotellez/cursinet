@@ -1,5 +1,5 @@
 .page {
-  padding: 130px 24px 80px;
+  padding: 100px 24px 80px;
 }
 
 .container {
@@ -7,34 +7,210 @@
   margin: 0 auto;
 }
 
+/* ── Breadcrumb ── */
 
-.toolbar {
+.breadcrumb {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 40px;
-}
-
-.clearAll {
-  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.breadcrumb a {
+  color: var(--text-primary);
+  text-decoration: none;
+  pointer-events: none;
+  cursor: default;
+}
+
+.separator {
+  color: var(--text-muted);
+}
+
+/* ── Category ribbon ── */
+
+.categorySection {
+  margin-bottom: 24px;
+}
+
+.categoryLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.categoryRibbon {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.catPill {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.catPill:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.catPillActive {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.catPillActive:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* ── Sub-toolbar ── */
+
+.subToolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 9px 34px 9px 36px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  transition: border-color var(--transition-fast);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.searchInput:focus {
+  border-color: var(--accent);
+}
+
+.searchClear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.searchClear:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.levelGroup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.levelBtn {
+  padding: 8px 14px;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-input);
-  width: fit-content;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
   cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
 }
 
-.clearAll:hover {
+.levelBtn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.levelBtnActive {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.levelBtnActive:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.clearBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.clearBtn:hover {
   color: var(--danger);
   border-color: var(--danger);
 }
+
+/* ── Results ── */
 
 .results {
   min-height: 300px;

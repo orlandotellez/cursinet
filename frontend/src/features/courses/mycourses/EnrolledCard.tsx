@@ -55,11 +55,6 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
   const [urlReady, setUrlReady] = useState(false);
 
   useEffect(() => {
-    if (isCompleted) {
-      setUrlReady(true);
-      return;
-    }
-
     let cancelled = false;
 
     fetchCurriculum(enrollment.courseId)
@@ -90,9 +85,7 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
     toggleBookmark(enrollment.courseId);
   };
 
-  const href = isCompleted
-    ? '/certificados'
-    : (lessonUrl ?? `/aprender/${enrollment.courseId}`);
+  const courseUrl = lessonUrl ?? `/aprender/${enrollment.courseId}`;
 
   return (
     <article className={styles.card}>
@@ -133,10 +126,22 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
             {enrollment.completedLessons}/{enrollment.totalLessons} lecciones
           </span>
         </div>
-        <Link href={href} className={styles.continueBtn}>
-          <Play size={14} />
-          {isCompleted ? 'Ver certificado' : 'Continuar'}
-        </Link>
+        {isCompleted ? (
+          <div className={styles.completedActions}>
+            <Link href={courseUrl} className={styles.secondaryBtn}>
+              <Play size={14} />
+              Ver curso
+            </Link>
+            <Link href="/certificados" className={styles.continueBtn}>
+              Ver certificado
+            </Link>
+          </div>
+        ) : (
+          <Link href={courseUrl} className={styles.continueBtn}>
+            <Play size={14} />
+            Continuar
+          </Link>
+        )}
       </div>
     </article>
   );

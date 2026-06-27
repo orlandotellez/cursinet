@@ -31,7 +31,7 @@
 .logoIcon {
   width: 40px;
   height: 40px;
-  border-radius: 6px;
+  border-radius: 5px;
   background: var(--accent);
   display: flex;
   align-items: center;
@@ -283,7 +283,7 @@
   justify-content: center;
   gap: 6px;
   padding: 20px;
-  border-radius: 6px;
+  border-radius: 5px;
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -341,7 +341,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 5px;
   border: none;
   background: transparent;
   color: var(--text-muted);
