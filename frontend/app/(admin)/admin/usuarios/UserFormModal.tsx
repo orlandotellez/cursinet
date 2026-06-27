@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Loader } from 'lucide-react';
+import { X } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import type { UserDTO, CreateUserPayload, UpdateUserPayload } from '@/src/shared/api/users';
 import styles from './page.module.css';
 
@@ -159,7 +160,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
           <div className={styles.formActions}>
             <button type="button" className={styles.formCancel} onClick={onClose}>Cancelar</button>
             <button type="submit" className={styles.formSubmit} disabled={saving}>
-              {saving ? <Loader size={16} className={styles.spinner} /> : null}
+              {saving ? <Spinner size="sm" className={styles.spinner} /> : null}
               {isEdit ? 'Guardar cambios' : 'Crear usuario'}
             </button>
           </div>

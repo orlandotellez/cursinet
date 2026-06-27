@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Star, Trash2, Pencil, X, Check, Loader2 } from 'lucide-react';
+import { Star, Trash2, Pencil, X, Check } from 'lucide-react';
+import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import * as reviewsApi from '@/src/shared/api/reviews';
@@ -129,7 +130,7 @@ export function ReviewSection({ courseId, enrolled }: ReviewSectionProps) {
 
       {loading ? (
         <div className={styles.loadingWrap}>
-          <Loader2 size={24} className={styles.spinnerIcon} />
+          <Spinner size="md" className={styles.spinnerIcon} />
         </div>
       ) : reviews.length === 0 && !showForm ? (
         <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
@@ -216,7 +217,7 @@ export function ReviewSection({ courseId, enrolled }: ReviewSectionProps) {
             >
               {submitting ? (
                 <span className={styles.btnLoading}>
-                  <Loader2 size={16} className={styles.spinner} />
+                  <Spinner size="sm" className={styles.spinner} />
                   Guardando…
                 </span>
               ) : editingId ? (
