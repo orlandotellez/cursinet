@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect } from 'react';
-import { Heart, Loader2 } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import type { CourseCardData } from '@/src/shared/types';
 import { FavoriteCard } from '@/src/features/courses/favorites/FavoriteCard';
 import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
+import { FavoritosSkeleton } from './loading';
 import styles from './page.module.css';
 
 export default function FavoritosPage() {
@@ -20,16 +21,7 @@ export default function FavoritosPage() {
     toggleBookmark(id);
   };
 
-  if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Favoritos</h1>
-          <Loader2 size={20} className={styles.loadingSpinner} />
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <FavoritosSkeleton />;
 
   return (
     <div className={styles.page}>
