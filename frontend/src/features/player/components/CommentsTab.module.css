@@ -97,3 +97,148 @@
   color: var(--text-secondary);
   line-height: 1.6;
 }
+
+.edited {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-radius: 4px;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.actionBtn:hover {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.replies {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+}
+
+.replyCard {
+  display: flex;
+  gap: 10px;
+}
+
+.replyAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.replyBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.sending {
+  display: inline-block;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.empty {
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editTextarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.editTextarea:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.editActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cancelBtn,
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-input);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.cancelBtn {
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.cancelBtn:hover {
+  background: var(--border-strong);
+}
+
+.saveBtn {
+  color: white;
+  background: var(--accent);
+  border: none;
+}
+
+.saveBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

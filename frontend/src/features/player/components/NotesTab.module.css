@@ -1,3 +1,10 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .timestampBtn {
   display: inline-flex;
   align-items: center;
@@ -8,13 +15,41 @@
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
-  margin-bottom: 12px;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .timestampBtn:hover {
   background: var(--border-strong);
   color: var(--text-primary);
+}
+
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-input);
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  transition: filter var(--transition-fast);
+}
+
+.saveBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.savedAt {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
 }
 
 .textarea {

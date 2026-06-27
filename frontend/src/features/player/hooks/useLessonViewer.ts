@@ -11,6 +11,7 @@ import type { CourseDTO } from '@/src/shared/api/courses';
 import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/curriculum';
 import type { LessonProgressResponse } from '@/src/shared/api/lessons';
 import type { TabKey } from '@/src/features/player/components/PlayerTabs';
+import type { CommentDTO } from '@/src/shared/api/comments';
 
 export interface UseLessonViewer {
   // Routing
@@ -44,6 +45,15 @@ export interface UseLessonViewer {
   setCommentText: (text: string) => void;
   notes: string;
   setNotes: (text: string) => void;
+  comments: CommentDTO[];
+  commentsLoading: boolean;
+  isSendingComment: boolean;
+  currentUserId: string;
+  onDeleteComment: (commentId: string) => Promise<void>;
+  onEditComment: (commentId: string, newBody: string) => Promise<void>;
+  handleSaveNotes: () => Promise<void>;
+  isSavingNotes: boolean;
+  lastSaved: string | null;
 
   // Actions
   handleMarkComplete: () => Promise<void>;
@@ -58,7 +68,7 @@ export function useLessonViewer(): UseLessonViewer {
 
   // ── Delegar a hooks especializados ──
   const data = useLessonData(courseId, lessonId);
-  const ui = useLessonUI();
+  const ui = useLessonUI(lessonId);
   const navigation = useLessonNavigation(
     lessonId,
     data.curriculum,
@@ -102,6 +112,15 @@ export function useLessonViewer(): UseLessonViewer {
     setCommentText: ui.setCommentText,
     notes: ui.notes,
     setNotes: ui.setNotes,
+    comments: ui.comments,
+    commentsLoading: ui.commentsLoading,
+    isSendingComment: ui.isSendingComment,
+    currentUserId: ui.currentUserId,
+    onDeleteComment: ui.onDeleteComment,
+    onEditComment: ui.onEditComment,
+    handleSaveNotes: ui.handleSaveNotes,
+    isSavingNotes: ui.isSavingNotes,
+    lastSaved: ui.lastSaved,
     handleMarkComplete: navigation.handleMarkComplete,
     handleSendComment: ui.handleSendComment,
     retry: data.retry,

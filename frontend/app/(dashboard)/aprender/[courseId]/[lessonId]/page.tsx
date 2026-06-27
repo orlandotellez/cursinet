@@ -136,13 +136,26 @@ function LessonViewerContent() {
               {v.activeTab === 'description' && <DescriptionTab course={course} />}
               {v.activeTab === 'comments' && (
                 <CommentsTab
+                  comments={v.comments}
                   commentText={v.commentText}
                   setCommentText={v.setCommentText}
                   handleSendComment={v.handleSendComment}
+                  isSending={v.isSendingComment}
+                  currentUserId={v.currentUserId}
+                  onDeleteComment={v.onDeleteComment}
+                  onEditComment={v.onEditComment}
                 />
               )}
               {v.activeTab === 'resources' && <ResourcesTab />}
-              {v.activeTab === 'notes' && <NotesTab notes={v.notes} setNotes={v.setNotes} />}
+              {v.activeTab === 'notes' && (
+                <NotesTab
+                  notes={v.notes}
+                  setNotes={v.setNotes}
+                  onSaveNotes={v.handleSaveNotes}
+                  isSaving={v.isSavingNotes}
+                  lastSaved={v.lastSaved}
+                />
+              )}
             </div>
           </>
         )}
