@@ -13,7 +13,7 @@ import {
 import styles from './layout.module.css';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { AuthLoadingScreen } from '@/src/shared/components/AuthLoadingScreen';
-import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
+import { useSidebarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
 
 const sidebarItems = [
@@ -29,7 +29,7 @@ const sidebarItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isLoading } = useAuthGuard({ requireAuth: true, allowedRoles: ['student'] });
-  const { collapsed } = useSideBarStore();
+  const { collapsed } = useSidebarStore();
 
   if (isLoading) {
     return <AuthLoadingScreen />;

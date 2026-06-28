@@ -3,7 +3,7 @@
 import { LayoutDashboard, Users, BookOpen, BarChart3, Compass } from 'lucide-react';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { AuthLoadingScreen } from '@/src/shared/components/AuthLoadingScreen';
-import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
+import { useSidebarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
 import styles from './layout.module.css';
 
@@ -17,7 +17,7 @@ const adminSidebarItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { isLoading } = useAuthGuard({ requireAuth: true, allowedRoles: ['admin'] });
-  const { collapsed } = useSideBarStore();
+  const { collapsed } = useSidebarStore();
 
   if (isLoading) {
     return <AuthLoadingScreen />;

@@ -3,7 +3,7 @@
 import { LayoutDashboard, BookOpen, Compass } from 'lucide-react';
 import { Sidebar } from '@/src/shared/components/Sidebar';
 import { AuthLoadingScreen } from '@/src/shared/components/AuthLoadingScreen';
-import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
+import { useSidebarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
 import styles from './layout.module.css';
 
@@ -15,7 +15,7 @@ const instructorSidebarItems = [
 
 export default function InstructorLayout({ children }: { children: React.ReactNode }) {
   const { isLoading } = useAuthGuard({ requireAuth: true, allowedRoles: ['instructor', 'admin'] });
-  const { collapsed } = useSideBarStore();
+  const { collapsed } = useSidebarStore();
 
   if (isLoading) {
     return <AuthLoadingScreen />;

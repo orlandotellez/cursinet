@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { LineChart } from '@/src/shared/components/LineChart';
 import type { InstructorKpi } from '@/src/shared/types';
-import { instructorKpis, instructorRevenue } from '@/src/features/courses/data';
+import { instructorKpis, instructorRevenue } from '@/src/shared/mock';
 import styles from './page.module.css';
 
 /* ───────────────────────────────────────────

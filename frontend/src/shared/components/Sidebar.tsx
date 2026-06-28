@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSideBarStore } from '@/src/shared/store/useSidebarStore';
+import { useSidebarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { SidebarNav } from './SidebarNav';
 import { UserDropdown } from './UserDropdown';
@@ -21,7 +21,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ title, items }: SidebarProps) {
-  const { collapsed, setCollapsed } = useSideBarStore();
+  const { collapsed, setCollapsed } = useSidebarStore();
   const { user, logout } = useAuthStore();
   const [showConfirm, setShowConfirm] = useState(false);
 
