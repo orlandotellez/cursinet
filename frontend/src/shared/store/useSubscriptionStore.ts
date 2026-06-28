@@ -2,7 +2,8 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import * as subscriptionsApi from '../api/subscriptions';
+import * as subscriptionsApi from '../api/billing';
+import { useToastStore } from './useToastStore';
 import type { SubscriptionPlan } from '../types';
 
 interface SubscriptionState {
@@ -24,6 +25,16 @@ interface SubscriptionState {
   isOnPlan: (plan: SubscriptionPlan) => boolean;
 }
 
+function mapSubscription(data: { plan: string; status: string; currentPeriodStart?: string | null; currentPeriodEnd?: string | null; cancelAtPeriodEnd?: boolean }): SubscriptionState['subscription'] {
+  return {
+    plan: data.plan,
+    status: data.status,
+    currentPeriodStart: data.currentPeriodStart ?? undefined,
+    currentPeriodEnd: data.currentPeriodEnd ?? undefined,
+    cancelAtPeriodEnd: data.cancelAtPeriodEnd,
+  };
+}
+
 export const useSubscriptionStore = create<SubscriptionState>()(
   persist(
     (set, get) => ({
@@ -35,22 +46,11 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         set({ loading: true, error: null });
         try {
           const data = await subscriptionsApi.getMySubscription();
-          set({
-            subscription: {
-              plan: data.plan,
-              status: data.status,
-              currentPeriodStart: data.currentPeriodStart ?? undefined,
-              currentPeriodEnd: data.currentPeriodEnd ?? undefined,
-              cancelAtPeriodEnd: data.cancelAtPeriodEnd,
-            },
-            loading: false,
-          });
-        } catch {
-          // If API fails, fall back to free plan
-          set({
-            subscription: { plan: 'free', status: 'active' },
-            loading: false,
-          });
+          set({ subscription: mapSubscription(data), loading: false });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Error al cargar suscripción';
+          set({ loading: false, error: message });
+          useToastStore.getState().error(message);
         }
       },
 
@@ -77,18 +77,11 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         set({ error: null });
         try {
           const data = await subscriptionsApi.cancelSubscription();
-          set({
-            subscription: {
-              plan: data.plan,
-              status: data.status,
-              currentPeriodStart: data.currentPeriodStart ?? undefined,
-              currentPeriodEnd: data.currentPeriodEnd ?? undefined,
-              cancelAtPeriodEnd: data.cancelAtPeriodEnd,
-            },
-          });
+          set({ subscription: mapSubscription(data) });
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Error al cancelar suscripción';
           set({ error: message });
+          useToastStore.getState().error(message);
           throw err;
         }
       },
@@ -97,18 +90,11 @@ export const useSubscriptionStore = create<SubscriptionState>()(
         set({ error: null });
         try {
           const data = await subscriptionsApi.reactivateSubscription();
-          set({
-            subscription: {
-              plan: data.plan,
-              status: data.status,
-              currentPeriodStart: data.currentPeriodStart ?? undefined,
-              currentPeriodEnd: data.currentPeriodEnd ?? undefined,
-              cancelAtPeriodEnd: data.cancelAtPeriodEnd,
-            },
-          });
+          set({ subscription: mapSubscription(data) });
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Error al reactivar suscripción';
           set({ error: message });
+          useToastStore.getState().error(message);
           throw err;
         }
       },

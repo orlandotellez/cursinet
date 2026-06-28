@@ -2,7 +2,8 @@
 
 import { create } from 'zustand';
 import type { CourseCardData } from '../types';
-import * as bookmarkApi from '../api/bookmarks';
+import * as bookmarkApi from '../api/student';
+import { useToastStore } from './useToastStore';
 
 function mapToCourseCard(b: bookmarkApi.BookmarkResponse): CourseCardData {
   return {
@@ -15,7 +16,7 @@ function mapToCourseCard(b: bookmarkApi.BookmarkResponse): CourseCardData {
     category: { name: b.categoryName },
     level: b.courseLevel.toLowerCase() as CourseCardData['level'],
     duration: b.durationMinutes,
-    lessonsCount: 0, // Backend doesn't return this; will be enriched later
+    lessonsCount: undefined, // Backend doesn't return this; enriched from enrollment
     price: b.price,
     rating: b.averageRating,
     reviewsCount: b.reviewsCount,
@@ -45,13 +46,9 @@ export const useBookmarkStore = create<BookmarkState>()((set, get) => ({
       const bookmarks = await bookmarkApi.getMyBookmarks();
       set({ bookmarks, isLoading: false });
     } catch (err) {
-      if (err instanceof TypeError) {
-        // Network error — silent
-        set({ isLoading: false });
-        return;
-      }
       const message = err instanceof Error ? err.message : 'Error al cargar favoritos';
       set({ isLoading: false, error: message });
+      useToastStore.getState().error(message);
     }
   },
 

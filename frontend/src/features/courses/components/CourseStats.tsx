@@ -3,7 +3,7 @@ import styles from './CourseStats.module.css';
 
 interface CourseStatsProps {
   duration: number;
-  lessonsCount: number;
+  lessonsCount?: number;
   rating: number;
   studentsCount: number;
 }
@@ -15,10 +15,12 @@ export function CourseStats({ duration, lessonsCount, rating, studentsCount }: C
         <Clock size={12} />
         <span>{duration}h</span>
       </div>
-      <div className={styles.stat}>
-        <BookOpen size={12} />
-        <span>{lessonsCount} lec.</span>
-      </div>
+      {lessonsCount !== undefined && (
+        <div className={styles.stat}>
+          <BookOpen size={12} />
+          <span>{lessonsCount} lec.</span>
+        </div>
+      )}
       <div className={styles.stat}>
         <Star size={12} />
         <span>{rating}</span>

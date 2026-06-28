@@ -3,12 +3,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Save, CheckCircle, AlertCircle } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
-import { getCategories, type CategoryDTO } from '@/src/shared/api/categories';
+import { useToastStore } from '@/src/shared/store/useToastStore';
+import { getCategories, type CategoryDTO } from '@/src/shared/api/courses';
+import { validateShape } from '@/src/shared/lib/validation';
+import { createCourseSchema } from '@/src/shared/validations';
 import { createCourse, updateCourse, type CourseDTO } from '@/src/shared/api/courses';
 import styles from './CourseFormModal.module.css';
 
 const LEVELS = [
-  { value: 'Begginer', label: 'Principiante' },
+  { value: 'Beginner', label: 'Principiante' },
   { value: 'Intermediate', label: 'Intermedio' },
   { value: 'Advanced', label: 'Avanzado' },
   { value: 'Expert', label: 'Experto' },
@@ -42,7 +45,7 @@ const emptyForm: CourseFormData = {
   shortDescription: '',
   description: '',
   categoryId: '',
-  level: 'Begginer',
+  level: 'Beginner',
   price: '0',
   previewVideoUrl: '',
   durationMinutes: '0',
@@ -77,8 +80,8 @@ export default function CourseFormModal({
           setCategories(cats.filter((c) => c.isActive));
           setLoadingCategories(false);
         })
-        .catch((err) => {
-          console.error('Error loading categories:', err);
+        .catch(() => {
+          useToastStore.getState().error('No se pudieron cargar las categorías');
           setError('No se pudieron cargar las categorías');
           setLoadingCategories(false);
         });
@@ -129,23 +132,8 @@ export default function CourseFormModal({
     setError(null);
     setSuccess(null);
 
-    // Validaciones
-    if (!form.categoryId) {
-      setError('Seleccioná una categoría');
-      return;
-    }
-
     const numericPrice = parseFloat(form.price);
-    if (isNaN(numericPrice) || numericPrice < 0) {
-      setError('El precio debe ser un número válido');
-      return;
-    }
-
     const duration = parseInt(form.durationMinutes, 10);
-    if (isNaN(duration) || duration < 0) {
-      setError('La duración debe ser un número válido en minutos');
-      return;
-    }
 
     const requirements = form.requirements
       .split('\n')
@@ -157,23 +145,33 @@ export default function CourseFormModal({
       .map((l) => l.trim())
       .filter(Boolean);
 
+    // Validar contra schema compartido
+    const payload = {
+      title: form.title,
+      categoryId: form.categoryId,
+      level: form.level,
+      shortDescription: form.shortDescription || null,
+      description: form.description || null,
+      previewVideoUrl: form.previewVideoUrl || null,
+      durationMinutes: duration,
+      price: form.isFree ? 0 : numericPrice,
+      isFree: form.isFree,
+      requirements: requirements.length > 0 ? requirements : undefined,
+      learningObjectives: learningObjectives.length > 0 ? learningObjectives : undefined,
+    };
+
+    const validation = validateShape(createCourseSchema, payload);
+    if (!validation.success) {
+      const firstError = Object.values(validation.fieldErrors)[0];
+      setError(firstError);
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (mode === 'create') {
-        const created = await createCourse({
-          title: form.title,
-          categoryId: form.categoryId,
-          level: form.level,
-          shortDescription: form.shortDescription || null,
-          description: form.description || null,
-          previewVideoUrl: form.previewVideoUrl || null,
-          durationMinutes: duration,
-          price: form.isFree ? 0 : numericPrice,
-          isFree: form.isFree,
-          requirements: requirements.length > 0 ? requirements : undefined,
-          learningObjectives: learningObjectives.length > 0 ? learningObjectives : undefined,
-        });
+        const created = await createCourse(payload);
         setSuccess(`Curso "${created.title}" creado exitosamente 🎉`);
         if (onSaved) onSaved(created);
         setTimeout(() => onClose(), 1500);
