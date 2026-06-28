@@ -1,5 +1,5 @@
 import type { CourseDTO } from '@/src/shared/api/courses';
-import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/curriculum';
+import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/courses';
 import type { Course, Lesson, Level } from '@/src/shared/types';
 
 /**

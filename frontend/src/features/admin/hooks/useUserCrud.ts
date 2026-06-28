@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { getUsers, deleteUser, restoreUser, type UserDTO } from '@/src/shared/api/users';
+import { getUsers, deleteUser, restoreUser, type UserDTO } from '@/src/shared/api/auth';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 
 export type RoleFilter = 'all' | 'Admin' | 'Instructor' | 'Student' | 'Moderator' | 'deleted';
 
@@ -50,7 +51,7 @@ export function useUserCrud() {
       setDeleteTarget(null);
       await fetchData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al eliminar');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al eliminar');
     }
   }
 
@@ -60,7 +61,7 @@ export function useUserCrud() {
       await restoreUser(id);
       await fetchData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al restaurar');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al restaurar');
     } finally {
       setRestoringId(null);
     }

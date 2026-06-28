@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { getCourses, deleteCourse, publishCourse, unpublishCourse, type CourseDTO } from '@/src/shared/api/courses';
-import { getCategories, type CategoryDTO } from '@/src/shared/api/categories';
+import { getCategories, type CategoryDTO } from '@/src/shared/api/courses';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 
 export interface DeleteTarget {
   id: string;
@@ -52,7 +53,7 @@ export function useCourseCrud() {
       setDeleteTarget(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al eliminar';
-      alert(msg);
+      useToastStore.getState().error(msg);
     } finally {
       setDeletingId(null);
     }
@@ -64,7 +65,7 @@ export function useCourseCrud() {
       await publishCourse(id);
       await fetchData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al publicar');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al publicar');
     } finally {
       setPublishingId(null);
     }
@@ -76,7 +77,7 @@ export function useCourseCrud() {
       await unpublishCourse(id);
       await fetchData();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al despublicar');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al despublicar');
     } finally {
       setPublishingId(null);
     }

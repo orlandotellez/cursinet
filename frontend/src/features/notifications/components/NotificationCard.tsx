@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { Info, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import type { Notification as NotificationType } from '@/src/shared/types';
 import styles from './NotificationCard.module.css';
 
 interface NotificationCardProps {
-  notification: NotificationType;
-  onMarkRead: (id: string) => void;
+  notification?: NotificationType;
+  onMarkRead?: (id: string) => void;
+  loading?: boolean;
 }
 
 const iconMap = {
@@ -35,14 +37,29 @@ function getTimeAgo(dateStr: string): string {
   });
 }
 
-export function NotificationCard({ notification, onMarkRead }: NotificationCardProps) {
+export function NotificationCard({ notification, onMarkRead, loading }: NotificationCardProps) {
+  if (loading) {
+    return (
+      <div className={styles.card}>
+        <SkeletonBase width={36} height={36} borderRadius={9999} />
+        <div className={styles.body}>
+          <SkeletonBase width="60%" height={16} style={{ marginBottom: 4 }} />
+          <SkeletonBase width="90%" height={14} style={{ marginBottom: 6 }} />
+          <SkeletonBase width={60} height={12} />
+        </div>
+      </div>
+    );
+  }
+
+  if (!notification) return null;
+
   const Icon = iconMap[notification.type];
   const timeAgo = getTimeAgo(notification.createdAt);
 
   return (
     <div
       className={`${styles.card} ${!notification.read ? styles.unread : ''}`}
-      onClick={() => onMarkRead(notification.id)}
+      onClick={() => onMarkRead!(notification.id)}
     >
       <div className={`${styles.icon} ${styles[notification.type]}`}>
         <Icon size={18} />

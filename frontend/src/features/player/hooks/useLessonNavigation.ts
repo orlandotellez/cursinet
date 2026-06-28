@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import type { CurriculumLesson } from '@/src/shared/api/curriculum';
-import type { CurriculumResponse } from '@/src/shared/api/curriculum';
-import type { LessonProgressResponse } from '@/src/shared/api/lessons';
-import { upsertProgress } from '@/src/shared/api/lessons';
+import type { CurriculumLesson } from '@/src/shared/api/courses';
+import type { CurriculumResponse } from '@/src/shared/api/courses';
+import type { LessonProgressResponse } from '@/src/shared/api/courses';
+import { upsertProgress } from '@/src/shared/api/courses';
 import { toLesson } from '@/src/features/player/utils/mappers';
 import type { Lesson } from '@/src/shared/types';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 
 export interface LessonNavigationResult {
   prevLesson: Lesson | null;
@@ -52,8 +53,8 @@ export function useLessonNavigation(
     try {
       await upsertProgress(lesson.moduleId, lesson.id, { isCompleted: true });
       setCompleted(true);
-    } catch (err) {
-      console.error('Error marking lesson complete:', err);
+    } catch {
+      useToastStore.getState().error('Error al marcar lección como completada');
     } finally {
       setSavingProgress(false);
     }

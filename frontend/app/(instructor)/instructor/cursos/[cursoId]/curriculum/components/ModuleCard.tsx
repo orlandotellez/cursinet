@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { ModuleResponse } from '@/src/shared/api/modules';
-import type { LessonSummary } from '@/src/shared/api/modules';
+import type { ModuleResponse } from '@/src/shared/api/courses';
+import type { LessonSummary } from '@/src/shared/api/courses';
 import { LessonCard } from './LessonCard';
 import styles from '../page.module.css';
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import { FilterTabs } from '@/src/features/courses/mycourses/FilterTabs';
 import { EnrolledCard } from '@/src/features/courses/mycourses/EnrolledCard';
-import { MisCursosSkeleton } from './loading';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import { useEnrollmentStore } from '@/src/shared/store/useEnrollmentStore';
 import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
 import styles from './page.module.css';
@@ -21,8 +21,6 @@ export default function MisCursosPage() {
     loadBookmarks();
   }, [loadMyEnrollments, loadBookmarks]);
 
-  if (isLoading) return <MisCursosSkeleton />;
-
   const filtered = enrollments.filter((e) => {
     if (filter === 'in-progress') return e.progress > 0 && e.progress < 100;
     if (filter === 'completed') return e.progress === 100;
@@ -32,21 +30,35 @@ export default function MisCursosPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Mis Cursos</h1>
-        <span className={styles.count}>{enrollments.length} cursos</span>
+        {isLoading ? (
+          <>
+            <SkeletonBase width={140} height={28} />
+            <SkeletonBase width={80} height={16} />
+          </>
+        ) : (
+          <>
+            <h1 className={styles.title}>Mis Cursos</h1>
+            <span className={styles.count}>{enrollments.length} cursos</span>
+          </>
+        )}
       </div>
 
-      <FilterTabs active={filter} onChange={setFilter} />
+      {isLoading ? null : <FilterTabs active={filter} onChange={setFilter} />}
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className={styles.grid}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <EnrolledCard key={i} loading />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className={styles.empty}>
           <BookOpen size={48} />
           <p>No hay cursos en esta categoría</p>
         </div>
       ) : (
         <div className={styles.grid}>
-          {filtered.map((enr) => (
-            <EnrolledCard key={enr.id} enrollment={enr} />
+          {filtered.map((enr) => (              <EnrolledCard key={enr.id} enrollment={enr} />
           ))}
         </div>
       )}

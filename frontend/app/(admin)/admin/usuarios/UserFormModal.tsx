@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
-import type { UserDTO, CreateUserPayload, UpdateUserPayload } from '@/src/shared/api/users';
+import type { UserDTO, UserRoleDTO, CreateUserPayload, UpdateUserPayload } from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
 interface Props {
@@ -40,7 +40,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState(user?.role ?? 'Student');
+  const [role, setRole] = useState<UserRoleDTO>(user?.role ?? 'Student');
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [userName, setUserName] = useState(user?.userName ?? '');
@@ -121,7 +121,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
 
             <div className={styles.formField}>
               <label htmlFor="role">Rol</label>
-              <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
+              <select id="role" value={role} onChange={(e) => setRole(e.target.value as UserRoleDTO)}>
                 {roles.map((r) => (
                   <option key={r.value} value={r.value}>{r.label}</option>
                 ))}

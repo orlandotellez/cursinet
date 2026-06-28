@@ -14,7 +14,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import type { LessonSummary } from '@/src/shared/api/modules';
+import type { LessonSummary } from '@/src/shared/api/courses';
 import styles from '../page.module.css';
 
 interface LessonCardProps {

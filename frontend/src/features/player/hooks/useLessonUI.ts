@@ -8,9 +8,10 @@ import {
   updateComment,
   deleteComment,
   type CommentDTO,
-} from '@/src/shared/api/comments';
-import { getNote, saveNote } from '@/src/shared/api/lessonNotes';
+} from '@/src/shared/api/student';
+import { getNote, saveNote } from '@/src/shared/api/student';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 
 export interface LessonUIResult {
   activeTab: TabKey;
@@ -104,8 +105,8 @@ export function useLessonUI(lessonId?: string): LessonUIResult {
         });
         setComments((prev) => [newComment, ...prev]);
         setCommentText('');
-      } catch (err) {
-        console.error('Error sending comment:', err);
+      } catch {
+        useToastStore.getState().error('Error al enviar comentario');
       } finally {
         setIsSendingComment(false);
       }
@@ -119,8 +120,8 @@ export function useLessonUI(lessonId?: string): LessonUIResult {
       try {
         await deleteComment(lessonId, commentId);
         setComments((prev) => prev.filter((c) => c.id !== commentId));
-      } catch (err) {
-        console.error('Error deleting comment:', err);
+      } catch {
+        useToastStore.getState().error('Error al eliminar comentario');
       }
     },
     [lessonId],
@@ -137,8 +138,8 @@ export function useLessonUI(lessonId?: string): LessonUIResult {
             c.id === commentId ? { ...c, body: newBody, isEdited: true } : c,
           ),
         );
-      } catch (err) {
-        console.error('Error editing comment:', err);
+      } catch {
+        useToastStore.getState().error('Error al editar comentario');
       }
     },
     [lessonId],
@@ -150,8 +151,8 @@ export function useLessonUI(lessonId?: string): LessonUIResult {
     try {
       const note = await saveNote(lessonId, notes);
       setLastSaved(new Date(note.updatedAt).toLocaleString('es-ES'));
-    } catch (err) {
-      console.error('Error saving notes:', err);
+    } catch {
+      useToastStore.getState().error('Error al guardar notas');
     } finally {
       setIsSavingNotes(false);
     }

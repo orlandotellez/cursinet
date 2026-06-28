@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { createLesson, updateLesson, deleteLesson } from '@/src/shared/api/lessons';
-import type { ModuleResponse, LessonSummary } from '@/src/shared/api/modules';
+import { createLesson, updateLesson, deleteLesson } from '@/src/shared/api/courses';
+import type { ModuleResponse, LessonSummary } from '@/src/shared/api/courses';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 
 export interface LessonFormData {
   title: string;
@@ -108,7 +109,7 @@ export function useLessonCrud(cursoId: string) {
         ),
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al eliminar lección');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al eliminar lección');
     }
   }
 
@@ -132,7 +133,7 @@ export function useLessonCrud(cursoId: string) {
         ),
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al cambiar estado de la lección');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al cambiar estado de la lección');
     }
   }
 

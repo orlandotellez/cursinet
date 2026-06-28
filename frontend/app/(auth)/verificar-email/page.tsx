@@ -7,7 +7,7 @@ import { Spinner } from '@/src/shared/components/Spinner';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { verifyEmailSchema, resendVerificationSchema } from '@/src/shared/validations';
-import { useAuthForm } from '@/src/shared/hooks/useAuthForm';
+import { useAsyncAction } from '@/src/shared/hooks/useAsyncAction';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -25,8 +25,8 @@ function VerificarEmailForm() {
   const identifierParam = searchParams.get('identifier') || '';
   const codeParam = searchParams.get('code') || '';
 
-  const { isLoading, error, execute, clearError } = useAuthForm();
-  const resend = useAuthForm();
+  const { isLoading, error, execute, clearError } = useAsyncAction();
+  const resend = useAsyncAction();
   const [email, setEmail] = useState(identifierParam);
   const [code, setCode] = useState(codeParam);
   const [success, setSuccess] = useState(false);

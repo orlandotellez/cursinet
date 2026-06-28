@@ -8,10 +8,10 @@ import { useVideoProgress } from './useVideoProgress';
 import { toLesson, toCourse } from '@/src/features/player/utils/mappers';
 import type { Course, Lesson } from '@/src/shared/types';
 import type { CourseDTO } from '@/src/shared/api/courses';
-import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/curriculum';
-import type { LessonProgressResponse } from '@/src/shared/api/lessons';
+import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/courses';
+import type { LessonProgressResponse } from '@/src/shared/api/courses';
 import type { TabKey } from '@/src/features/player/components/PlayerTabs';
-import type { CommentDTO } from '@/src/shared/api/comments';
+import type { CommentDTO } from '@/src/shared/api/student';
 
 export interface UseLessonViewer {
   // Routing

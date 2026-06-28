@@ -7,8 +7,9 @@ import {
   deleteModule,
   reorderModules,
   type ModuleResponse,
-} from '@/src/shared/api/modules';
-import type { LessonSummary } from '@/src/shared/api/modules';
+} from '@/src/shared/api/courses';
+import type { LessonSummary } from '@/src/shared/api/courses';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 
 export function useModuleCrud(cursoId: string, fetchData: () => Promise<void>) {
   const [modules, setModules] = useState<ModuleResponse[]>([]);
@@ -58,7 +59,7 @@ export function useModuleCrud(cursoId: string, fetchData: () => Promise<void>) {
       await deleteModule(cursoId, mod.id);
       setModules((prev) => prev.filter((m) => m.id !== mod.id));
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al eliminar módulo');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al eliminar módulo');
     }
   }
 
@@ -67,7 +68,7 @@ export function useModuleCrud(cursoId: string, fetchData: () => Promise<void>) {
       const updated = await updateModule(cursoId, mod.id, { isPublished: !mod.isPublished });
       setModules((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al cambiar estado del módulo');
+      useToastStore.getState().error(err instanceof Error ? err.message : 'Error al cambiar estado del módulo');
     }
   }
 

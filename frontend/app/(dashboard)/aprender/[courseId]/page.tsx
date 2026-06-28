@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { AlertCircle } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
 import { getCourseById } from '@/src/shared/api/courses';
-import { getCurriculum } from '@/src/shared/api/curriculum';
+import { getCurriculum } from '@/src/shared/api/courses';
 import styles from './[lessonId]/page.module.css';
 
 export default function AprenderCoursePage() {

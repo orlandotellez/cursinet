@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Send, Trash2, Pencil, X, Check } from 'lucide-react';
-import type { CommentDTO } from '@/src/shared/api/comments';
+import type { CommentDTO } from '@/src/shared/api/student';
 import styles from './CommentsTab.module.css';
 
 interface CommentsTabProps {

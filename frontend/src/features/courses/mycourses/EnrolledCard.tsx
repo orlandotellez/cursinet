@@ -3,16 +3,18 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Play, Heart } from 'lucide-react';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import { CourseThumbnail } from '@/src/features/courses/components/CourseThumbnail';
 import { CourseLevelBadge } from '@/src/features/courses/components/CourseLevelBadge';
 import type { Enrollment } from '@/src/shared/types';
-import type { CurriculumResponse } from '@/src/shared/api/curriculum';
+import type { CurriculumResponse } from '@/src/shared/api/courses';
 import { useBookmarkStore } from '@/src/shared/store/useBookmarkStore';
-import { getCurriculum } from '@/src/shared/api/curriculum';
+import { getCurriculum } from '@/src/shared/api/courses';
 import styles from './EnrolledCard.module.css';
 
 interface EnrolledCardProps {
-  enrollment: Enrollment;
+  enrollment?: Enrollment;
+  loading?: boolean;
 }
 
 // ─── Module-level curriculum cache ──────────────────────────────────────────
@@ -41,15 +43,20 @@ function getNextLessonUrl(
   return `/aprender/${courseId}/${target.id}`;
 }
 
-export function EnrolledCard({ enrollment }: EnrolledCardProps) {
-  const isCompleted = enrollment.progress === 100;
-  const isBookmarked = useBookmarkStore((s) => s.isBookmarked(enrollment.courseId));
+export function EnrolledCard({ enrollment, loading }: EnrolledCardProps) {
+  // ── Hooks unconditionales (React Rules of Hooks) ──
+  const isBookmarked = useBookmarkStore((s) =>
+    enrollment ? s.isBookmarked(enrollment.courseId) : false,
+  );
   const toggleBookmark = useBookmarkStore((s) => s.toggleBookmark);
 
   const [lessonUrl, setLessonUrl] = useState<string | null>(null);
   const [urlReady, setUrlReady] = useState(false);
 
+  const isCompleted = enrollment ? enrollment.progress === 100 : false;
+
   useEffect(() => {
+    if (loading || !enrollment) return;
     let cancelled = false;
 
     fetchCurriculum(enrollment.courseId)
@@ -72,8 +79,35 @@ export function EnrolledCard({ enrollment }: EnrolledCardProps) {
     return () => {
       cancelled = true;
     };
-  }, [enrollment.courseId, enrollment.completedLessons, isCompleted]);
+  }, [loading, enrollment?.courseId, enrollment?.completedLessons, isCompleted]);
 
+  // ── Early returns (solo después de los hooks) ──
+  if (loading) {
+    return (
+      <article className={styles.card}>
+        <div className={styles.thumbnail}>
+          <SkeletonBase width="100%" height="100%" />
+        </div>
+        <div className={styles.body}>
+          <div className={styles.meta}>
+            <SkeletonBase width={60} height={14} />
+            <SkeletonBase width={50} height={14} />
+          </div>
+          <SkeletonBase width="80%" height={18} />
+          <SkeletonBase width="50%" height={14} />
+          <div className={styles.progressWrap}>
+            <SkeletonBase width="100%" height={6} borderRadius={5} />
+            <SkeletonBase width={80} height={14} />
+          </div>
+          <SkeletonBase width="100%" height={38} borderRadius={8} />
+        </div>
+      </article>
+    );
+  }
+
+  if (!enrollment) return null;
+
+  // ── Handlers & derived values ──
   const handleToggleFav = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

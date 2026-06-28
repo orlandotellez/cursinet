@@ -6,6 +6,7 @@ import { Spinner } from '@/src/shared/components/Spinner';
 import Link from 'next/link';
 import { getCourses, deleteCourse, publishCourse, type CourseDTO } from '@/src/shared/api/courses';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 import CourseFormModal from '@/src/features/courses/components/CourseFormModal';
 import { courseToFormData } from '@/src/features/courses/utils/courseToFormData';
 import type { CourseFormData } from '@/src/features/courses/components/CourseFormModal';
@@ -73,29 +74,21 @@ export default function InstructorCursos() {
   }
 
   function handleDeleteClick(id: string, title: string) {
-    console.log('[Instructor] Delete btn clicked, setting ref:', id);
     deleteIdRef.current = id;
     setDeleteTarget({ id, title });
   }
 
   async function handleConfirmDelete() {
-    console.log('[Instructor] handleConfirmDelete called, ref:', deleteIdRef.current, 'deleteTarget:', deleteTarget);
     const id = deleteIdRef.current;
-    if (!id) {
-      console.log('[Instructor] NO ID in ref, returning');
-      return;
-    }
-    console.log('[Instructor] Deleting course:', id);
+    if (!id) return;
     setDeletingId(id);
     try {
       await deleteCourse(id);
-      console.log('[Instructor] API delete success for:', id);
       setCourses((prev) => prev.filter((c) => c.id !== id));
       setDeleteTarget(null);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al eliminar';
-      console.log('[Instructor] Delete FAILED:', msg);
-      alert(msg);
+      useToastStore.getState().error(msg);
     } finally {
       setDeletingId(null);
     }
@@ -108,7 +101,7 @@ export default function InstructorCursos() {
       setCourses((prev) => prev.map((c) => (c.id === id ? updated : c)));
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Error al publicar el curso';
-      alert(msg);
+      useToastStore.getState().error(msg);
     } finally {
       setPublishingId(null);
     }
@@ -128,7 +121,7 @@ export default function InstructorCursos() {
   }
 
   const levelLabel: Record<string, string> = {
-    Begginer: 'Principiante',
+    Beginner: 'Principiante',
     Intermediate: 'Intermedio',
     Advanced: 'Avanzado',
     Expert: 'Experto',

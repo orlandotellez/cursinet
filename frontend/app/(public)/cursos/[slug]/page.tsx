@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { getCourseBySlug, type CourseDTO } from '@/src/shared/api/courses';
-import { getCurriculum, type CurriculumResponse, type CurriculumModule, type CurriculumLesson } from '@/src/shared/api/curriculum';
+import { getCurriculum, type CurriculumResponse, type CurriculumModule, type CurriculumLesson } from '@/src/shared/api/courses';
 import { ErrorState } from '@/src/shared/components/ErrorState';
 import { useEnrollmentStore } from '@/src/shared/store/useEnrollmentStore';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
@@ -16,7 +16,7 @@ import { InstructorCard } from '@/src/features/courses/detail/InstructorCard';
 import { ReviewSection } from '@/src/features/courses/detail/ReviewSection';
 import { PaymentModal } from '@/src/features/payment/PaymentModal';
 import type { Course, Instructor, Category, CourseModule, Lesson } from '@/src/shared/types';
-import s from '@/src/shared/styles/skeleton.module.css';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import styles from './page.module.css';
 
 // ─── Adapter: map API data to the mock Course shape ───────────────────────
@@ -99,85 +99,63 @@ function CourseDetailSkeleton() {
     <div className={styles.page}>
       <div className={styles.container}>
 
-        {/* Breadcrumb — always visible */}
         <nav className={styles.breadcrumb}>
           <Link href="/cursos">Cursos</Link>
           <span className={styles.breadcrumbSep}>/</span>
-          <span className={s.base} style={{ width: 220, height: 15, display: 'inline-block', borderRadius: 4 }} />
+          <SkeletonBase width={220} height={15} style={{ display: 'inline-block' }} />
         </nav>
 
-        {/* Hero skeleton */}
         <div className={styles.heroSkeleton}>
           <div className={styles.heroSkeletonBody}>
-            <div className={s.base} style={{ width: 80, height: 22, borderRadius: 100 }} />
-            <div className={s.base} style={{ width: '90%', height: 34, marginTop: 4 }} />
-            <div className={s.base} style={{ width: '70%', height: 34 }} />
-            <div className={s.base} style={{ width: '100%', height: 16, marginTop: 8 }} />
-            <div className={s.base} style={{ width: '60%', height: 16 }} />
+            <SkeletonBase width={80} height={22} borderRadius={100} />
+            <SkeletonBase width='90%' height={34} style={{ marginTop: 4 }} />
+            <SkeletonBase width='70%' height={34} />
+            <SkeletonBase width='100%' height={16} style={{ marginTop: 8 }} />
+            <SkeletonBase width='60%' height={16} />
             <div className={styles.heroSkeletonMeta}>
-              <div className={s.base} style={{ width: 120, height: 16 }} />
-              <div className={s.base} style={{ width: 100, height: 16 }} />
-              <div className={s.base} style={{ width: 60, height: 16 }} />
+              <SkeletonBase width={120} height={16} />
+              <SkeletonBase width={100} height={16} />
+              <SkeletonBase width={60} height={16} />
             </div>
             <div className={styles.heroSkeletonMeta}>
-              <div className={s.base} style={{ width: 160, height: 40, borderRadius: 8 }} />
-              <div className={s.base} style={{ width: 140, height: 48, borderRadius: 8 }} />
+              <SkeletonBase width={160} height={40} borderRadius={8} />
+              <SkeletonBase width={140} height={48} borderRadius={8} />
             </div>
           </div>
           <div className={styles.heroSkeletonThumb}>
-            <div className={s.base} style={{ width: '100%', height: '100%', borderRadius: 12 }} />
+            <SkeletonBase width='100%' height='100%' borderRadius={12} />
           </div>
         </div>
 
-        {/* Description section skeleton */}
         <section className={styles.section}>
-          <div className={s.base} style={{ width: 120, height: 22, marginBottom: 20 }} />
-          <div className={s.base} style={{ width: '100%', height: 14, marginBottom: 10 }} />
-          <div className={s.base} style={{ width: '100%', height: 14, marginBottom: 10 }} />
-          <div className={s.base} style={{ width: '70%', height: 14 }} />
+          <SkeletonBase width={120} height={22} style={{ marginBottom: 20 }} />
+          <SkeletonBase width='100%' height={14} style={{ marginBottom: 10 }} />
+          <SkeletonBase width='100%' height={14} style={{ marginBottom: 10 }} />
+          <SkeletonBase width='70%' height={14} />
         </section>
 
-        {/* What you'll learn skeleton */}
         <section className={styles.section}>
-          <div className={s.base} style={{ width: 180, height: 22, marginBottom: 20 }} />
+          <SkeletonBase width={180} height={22} style={{ marginBottom: 20 }} />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div className={s.base} style={{ width: 18, height: 18, borderRadius: 4, flexShrink: 0 }} />
-                <div className={s.base} style={{ flex: 1, height: 14 }} />
+                <SkeletonBase width={18} height={18} borderRadius={4} style={{ flexShrink: 0 }} />
+                <SkeletonBase style={{ flex: 1, height: 14 }} />
               </div>
             ))}
           </div>
         </section>
 
-        {/* Curriculum skeleton */}
         <section className={styles.section}>
-          <div className={s.base} style={{ width: 200, height: 22, marginBottom: 20 }} />
+          <SkeletonBase width={200} height={22} style={{ marginBottom: 20 }} />
           {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className={s.base}
-              style={{
-                width: '100%',
-                height: 48,
-                borderRadius: 8,
-                marginBottom: 8,
-              }}
-            />
+            <SkeletonBase key={i} width='100%' height={48} borderRadius={8} style={{ marginBottom: 8 }} />
           ))}
         </section>
 
-        {/* Instructor skeleton */}
         <section className={styles.section}>
-          <div className={s.base} style={{ width: 120, height: 22, marginBottom: 20 }} />
-          <div
-            className={s.base}
-            style={{
-              width: '100%',
-              height: 120,
-              borderRadius: 12,
-            }}
-          />
+          <SkeletonBase width={120} height={22} style={{ marginBottom: 20 }} />
+          <SkeletonBase width='100%' height={120} borderRadius={12} />
         </section>
       </div>
     </div>
@@ -195,7 +173,7 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPayment, setShowPayment] = useState(false);
-  const { enroll, demoEnroll, isEnrolled } = useEnrollmentStore();
+  const { enroll, isEnrolled } = useEnrollmentStore();
   const { isAuthenticated } = useAuthStore();
   const enrolled = course ? isEnrolled(course.id) : false;
 
@@ -276,7 +254,11 @@ export default function CourseDetailPage() {
 
   const handlePaymentSuccess = async () => {
     setShowPayment(false);
-    demoEnroll(course!.id);
+    try {
+      await enroll(course!.id);
+    } catch {
+      // Error is already set in the store
+    }
     router.push(firstLessonHref);
   };
 

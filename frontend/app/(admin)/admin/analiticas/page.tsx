@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BarChart3, TrendingUp, DollarSign, Users } from 'lucide-react';
 import { LineChart } from '@/src/shared/components/LineChart';
-import { getAnalytics } from '@/src/shared/api/analytics';
-import type { AnalyticsData } from '@/src/shared/api/analytics';
+import { getAnalytics } from '@/src/shared/api/admin';
+import type { AnalyticsData } from '@/src/shared/api/admin';
 import styles from './page.module.css';
 
 type TimeRange = '7d' | '30d' | '12s' | '1a';

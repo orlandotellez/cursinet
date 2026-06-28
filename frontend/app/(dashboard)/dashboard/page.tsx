@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
-import { getMyCertificates } from '@/src/shared/api/certificates';
-import { getMyEnrollments } from '@/src/shared/api/enrollment';
+import { useToastStore } from '@/src/shared/store/useToastStore';
+import { getMyCertificates } from '@/src/shared/api/student';
+import { getMyEnrollments } from '@/src/shared/api/student';
 import { DashboardHeader } from '@/src/features/dashboard/components/DashboardHeader';
 import { ContinueLearning } from '@/src/features/dashboard/components/ContinueLearning';
 import { StatsCards } from '@/src/features/dashboard/components/StatsCards';
 import { RecentCertificates } from '@/src/features/dashboard/components/RecentCertificates';
-import { DashboardSkeleton } from './loading';
 import type { Certificate } from '@/src/shared/types';
-import type { EnrollmentResponse } from '@/src/shared/api/enrollment';
+import type { EnrollmentResponse } from '@/src/shared/api/student';
 import type { Enrollment } from '@/src/shared/types';
 import styles from './page.module.css';
 
@@ -77,8 +77,8 @@ export default function DashboardPage() {
           setEnrollments(enrs);
           setTransformedEnrollments(enrs.map(transformEnrollment));
         }
-      } catch (error) {
-        console.error('Error loading dashboard data:', error);
+      } catch {
+        useToastStore.getState().error('Error al cargar datos del dashboard');
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -91,16 +91,12 @@ export default function DashboardPage() {
     };
   }, []);
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
-
   return (
     <div className={styles.page}>
-      <DashboardHeader name={name} />
-      <ContinueLearning enrollments={transformedEnrollments} />
-      <StatsCards stats={studentStats} />
-      <RecentCertificates certificates={certificates} />
+      <DashboardHeader name={name} loading={isLoading} />
+      <ContinueLearning enrollments={isLoading ? [] : transformedEnrollments} loading={isLoading} />
+      <StatsCards stats={studentStats} loading={isLoading} />
+      <RecentCertificates certificates={certificates} loading={isLoading} />
     </div>
   );
 }

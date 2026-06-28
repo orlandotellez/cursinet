@@ -4,13 +4,14 @@ import { useState, useEffect } from 'react';
 import { Save, User, Lock, Bell, Globe, Phone, AtSign, CheckCircle, AlertTriangle, Code2, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 import { getMyProfile } from '@/src/shared/api/auth';
-import { updateMyProfile, changePassword } from '@/src/shared/api/myProfile';
+import { updateMyProfile, changePassword } from '@/src/shared/api/auth';
 import {
   getNotificationPreferences,
   saveNotificationPreferences,
-} from '@/src/shared/api/notificationPreferences';
-import { ConfiguracionSkeleton } from './loading';
+} from '@/src/shared/api/admin';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import styles from './page.module.css';
 
 interface NotificationSettings {
@@ -105,8 +106,8 @@ export default function ConfiguracionPage() {
           });
           setNotifLoaded(true);
         }
-      } catch (err) {
-        console.error('Error loading profile:', err);
+      } catch {
+        useToastStore.getState().error('Error al cargar perfil');
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -138,8 +139,8 @@ export default function ConfiguracionPage() {
         saveNotificationPreferences(updated).then((result) => {
           setNotifSaved(true);
           setTimeout(() => setNotifSaved(false), 2000);
-        }).catch((err) => {
-          console.error('Error saving notification preferences:', err);
+        }).catch(() => {
+          useToastStore.getState().error('Error al guardar preferencias');
           // Revert on error
           setNotifications(prev);
         });
@@ -213,8 +214,8 @@ export default function ConfiguracionPage() {
       if (notifLoaded) {
         try {
           await saveNotificationPreferences(notifications);
-        } catch (err) {
-          console.error('Error saving notification prefs:', err);
+        } catch {
+          useToastStore.getState().error('Error al guardar preferencias');
         }
       }
 
@@ -228,7 +229,111 @@ export default function ConfiguracionPage() {
     }
   };
 
-  if (isLoading) return <ConfiguracionSkeleton />;
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <SkeletonBase width={180} height={28} style={{ marginBottom: 28 }} />
+
+        {/* Perfil section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={80} height={16} />
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+            </div>
+            <div className={styles.field}>
+              <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.field}>
+              <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.field}>
+              <SkeletonBase width={80} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={80} />
+            </div>
+          </div>
+        </div>
+
+        {/* Redes section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={60} height={16} />
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <SkeletonBase width={80} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contraseña section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={100} height={16} />
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+              <div className={styles.field}>
+                <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Notificaciones section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={120} height={16} />
+          </div>
+          <div className={styles.toggles}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={styles.toggleRow}>
+                <SkeletonBase width={180} height={16} />
+                <SkeletonBase width={44} height={24} borderRadius={5} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <SkeletonBase width={150} height={40} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
