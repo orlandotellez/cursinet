@@ -9,6 +9,7 @@ public interface ILessonRepository
     Task<Lesson?> GetByIdAsync(Guid id);
     Task<Lesson?> GetBySlugAsync(string slug);
     Task<bool> SlugExistsAsync(string slug);
+    Task<Dictionary<Guid, int>> GetPublishedCountByCourseIdsAsync(List<Guid> courseIds);
     Task<Lesson> CreateAsync(Lesson lesson);
     Task<Lesson> UpdateAsync(Lesson lesson);
     Task SoftDeleteAsync(Guid id);

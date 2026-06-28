@@ -5,9 +5,9 @@ public class Verification
 {
 	public Guid Id {get; set;} // ID de la tabla
 
-	public string Identifier {get; set;} // Identificador (email, telefono)
+	public string Identifier {get; set;} = null!; // Identificador (email, telefono)
 
-	public string Value {get; set;} // Token de verificación
+	public string Value {get; set;} = null!; // Token de verificación
 
 	public DateTime ExpiresAt {get; set;} // Tiempo de expiración del token
 

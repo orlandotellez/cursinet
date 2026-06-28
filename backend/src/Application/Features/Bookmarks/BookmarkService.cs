@@ -28,7 +28,7 @@ public class BookmarkService : IBookmarkService
 
         var course = await _courseRepository.GetByIdAsync(courseId);
         if (course == null)
-            throw new AppException("Course not found", 404, "course.not-found");
+            throw AppExceptions.NotFound("Course not found");
 
         var exists = await _bookmarkRepository.ExistsAsync(userId, courseId);
         if (exists)

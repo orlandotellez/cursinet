@@ -1,6 +1,7 @@
 using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Domain.Exceptions;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -12,23 +13,19 @@ namespace Cursinet.Api.Controllers;
 public class EnrollmentController : ControllerBase
 {
     private readonly IEnrollmentService _enrollmentService;
-    private readonly AuthHelper _authHelper;
 
-    public EnrollmentController(IEnrollmentService enrollmentService, AuthHelper authHelper)
+    public EnrollmentController(IEnrollmentService enrollmentService)
     {
         _enrollmentService = enrollmentService;
-        _authHelper = authHelper;
     }
 
     [HttpPost]
     [RequirePermission(Permissions.EnrollmentCreate)]
     public async Task<ActionResult<EnrollmentResponse>> Enroll([FromBody] EnrollmentRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _enrollmentService.EnrollAsync(userId.Value, request.CourseId);
+        var result = await _enrollmentService.EnrollAsync(userId, request.CourseId);
         return CreatedAtAction(null, result);
     }
 
@@ -36,11 +33,9 @@ public class EnrollmentController : ControllerBase
     [RequirePermission(Permissions.EnrollmentRead)]
     public async Task<ActionResult<List<EnrollmentResponse>>> GetMyEnrollments()
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _enrollmentService.GetMyEnrollmentsAsync(userId.Value);
+        var result = await _enrollmentService.GetMyEnrollmentsAsync(userId);
         return Ok(result);
     }
 
@@ -48,11 +43,9 @@ public class EnrollmentController : ControllerBase
     [RequirePermission(Permissions.EnrollmentRead)]
     public async Task<ActionResult<EnrollmentStatusResponse>> GetStatus(Guid courseId)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _enrollmentService.GetStatusAsync(userId.Value, courseId);
+        var result = await _enrollmentService.GetStatusAsync(userId, courseId);
         return Ok(result);
     }
 }

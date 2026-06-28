@@ -21,6 +21,14 @@ public class EnrollmentRepository : IEnrollmentRepository
             .ToListAsync();
     }
 
+    public async Task<List<Enrollment>> GetSinceAsync(DateTime since)
+    {
+        return await _context.Enrollments
+            .Where(e => e.DeletedAt == null && e.CreatedAt >= since)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<Enrollment?> GetByCourseAndUserAsync(Guid courseId, Guid userId)
     {
         return await _context.Enrollments

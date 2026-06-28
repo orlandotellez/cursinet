@@ -51,7 +51,7 @@ public class AuthService : IAuthService
             Id = Guid.NewGuid(),
             Name = request.Name,
             Email = request.Email,
-            Role = request.Role ?? UserRole.Student,
+            Role = UserRole.Student,
             IsActive = true,
             EmailVerified = false,
             CreatedAt = DateTime.UtcNow,
@@ -126,8 +126,6 @@ public class AuthService : IAuthService
             throw AppExceptions.Unauthorized("Invalid credentials");
 
         // Obtener usuario
-        if (account.UserId == null) throw AppExceptions.Unauthorized("Invalid credentials");
-
         var user = await _userRepository.GetByIdAsync(account.UserId);
         if (user == null) throw AppExceptions.Unauthorized("User not found");
 
@@ -400,8 +398,11 @@ public class AuthService : IAuthService
 
     private static string GenerateVerificationCode()
     {
-        const string chars = "0123456789";
-        var random = new Random();
-        return new string(Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray());
+        var code = new char[6];
+        Span<byte> bytes = stackalloc byte[6];
+        System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
+        for (int i = 0; i < 6; i++)
+            code[i] = (char)('0' + bytes[i] % 10);
+        return new string(code);
     }
 }

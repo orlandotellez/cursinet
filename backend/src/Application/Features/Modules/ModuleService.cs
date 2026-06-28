@@ -1,3 +1,4 @@
+using Cursinet.Application.Common.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
@@ -129,8 +130,7 @@ public class ModuleService : IModuleService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         var existingModules = await _moduleRepository.GetByCourseAsync(courseId);
         var maxSortOrder = existingModules.Any() ? existingModules.Max(m => m.SortOrder) : 0;
@@ -161,8 +161,7 @@ public class ModuleService : IModuleService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         if (request.Title != null) module.Title = request.Title;
         if (request.Description != null) module.Description = request.Description;
@@ -184,8 +183,7 @@ public class ModuleService : IModuleService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         await _moduleRepository.SoftDeleteAsync(id);
     }
@@ -196,8 +194,7 @@ public class ModuleService : IModuleService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         await _moduleRepository.UpdateSortOrderAsync(
             request.Items.Select(i => (i.Id, i.SortOrder)).ToList());

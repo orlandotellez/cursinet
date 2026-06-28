@@ -25,25 +25,8 @@ public class UserCrudService : IUserCrudService
     public async Task<List<UserDto>> GetAllAsync(UserFilter? filter = null)
     {
         filter ??= new UserFilter();
-        var users = await _userRepository.GetAllAsync(filter.IncludeDeleted ?? false);
-
-        var query = users.AsEnumerable();
-
-        if (!string.IsNullOrWhiteSpace(filter.Search))
-        {
-            var s = filter.Search.ToLower();
-            query = query.Where(u =>
-                u.Name.ToLower().Contains(s) ||
-                u.Email.ToLower().Contains(s));
-        }
-
-        if (filter.Role.HasValue)
-            query = query.Where(u => u.Role == filter.Role.Value);
-
-        if (filter.IsActive.HasValue)
-            query = query.Where(u => u.IsActive == filter.IsActive.Value);
-
-        return query.Select(u => u.MapUserToDto()).ToList();
+        var users = await _userRepository.GetAllAsync(filter);
+        return users.Select(u => u.MapUserToDto()).ToList();
     }
 
     public async Task<UserDto> GetByIdAsync(Guid id)

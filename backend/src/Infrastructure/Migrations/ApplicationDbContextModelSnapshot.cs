@@ -18,7 +18,7 @@ namespace Cursinet.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "user_role", new[] { "student", "instructor", "admin", "moderator" });
@@ -1654,6 +1654,9 @@ namespace Cursinet.Infrastructure.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("email_verified");
 
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("integer");
+
                     b.Property<string>("GithubUrl")
                         .HasColumnType("text")
                         .HasColumnName("github_url");
@@ -1675,6 +1678,9 @@ namespace Cursinet.Infrastructure.Migrations
                     b.Property<string>("LinkedinUrl")
                         .HasColumnType("text")
                         .HasColumnName("linkedin_url");
+
+                    b.Property<DateTime?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()

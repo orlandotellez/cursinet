@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Domain.Exceptions;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -15,13 +15,11 @@ namespace Cursinet.Api.Controllers;
 public class CourseController : ControllerBase
 {
     private readonly ICourseService _courseService;
-    private readonly AuthHelper _authHelper;
     private readonly ILogger<CourseController> _logger;
 
-    public CourseController(ICourseService courseService, AuthHelper authHelper, ILogger<CourseController> logger)
+    public CourseController(ICourseService courseService, ILogger<CourseController> logger)
     {
         _courseService = courseService;
-        _authHelper = authHelper;
         _logger = logger;
     }
 
@@ -61,11 +59,9 @@ public class CourseController : ControllerBase
     [RequirePermission(Permissions.CourseCreate)]
     public async Task<ActionResult<CourseResponse>> Create([FromBody] CreateCourseRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var course = await _courseService.CreateAsync(request, userId.Value);
+        var course = await _courseService.CreateAsync(request, userId);
         return CreatedAtAction(nameof(GetById), new { id = course.Id }, course);
     }
 
@@ -73,12 +69,10 @@ public class CourseController : ControllerBase
     [RequirePermission(Permissions.CourseUpdate)]
     public async Task<ActionResult<CourseResponse>> Update(Guid id, [FromBody] UpdateCourseRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var userRole = GetCurrentUserRole();
-        var course = await _courseService.UpdateAsync(id, request, userId.Value, userRole);
+        var userRole = HttpContext.GetCurrentUserRole();
+        var course = await _courseService.UpdateAsync(id, request, userId, userRole);
         return Ok(course);
     }
 
@@ -86,22 +80,12 @@ public class CourseController : ControllerBase
     [RequirePermission(Permissions.CourseDelete)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var userRole = GetCurrentUserRole();
-        _logger.LogInformation("🗑️ Delete course {CourseId} requested by user {UserId} with role {Role}", id, userId, userRole);
-        try
-        {
-            await _courseService.DeleteAsync(id, userId.Value, userRole);
-            _logger.LogInformation("✅ Course {CourseId} soft-deleted successfully", id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "❌ Failed to delete course {CourseId}", id);
-            throw;
-        }
+        var userRole = HttpContext.GetCurrentUserRole();
+        _logger.LogInformation("Delete course {CourseId} requested by user {UserId} with role {Role}", id, userId, userRole);
+        await _courseService.DeleteAsync(id, userId, userRole);
+        _logger.LogInformation("Course {CourseId} soft-deleted successfully", id);
         return Ok(new { message = "Course deleted successfully" });
     }
 
@@ -109,12 +93,10 @@ public class CourseController : ControllerBase
     [RequirePermission(Permissions.CoursePublish)]
     public async Task<ActionResult<CourseResponse>> Publish(Guid id)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var userRole = GetCurrentUserRole();
-        var course = await _courseService.PublishAsync(id, userId.Value, userRole);
+        var userRole = HttpContext.GetCurrentUserRole();
+        var course = await _courseService.PublishAsync(id, userId, userRole);
         return Ok(course);
     }
 
@@ -122,24 +104,10 @@ public class CourseController : ControllerBase
     [RequirePermission(Permissions.CoursePublish)]
     public async Task<ActionResult<CourseResponse>> Unpublish(Guid id)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var userRole = GetCurrentUserRole();
-        var course = await _courseService.UnpublishAsync(id, userId.Value, userRole);
+        var userRole = HttpContext.GetCurrentUserRole();
+        var course = await _courseService.UnpublishAsync(id, userId, userRole);
         return Ok(course);
-    }
-
-    private async Task<Guid?> GetCurrentUserIdAsync()
-        => await _authHelper.ResolveCurrentUserId();
-
-    private UserRole GetCurrentUserRole()
-    {
-        var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (Enum.TryParse<UserRole>(roleClaim, out var role))
-            return role;
-
-        return UserRole.Student;
     }
 }

@@ -1,6 +1,7 @@
 using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Domain.Exceptions;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,10 @@ namespace Cursinet.Api.Controllers;
 public class PaymentsController : ControllerBase
 {
     private readonly IPaymentService _paymentService;
-    private readonly AuthHelper _authHelper;
 
-    public PaymentsController(IPaymentService paymentService, AuthHelper authHelper)
+    public PaymentsController(IPaymentService paymentService)
     {
         _paymentService = paymentService;
-        _authHelper = authHelper;
     }
 
     /// Creates a payment for a course. Returns payment details + optional Stripe client_secret.
@@ -25,11 +24,9 @@ public class PaymentsController : ControllerBase
     [RequirePermission(Permissions.PaymentCreate)]
     public async Task<ActionResult<CreatePaymentResponse>> CreatePayment([FromBody] CreatePaymentRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _paymentService.CreatePaymentAsync(userId.Value, request);
+        var result = await _paymentService.CreatePaymentAsync(userId, request);
         return Ok(result);
     }
 
@@ -38,11 +35,9 @@ public class PaymentsController : ControllerBase
     [RequirePermission(Permissions.PaymentCreate)]
     public async Task<ActionResult<PaymentResponse>> ConfirmPayment([FromBody] ConfirmPaymentRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _paymentService.ConfirmPaymentAsync(userId.Value, request);
+        var result = await _paymentService.ConfirmPaymentAsync(userId, request);
         return Ok(result);
     }
 
@@ -51,11 +46,9 @@ public class PaymentsController : ControllerBase
     [RequirePermission(Permissions.PaymentRead)]
     public async Task<ActionResult<List<PaymentResponse>>> GetMyPayments()
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _paymentService.GetMyPaymentsAsync(userId.Value);
+        var result = await _paymentService.GetMyPaymentsAsync(userId);
         return Ok(result);
     }
 
@@ -64,11 +57,9 @@ public class PaymentsController : ControllerBase
     [RequirePermission(Permissions.PaymentRead)]
     public async Task<ActionResult<PaymentResponse>> GetPayment(Guid id)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _paymentService.GetPaymentAsync(userId.Value, id);
+        var result = await _paymentService.GetPaymentAsync(userId, id);
         if (result == null)
             return NotFound(new { error = "Payment not found" });
 

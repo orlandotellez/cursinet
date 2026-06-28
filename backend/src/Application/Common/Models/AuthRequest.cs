@@ -1,5 +1,3 @@
-using Cursinet.Domain.Enums;
-
 namespace Cursinet.Application.Common.Models;
 
 public record LoginRequest(
@@ -10,8 +8,7 @@ public record LoginRequest(
 public record RegisterRequest(
     string Name,
     string Email,
-    string Password,
-    UserRole? Role = null
+    string Password
 );
 
 public record RefreshRequest(

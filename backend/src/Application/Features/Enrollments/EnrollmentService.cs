@@ -30,20 +30,20 @@ public class EnrollmentService : IEnrollmentService
         // 1. Validate course exists
         var course = await _courseRepository.GetByIdAsync(courseId);
         if (course == null)
-            throw new AppException("Course not found", 404, "course.not-found");
+            throw AppExceptions.NotFound("Course not found");
 
         // 2. Validate course is published
         if (!course.IsPublished)
-            throw new AppException("Course is not published", 400, "enrollment.not-published");
+            throw AppExceptions.BadRequest("Course is not published");
 
         // 3. Only free courses can be enrolled directly
         if (!course.IsFree)
-            throw new AppException("Course is not free — create a payment first", 400, "enrollment.payment-required");
+            throw AppExceptions.BadRequest("Course is not free — create a payment first");
 
         // 4. Check for duplicate enrollment
         var existing = await _enrollmentRepository.GetByCourseAndUserAsync(courseId, userId);
         if (existing != null)
-            throw new AppException("Already enrolled in this course", 409, "enrollment.duplicate");
+            throw AppExceptions.Conflict("Already enrolled in this course");
 
         // 5. Create enrollment entity
         var enrollment = new Enrollment
@@ -65,28 +65,18 @@ public class EnrollmentService : IEnrollmentService
     public async Task<List<EnrollmentResponse>> GetMyEnrollmentsAsync(Guid userId)
     {
         var enrollments = await _enrollmentRepository.GetByUserAsync(userId);
+        var courseIds = enrollments.Select(e => e.CourseId).ToList();
 
-        var results = new List<EnrollmentResponse>();
-        foreach (var enrollment in enrollments)
+        var totalLessonsMap = await _lessonRepository.GetPublishedCountByCourseIdsAsync(courseIds);
+        var completedLessonsMap = await _lessonProgressRepository.GetCompletedCountByCourseIdsAsync(userId, courseIds);
+
+        return enrollments.Select(e =>
         {
-            var dto = enrollment.MapToDto();
-
-            var totalLessons = (await _lessonRepository.GetByCourseAsync(enrollment.CourseId))
-                .Count(l => l.IsPublished && l.DeletedAt == null);
-
-            var completedLessons = (await _lessonProgressRepository.GetByUserAndCourseAsync(userId, enrollment.CourseId))
-                .Count(p => p.IsCompleted);
-
-            dto = dto with
-            {
-                TotalLessons = totalLessons,
-                CompletedLessons = completedLessons,
-            };
-
-            results.Add(dto);
-        }
-
-        return results;
+            var dto = e.MapToDto();
+            totalLessonsMap.TryGetValue(e.CourseId, out var total);
+            completedLessonsMap.TryGetValue(e.CourseId, out var completed);
+            return dto with { TotalLessons = total, CompletedLessons = completed };
+        }).ToList();
     }
 
     public async Task<EnrollmentStatusResponse> GetStatusAsync(Guid userId, Guid courseId)

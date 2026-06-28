@@ -1,8 +1,10 @@
+using Cursinet.Application.Common.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Entities;
 using Cursinet.Domain.Exceptions;
+using Cursinet.Domain.Enums;
 
 namespace Cursinet.Application.Features.Comments;
 
@@ -73,8 +75,7 @@ public class CommentService : ICommentService
         if (comment == null)
             throw AppExceptions.NotFound("Comment not found");
 
-        if (comment.UserId != userId)
-            throw AppExceptions.Forbidden("You can only edit your own comments");
+        Guard.AgainstNotOwner(comment.UserId, userId, UserRole.Admin, "comment");
 
         comment.Body = body.Trim();
         comment.IsEdited = true;
@@ -90,8 +91,7 @@ public class CommentService : ICommentService
         if (comment == null)
             throw AppExceptions.NotFound("Comment not found");
 
-        if (comment.UserId != userId)
-            throw AppExceptions.Forbidden("You can only delete your own comments");
+        Guard.AgainstNotOwner(comment.UserId, userId, UserRole.Admin, "comment");
 
         await _commentRepository.DeleteAsync(commentId);
     }

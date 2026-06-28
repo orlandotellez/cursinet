@@ -1,8 +1,10 @@
+using Cursinet.Application.Common.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Entities;
 using Cursinet.Domain.Exceptions;
+using Cursinet.Domain.Enums;
 
 namespace Cursinet.Application.Features.Reviews;
 
@@ -71,8 +73,7 @@ public class ReviewService : IReviewService
         if (review == null)
             throw AppExceptions.NotFound("Review not found");
 
-        if (review.UserId != userId)
-            throw AppExceptions.Forbidden("You can only edit your own reviews");
+        Guard.AgainstNotOwner(review.UserId, userId, UserRole.Admin, "review");
 
         review.Rating = rating;
         review.Comment = comment;
@@ -90,8 +91,7 @@ public class ReviewService : IReviewService
         if (review == null)
             throw AppExceptions.NotFound("Review not found");
 
-        if (review.UserId != userId)
-            throw AppExceptions.Forbidden("You can only delete your own reviews");
+        Guard.AgainstNotOwner(review.UserId, userId, UserRole.Admin, "review");
 
         var courseId = review.CourseId;
         await _reviewRepository.DeleteAsync(reviewId);

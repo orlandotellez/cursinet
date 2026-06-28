@@ -1,7 +1,10 @@
 using System.Text;
+using Microsoft.AspNetCore.RateLimiting;
 using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Application.Features.Categories;
+using FluentValidation;
 using Cursinet.Application.Features.Auth;
 using Cursinet.Application.Features.Courses;
 using Cursinet.Application.Features.Enrollments;
@@ -29,6 +32,19 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("Auth", opt =>
+    {
+        opt.PermitLimit = 10;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -49,8 +65,8 @@ builder.Services.AddControllers()
     });
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-builder.Services.AddScoped<AuthHelper>();
 builder.Services.AddScoped<CookieHelper>();
 builder.Services.AddScoped<TokenHelper>();
 
@@ -63,6 +79,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("JWT Secret is not configured");
 
+var jwtIssuer = builder.Configuration["Jwt:Issuer"]
+    ?? "cursinet-api";
+
+var jwtAudience = builder.Configuration["Jwt:Audience"]
+    ?? "cursinet-app";
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -70,8 +92,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
         };
@@ -101,6 +125,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IModuleService, ModuleService>();

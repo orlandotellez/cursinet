@@ -12,12 +12,10 @@ namespace Cursinet.Api.Controllers;
 public class CommentsController : ControllerBase
 {
     private readonly ICommentService _commentService;
-    private readonly AuthHelper _authHelper;
 
-    public CommentsController(ICommentService commentService, AuthHelper authHelper)
+    public CommentsController(ICommentService commentService)
     {
         _commentService = commentService;
-        _authHelper = authHelper;
     }
 
     /// <summary>Authenticated: get all comments for a lesson.</summary>
@@ -36,7 +34,7 @@ public class CommentsController : ControllerBase
         Guid lessonId,
         [FromBody] CreateCommentRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _commentService.CreateCommentAsync(
             lessonId, userId, request.Body, request.ParentId);
@@ -51,7 +49,7 @@ public class CommentsController : ControllerBase
         Guid commentId,
         [FromBody] UpdateCommentRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _commentService.UpdateCommentAsync(commentId, userId, request.Body);
         return Ok(result);
@@ -62,7 +60,7 @@ public class CommentsController : ControllerBase
     [Authorize]
     public async Task<ActionResult> DeleteComment(Guid lessonId, Guid commentId)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         await _commentService.DeleteCommentAsync(commentId, userId);
         return Ok(new { message = "Comment deleted successfully." });

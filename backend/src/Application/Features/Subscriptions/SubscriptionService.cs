@@ -71,7 +71,7 @@ public class SubscriptionService : ISubscriptionService
 
     private static SubscriptionResponse Map(Subscription s) => new()
     {
-        Plan = s.Plan == SubcriptionPlan.Monthly ? "pro" : "free",
+        Plan = s.Plan == SubscriptionPlan.Monthly ? "pro" : "free",
         Status = s.Status,
         CurrentPeriodStart = s.CurrentPeriodStart,
         CurrentPeriodEnd = s.CurrentPeriodEnd,

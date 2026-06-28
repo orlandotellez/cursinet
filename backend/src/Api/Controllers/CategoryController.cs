@@ -7,18 +7,17 @@ namespace Cursinet.Api.Controllers;
 [Route("api/v1/categories")]
 public class CategoryController : ControllerBase
 {
-    private readonly ICategoryRepository _categoryRepository;
+    private readonly ICategoryService _categoryService;
 
-    public CategoryController(ICategoryRepository categoryRepository)
+    public CategoryController(ICategoryService categoryService)
     {
-        _categoryRepository = categoryRepository;
+        _categoryService = categoryService;
     }
 
-    /// Listar categorías activas
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var categories = await _categoryRepository.GetAllAsync();
+        var categories = await _categoryService.GetAllAsync();
         return Ok(categories);
     }
 }

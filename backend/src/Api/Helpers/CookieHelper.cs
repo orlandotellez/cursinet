@@ -29,7 +29,7 @@ public class CookieHelper
             Path = "/",
             HttpOnly = true,
             Secure = isProduction,
-            SameSite = SameSiteMode.Lax,
+            SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddMinutes(15)
         };
 
@@ -38,7 +38,7 @@ public class CookieHelper
             Path = "/",
             HttpOnly = true,
             Secure = isProduction,
-            SameSite = SameSiteMode.Lax,
+            SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         };
 

@@ -12,12 +12,10 @@ namespace Cursinet.Api.Controllers;
 public class LessonNotesController : ControllerBase
 {
     private readonly ILessonNoteService _noteService;
-    private readonly AuthHelper _authHelper;
 
-    public LessonNotesController(ILessonNoteService noteService, AuthHelper authHelper)
+    public LessonNotesController(ILessonNoteService noteService)
     {
         _noteService = noteService;
-        _authHelper = authHelper;
     }
 
     /// <summary>Authenticated: get my note for a lesson.</summary>
@@ -25,7 +23,7 @@ public class LessonNotesController : ControllerBase
     [Authorize]
     public async Task<ActionResult<NoteResponse?>> GetNote(Guid lessonId)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var note = await _noteService.GetNoteAsync(userId, lessonId);
         return Ok(note);
@@ -38,7 +36,7 @@ public class LessonNotesController : ControllerBase
         Guid lessonId,
         [FromBody] SaveNoteRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _noteService.SaveNoteAsync(userId, lessonId, request.Content);
         return Ok(result);

@@ -7,9 +7,9 @@ public class Account
 {
 	public Guid Id {get; set;} // ID de la tabla
 
-	public string AccountId {get; set;} // ID de la cuenta del proveedor
+	public string AccountId {get; set;} = null!; // ID de la cuenta del proveedor
 
-	public string ProviderId {get; set;} // Proveedor OAuth (google,github,etc)
+	public string ProviderId {get; set;} = null!; // Proveedor OAuth (google,github,etc)
 	
 	public Guid UserId {get; set;} // ID del dueño del usuario
 	public User User {get; set;} =  null!; // Referencia a la tabla usuario

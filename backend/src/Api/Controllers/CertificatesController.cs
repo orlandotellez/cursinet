@@ -13,19 +13,17 @@ namespace Cursinet.Api.Controllers;
 public class CertificatesController : ControllerBase
 {
     private readonly ICertificateService _certificateService;
-    private readonly AuthHelper _authHelper;
 
-    public CertificatesController(ICertificateService certificateService, AuthHelper authHelper)
+    public CertificatesController(ICertificateService certificateService)
     {
         _certificateService = certificateService;
-        _authHelper = authHelper;
     }
 
     /// <summary>Get all certificates for the authenticated user.</summary>
     [HttpGet]
     public async Task<ActionResult<List<CertificateResponse>>> GetMyCertificates()
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var certificates = await _certificateService.GetMyCertificatesAsync(userId);
         return Ok(certificates);
@@ -35,7 +33,7 @@ public class CertificatesController : ControllerBase
     [HttpPost("{courseId}")]
     public async Task<ActionResult<CertificateResponse>> IssueCertificate(Guid courseId)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var certificate = await _certificateService.IssueCertificateAsync(courseId, userId);
         return CreatedAtAction(null, certificate);
