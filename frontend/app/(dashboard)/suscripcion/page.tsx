@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Check, Crown } from 'lucide-react';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { useSubscriptionStore } from '@/src/shared/store/useSubscriptionStore';
-import s from '@/src/shared/styles/skeleton.module.css';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import styles from './page.module.css';
 
 const freeFeatures = [
@@ -25,147 +25,170 @@ const proFeatures = [
 
 export default function SuscripcionPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { subscription, setFreePlan, upgradeToPro, cancelSubscription } = useSubscriptionStore();
-  const [ready, setReady] = useState(false);
+  const { subscription, loading, fetchSubscription, setFreePlan, upgradeToPro, cancelMySubscription, reactivateMySubscription } = useSubscriptionStore();
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    if (!subscription) setFreePlan();
-    setReady(true);
-  }, [isAuthenticated, subscription, setFreePlan]);
+    fetchSubscription();
+  }, [isAuthenticated, fetchSubscription]);
 
-  if (!ready) {
-    return <SuscripcionSkeleton />;
+  async function handleCancel() {
+    setCancelling(true);
+    try {
+      await cancelMySubscription();
+    } catch {
+      // error handled by store
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  async function handleReactivate() {
+    try {
+      await reactivateMySubscription();
+    } catch {
+      // error handled by store
+    }
   }
 
   const isFree = subscription?.plan === 'free';
   const isPro = subscription?.plan === 'pro';
   const isCancelled = subscription?.status === 'cancelled';
 
+  // On first render, subscription may be null but loading=false.
+  // Show a minimal skeleton to avoid flashing incorrect plan text.
+  const isFirstLoad = !subscription && !loading;
+
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Suscripción</h1>
+      {loading || isFirstLoad ? (
+        <SkeletonBase height={28} width={200} style={{ marginBottom: 32 }} />
+      ) : (
+        <h1 className={styles.title}>Suscripción</h1>
+      )}
 
-      {isCancelled && (
+      {!loading && isCancelled && (
         <div className={styles.cancelledBanner}>
           Tu suscripción está cancelada. Vas a conservar el acceso hasta el final del período facturado.
         </div>
       )}
 
       <div className={styles.currentPlan}>
-        <div className={styles.planBadge}>
-          <Crown size={20} />
-          <span>Plan actual: {isFree ? 'Gratuito' : 'Pro'}</span>
-        </div>
-        <p className={styles.planDesc}>
-          {isFree
-            ? 'Estás disfrutando de nuestros cursos gratuitos. Actualizá a Pro para acceder a todo el catálogo.'
-            : 'Tenés acceso completo a todos los cursos y funcionalidades premium.'}
-        </p>
+        {loading || isFirstLoad ? (
+          <>
+            <SkeletonBase width={160} height={28} borderRadius={100} style={{ marginBottom: 12 }} />
+            <SkeletonBase width="80%" height={16} style={{ marginBottom: 8 }} />
+            <SkeletonBase width="50%" height={16} />
+          </>
+        ) : (
+          <>
+            <div className={styles.planBadge}>
+              <Crown size={20} />
+              <span>Plan actual: {isFree ? 'Gratuito' : 'Pro'}</span>
+            </div>
+            <p className={styles.planDesc}>
+              {isFree
+                ? 'Estás disfrutando de nuestros cursos gratuitos. Actualizá a Pro para acceder a todo el catálogo.'
+                : 'Tenés acceso completo a todos los cursos y funcionalidades premium.'}
+            </p>
+          </>
+        )}
       </div>
 
       <div className={styles.plansGrid}>
-        <div className={`${styles.planCard} ${isFree ? styles.planActive : ''}`}>
-          <h2 className={styles.planName}>Gratuito</h2>
-          <div className={styles.planPrice}>
-            <span className={styles.priceAmount}>Gratis</span>
-          </div>
-          <ul className={styles.featureList}>
-            {freeFeatures.map((f) => (
-              <li key={f} className={styles.featureItem}>
-                <Check size={16} className={styles.featureCheck} />
-                {f}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className={`${styles.planCard} ${isPro ? styles.planActive : ''}`}>
-          <div className={styles.planHeader}>
-            <span className={styles.popularBadge}>Más popular</span>
-          </div>
-          <h2 className={styles.planName}>Pro</h2>
-          <div className={styles.planPrice}>
-            <span className={styles.priceAmount}>$10</span>
-            <span className={styles.pricePeriod}>/mes</span>
-          </div>
-          <ul className={styles.featureList}>
-            {proFeatures.map((f) => (
-              <li key={f} className={styles.featureItem}>
-                <Check size={16} className={styles.featureCheck} />
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          {isFree && (
-            <button className={styles.upgradeBtn} onClick={upgradeToPro}>
-              Actualizar a Pro
-            </button>
-          )}
-
-          {isPro && !isCancelled && (
-            <button className={styles.cancelBtn} onClick={cancelSubscription}>
-              Cancelar suscripción
-            </button>
-          )}
-
-          {isPro && isCancelled && (
-            <button className={styles.upgradeBtn} onClick={upgradeToPro}>
-              Reactivar suscripción
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SuscripcionSkeleton() {
-  return (
-    <div className={styles.page}>
-      <div className={s.base} style={{ height: 28, width: 200, marginBottom: 32 }} />
-
-      {/* Current plan skeleton */}
-      <div
-        style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-card)',
-          padding: 24,
-          marginBottom: 32,
-        }}
-      >
-        <div className={s.base} style={{ width: 160, height: 28, borderRadius: 100, marginBottom: 12 }} />
-        <div className={s.base} style={{ width: '80%', height: 16, marginBottom: 8 }} />
-        <div className={s.base} style={{ width: '50%', height: 16 }} />
-      </div>
-
-      {/* Plans grid skeleton */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-card)',
-              padding: 28,
-            }}
-          >
-            <div className={s.base} style={{ width: 80, height: 22, marginBottom: 16 }} />
-            <div className={s.base} style={{ width: 60, height: 36, marginBottom: 24 }} />
-            {Array.from({ length: 4 }).map((_, j) => (
-              <div
-                key={j}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}
-              >
-                <div className={s.base} style={{ width: 16, height: 16, borderRadius: 4, flexShrink: 0 }} />
-                <div className={s.base} style={{ flex: 1, height: 14 }} />
+        <div className={`${styles.planCard} ${!loading && isFree && !isFirstLoad ? styles.planActive : ''}`}>
+          {loading || isFirstLoad ? (
+            <>
+              <SkeletonBase width={80} height={22} style={{ marginBottom: 16 }} />
+              <div className={styles.planPrice}>
+                <SkeletonBase width={60} height={36} />
               </div>
-            ))}
-          </div>
-        ))}
+              <ul className={styles.featureList}>
+                {Array.from({ length: 4 }).map((_, j) => (
+                  <li key={j} className={styles.featureItem}>
+                    <SkeletonBase width={16} height={16} borderRadius={4} style={{ flexShrink: 0 }} />
+                    <SkeletonBase style={{ flex: 1, height: 14 }} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <>
+              <h2 className={styles.planName}>Gratuito</h2>
+              <div className={styles.planPrice}>
+                <span className={styles.priceAmount}>Gratis</span>
+              </div>
+              <ul className={styles.featureList}>
+                {freeFeatures.map((f) => (
+                  <li key={f} className={styles.featureItem}>
+                    <Check size={16} className={styles.featureCheck} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+
+        <div className={`${styles.planCard} ${!loading && isPro && !isFirstLoad ? styles.planActive : ''}`}>
+          {loading || isFirstLoad ? (
+            <>
+              <div className={styles.planHeader}>
+                <SkeletonBase width={100} height={22} borderRadius={100} style={{ margin: '0 auto' }} />
+              </div>
+              <SkeletonBase width={80} height={22} style={{ marginBottom: 16 }} />
+              <div className={styles.planPrice}>
+                <SkeletonBase width={80} height={36} />
+              </div>
+              <ul className={styles.featureList}>
+                {Array.from({ length: 6 }).map((_, j) => (
+                  <li key={j} className={styles.featureItem}>
+                    <SkeletonBase width={16} height={16} borderRadius={4} style={{ flexShrink: 0 }} />
+                    <SkeletonBase style={{ flex: 1, height: 14 }} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <>
+              <div className={styles.planHeader}>
+                <span className={styles.popularBadge}>Más popular</span>
+              </div>
+              <h2 className={styles.planName}>Pro</h2>
+              <div className={styles.planPrice}>
+                <span className={styles.priceAmount}>$10</span>
+                <span className={styles.pricePeriod}>/mes</span>
+              </div>
+              <ul className={styles.featureList}>
+                {proFeatures.map((f) => (
+                  <li key={f} className={styles.featureItem}>
+                    <Check size={16} className={styles.featureCheck} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {isFree && (
+                <button className={styles.upgradeBtn} onClick={upgradeToPro}>
+                  Actualizar a Pro
+                </button>
+              )}
+
+              {isPro && !isCancelled && (
+                <button className={styles.cancelBtn} onClick={handleCancel} disabled={cancelling}>
+                  {cancelling ? 'Cancelando...' : 'Cancelar suscripción'}
+                </button>
+              )}
+
+              {isPro && isCancelled && (
+                <button className={styles.upgradeBtn} onClick={handleReactivate}>
+                  Reactivar suscripción
+                </button>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

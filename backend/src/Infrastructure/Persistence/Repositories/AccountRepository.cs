@@ -60,4 +60,10 @@ public class AccountRepository : IAccountRepository
             .Include(a => a.User)
             .FirstOrDefaultAsync(a => a.ProviderId == "credentials" && a.User.Email == email);
     }
+
+    public async Task<Account?> GetCredentialsByUserIdAsync(Guid userId)
+    {
+        return await _context.Accounts
+            .FirstOrDefaultAsync(a => a.ProviderId == "credentials" && a.UserId == userId);
+    }
 }

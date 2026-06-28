@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { getCourseById, type CourseDTO } from '@/src/shared/api/courses';
-import { getModules, type ModuleResponse } from '@/src/shared/api/modules';
+import { getModules, type ModuleResponse } from '@/src/shared/api/courses';
 import { useModuleCrud } from '@/src/features/instructor/hooks/useModuleCrud';
 import { useLessonCrud, type LessonFormData } from '@/src/features/instructor/hooks/useLessonCrud';
 import { ModuleCard } from './components/ModuleCard';

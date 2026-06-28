@@ -1,14 +1,17 @@
 'use client'
 
-import { Clock } from 'lucide-react';
+import { Clock, Save } from 'lucide-react';
 import styles from './NotesTab.module.css';
 
 interface NotesTabProps {
   notes: string;
   setNotes: (v: string) => void;
+  onSaveNotes?: () => Promise<void>;
+  isSaving?: boolean;
+  lastSaved?: string | null;
 }
 
-export function NotesTab({ notes, setNotes }: NotesTabProps) {
+export function NotesTab({ notes, setNotes, onSaveNotes, isSaving, lastSaved }: NotesTabProps) {
   const addTimestamp = () => {
     const mins = Math.floor(Math.random() * 30);
     const secs = Math.floor(Math.random() * 60);
@@ -18,9 +21,24 @@ export function NotesTab({ notes, setNotes }: NotesTabProps) {
 
   return (
     <div>
-      <button className={styles.timestampBtn} onClick={addTimestamp}>
-        <Clock size={14} /> Agregar timestamp
-      </button>
+      <div className={styles.toolbar}>
+        <button className={styles.timestampBtn} onClick={addTimestamp}>
+          <Clock size={14} /> Agregar timestamp
+        </button>
+        {onSaveNotes && (
+          <button
+            className={styles.saveBtn}
+            onClick={onSaveNotes}
+            disabled={isSaving}
+          >
+            <Save size={14} />
+            {isSaving ? 'Guardando...' : 'Guardar nota'}
+          </button>
+        )}
+      </div>
+      {lastSaved && (
+        <span className={styles.savedAt}>Guardado: {lastSaved}</span>
+      )}
       <textarea
         className={styles.textarea}
         placeholder="Escribe tus notas aquí..."

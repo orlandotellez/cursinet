@@ -13,6 +13,10 @@ using Cursinet.Application.Features.Payments;
 using Cursinet.Application.Features.Users;
 using Cursinet.Application.Features.Analytics;
 using Cursinet.Application.Features.Bookmarks;
+using Cursinet.Application.Features.Comments;
+using Cursinet.Application.Features.LessonNotes;
+using Cursinet.Application.Features.NotificationPreferences;
+using Cursinet.Application.Features.Subscriptions;
 using Cursinet.Domain.Enums;
 using Cursinet.Api.Middleware;
 using Cursinet.Infrastructure.Persistence;
@@ -124,6 +128,15 @@ builder.Services.AddScoped<IVerificationRepository, VerificationRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICertificateRepository, CertificateRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ILessonNoteService, LessonNoteService>();
+builder.Services.AddScoped<ILessonNoteRepository, LessonNoteRepository>();
+builder.Services.AddScoped<INotificationPreferenceService, NotificationPreferenceService>();
+builder.Services.AddScoped<IUserNotificationPreferenceRepository, UserNotificationPreferenceRepository>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+
 builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
 
 builder.Services.AddScoped<DataSeeder>();

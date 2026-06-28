@@ -1,5 +1,5 @@
-import { pricingPlans } from '@/src/features/courses/data';
-import { getFeaturedCourses, getPublicCategories, getLandingStats } from '@/src/shared/api/public-data';
+import { pricingPlans } from '@/src/shared/mock';
+import { getFeaturedCourses, getPublicCategories, getLandingStats } from '@/src/shared/api/public';
 import { CategoriesGrid } from '@/src/features/home/components/CategoriesGrid';
 import { FeaturedCourses } from '@/src/features/home/components/FeaturedCourses';
 import { FinalCta } from '@/src/features/home/components/FinalCta';

@@ -69,7 +69,7 @@ export interface CourseCardData {
   category: Pick<Category, 'name'>;
   level: Level;
   duration: number;
-  lessonsCount: number;
+  lessonsCount?: number;
   price: number;
   rating: number;
   reviewsCount: number;

@@ -1,7 +1,7 @@
 'use client';
 
 import { X, Edit, Trash2, RotateCw } from 'lucide-react';
-import type { UserDTO } from '@/src/shared/api/users';
+import type { UserDTO } from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
 interface Props {

@@ -6,6 +6,7 @@ import * as authApi from '../api/auth';
 import { LoginPayload, RegisterPayload, User, UserRole } from '../types';
 import { DEMO_USERS } from '../lib/mockData';
 import { clearAllStorage } from '../lib/authUtils';
+import { useToastStore } from './useToastStore';
 
 function normalizeRole(role: string): UserRole {
   return role.toLowerCase() as UserRole;
@@ -29,6 +30,7 @@ interface AuthState {
   logout: () => Promise<void>;
   clearError: () => void;
   tryDemoCredentials: (email: string, password: string) => boolean;
+  setUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -54,6 +56,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Error al iniciar sesión';
           set({ isLoading: false, error: message });
+          useToastStore.getState().error(message);
           throw err;
         }
       },
@@ -72,6 +75,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Error al registrarse';
           set({ isLoading: false, error: message });
+          useToastStore.getState().error(message);
           throw err;
         }
       },
@@ -117,6 +121,8 @@ export const useAuthStore = create<AuthState>()(
           clearAllStorage();
         }
       },
+
+      setUser: (user) => set({ user }),
 
       clearError: () => set({ error: null }),
     }),

@@ -27,7 +27,7 @@ function formatDate(d: string | null): string {
 
 function mapLevel(level: string): string {
   const map: Record<string, string> = {
-    Begginer: 'Principiante',
+    Beginner: 'Principiante',
     Intermediate: 'Intermedio',
     Advanced: 'Avanzado',
     Expert: 'Experto',

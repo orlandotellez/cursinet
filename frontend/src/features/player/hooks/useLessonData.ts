@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CourseDTO } from '@/src/shared/api/courses';
 import { getCourseById } from '@/src/shared/api/courses';
-import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/curriculum';
-import { getCurriculum } from '@/src/shared/api/curriculum';
-import type { LessonProgressResponse } from '@/src/shared/api/lessons';
-import { getProgress, getLesson } from '@/src/shared/api/lessons';
+import type { CurriculumResponse, CurriculumLesson } from '@/src/shared/api/courses';
+import { getCurriculum } from '@/src/shared/api/courses';
+import type { LessonProgressResponse } from '@/src/shared/api/courses';
+import { getProgress, getLesson } from '@/src/shared/api/courses';
 
 export interface LessonDataResult {
   course: CourseDTO | null;

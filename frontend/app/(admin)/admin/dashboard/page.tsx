@@ -10,8 +10,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { LineChart } from '@/src/shared/components/LineChart';
-import { getDashboard } from '@/src/shared/api/analytics';
-import type { DashboardData } from '@/src/shared/api/analytics';
+import { getDashboard } from '@/src/shared/api/admin';
+import type { DashboardData } from '@/src/shared/api/admin';
 import styles from './page.module.css';
 
 /* ───────────────────────────────────────────

@@ -133,6 +133,30 @@ public class AuthController : ControllerBase
         return Ok(user);
     }
 
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<ActionResult<UserDto>> UpdateMyProfile([FromBody] UpdateMyProfileRequest request)
+    {
+        var userId = await _authHelper.ResolveCurrentUserId();
+        if (userId == null)
+            return Unauthorized(new { error = "User not authenticated" });
+
+        var result = await _authService.UpdateMyProfileAsync(userId.Value, request);
+        return Ok(result);
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<ActionResult<UserDto>> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userId = await _authHelper.ResolveCurrentUserId();
+        if (userId == null)
+            return Unauthorized(new { error = "User not authenticated" });
+
+        var result = await _authService.ChangePasswordAsync(userId.Value, request);
+        return Ok(new { message = "Password changed successfully", user = result });
+    }
+
     [HttpPost("logout")]
     public async Task<ActionResult> Logout()
     {

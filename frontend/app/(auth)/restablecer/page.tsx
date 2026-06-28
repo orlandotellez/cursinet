@@ -7,7 +7,7 @@ import { Spinner } from '@/src/shared/components/Spinner';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { resetPasswordSchema } from '@/src/shared/validations';
-import { useAuthForm } from '@/src/shared/hooks/useAuthForm';
+import { useAsyncAction } from '@/src/shared/hooks/useAsyncAction';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -31,7 +31,7 @@ function RestablecerForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [success, setSuccess] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const { isLoading, error, execute, clearError } = useAuthForm();
+  const { isLoading, error, execute, clearError } = useAsyncAction();
 
   // Si viene de un link con parámetros, pre-llenar
   useEffect(() => {

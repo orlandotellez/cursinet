@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import type { Notification } from '@/src/shared/types';
 import { NotificationCard } from '@/src/features/notifications/components/NotificationCard';
-import { NotificacionesSkeleton } from './loading';
 import styles from './page.module.css';
 
 export default function NotificacionesPage() {
@@ -32,28 +32,38 @@ export default function NotificacionesPage() {
     setIsLoading(false);
   }, []);
 
-  if (isLoading) return <NotificacionesSkeleton />;
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Notificaciones</h1>
-          {unreadCount > 0 && (
-            <span className={styles.unreadBadge}>
-              {unreadCount} sin leer
-            </span>
-          )}
-        </div>
-        {unreadCount > 0 && (
-          <button className={styles.markAllBtn} onClick={markAllRead}>
-            <CheckCheck size={16} />
-            Marcar todas como leídas
-          </button>
+        {isLoading ? (
+          <SkeletonBase width={200} height={28} />
+        ) : (
+          <>
+            <div>
+              <h1 className={styles.title}>Notificaciones</h1>
+              {unreadCount > 0 && (
+                <span className={styles.unreadBadge}>
+                  {unreadCount} sin leer
+                </span>
+              )}
+            </div>
+            {unreadCount > 0 && (
+              <button className={styles.markAllBtn} onClick={markAllRead}>
+                <CheckCheck size={16} />
+                Marcar todas como leídas
+              </button>
+            )}
+          </>
         )}
       </div>
 
-      {notifications.length === 0 ? (
+      {isLoading ? (
+        <div className={styles.list}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <NotificationCard key={i} loading />
+          ))}
+        </div>
+      ) : notifications.length === 0 ? (
         <div className={styles.empty}>
           <Bell size={48} />
           <h3 className={styles.emptyTitle}>Sin notificaciones</h3>

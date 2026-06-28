@@ -1,48 +1,72 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { Save } from 'lucide-react';
+import { Save, User, Lock, Bell, Globe, Phone, AtSign, CheckCircle, AlertTriangle, Code2, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
+import { useToastStore } from '@/src/shared/store/useToastStore';
 import { getMyProfile } from '@/src/shared/api/auth';
-import { updateUser } from '@/src/shared/api/users';
-import { ProfileSection } from '@/src/features/settings/components/ProfileSection';
-import { PasswordSection } from '@/src/features/settings/components/PasswordSection';
-import { NotificationPreferences } from '@/src/features/settings/components/NotificationPreferences';
-import { ConfiguracionSkeleton } from './loading';
+import { updateMyProfile, changePassword } from '@/src/shared/api/auth';
+import {
+  getNotificationPreferences,
+  saveNotificationPreferences,
+} from '@/src/shared/api/admin';
+import { SkeletonBase } from '@/src/shared/skeleton';
 import styles from './page.module.css';
+
+interface NotificationSettings {
+  courseUpdates: boolean;
+  newContent: boolean;
+  comments: boolean;
+  marketing: boolean;
+}
 
 export default function ConfiguracionPage() {
   const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
   const isDemoMode = useAuthStore((s) => s.isDemoMode);
 
+  // ─── Profile state ───
   const [profile, setProfile] = useState({
     name: user?.name ?? '',
     email: user?.email ?? '',
     bio: user?.bio ?? '',
+    userName: user?.userName ?? '',
+    phone: user?.phone ?? '',
+    websiteUrl: user?.websiteUrl ?? '',
+    githubUrl: user?.githubUrl ?? '',
+    linkedinUrl: user?.linkedinUrl ?? '',
   });
 
+  // ─── Password state ───
   const [password, setPassword] = useState({
     current: '',
     newPass: '',
     confirm: '',
   });
-
   const [showPasswords, setShowPasswords] = useState(false);
 
-  const [notifications, setNotifications] = useState({
+  // ─── Notifications state ───
+  const [notifications, setNotifications] = useState<NotificationSettings>({
     courseUpdates: true,
     newContent: true,
     comments: false,
     marketing: false,
   });
+  const [notifLoaded, setNotifLoaded] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(user?.emailVerified ?? false);
 
+  // ─── UI state ───
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [notifSaved, setNotifSaved] = useState(false);
 
-  // Cargar perfil completo desde la API
+  // Load profile + notification preferences
   useEffect(() => {
     const userId = user?.id;
     if (!userId || isDemoMode) {
@@ -52,32 +76,51 @@ export default function ConfiguracionPage() {
 
     let mounted = true;
 
-    async function loadProfile() {
+    async function loadData() {
       try {
-        const userData = await getMyProfile();
-        if (mounted) {
-          setProfile({
-            name: userData.name ?? '',
-            email: userData.email ?? '',
-            bio: userData.bio ?? '',
+        const [userData, notifPrefs] = await Promise.all([
+          getMyProfile(),
+          getNotificationPreferences().catch(() => null),
+        ]);
+
+        if (!mounted) return;
+
+        setProfile({
+          name: userData.name ?? '',
+          email: userData.email ?? '',
+          bio: userData.bio ?? '',
+          userName: userData.userName ?? '',
+          phone: userData.phone ?? '',
+          websiteUrl: userData.websiteUrl ?? '',
+          githubUrl: userData.githubUrl ?? '',
+          linkedinUrl: userData.linkedinUrl ?? '',
+        });
+        setEmailVerified(userData.emailVerified);
+
+        if (notifPrefs) {
+          setNotifications({
+            courseUpdates: notifPrefs.courseUpdates,
+            newContent: notifPrefs.newContent,
+            comments: notifPrefs.comments,
+            marketing: notifPrefs.marketing,
           });
+          setNotifLoaded(true);
         }
-      } catch (err) {
-        console.error('Error loading profile:', err);
-        // Si falla la API, nos quedamos con lo que tenemos del auth store
+      } catch {
+        useToastStore.getState().error('Error al cargar perfil');
       } finally {
         if (mounted) setIsLoading(false);
       }
     }
 
-    loadProfile();
-    return () => {
-      mounted = false;
-    };
+    loadData();
+    return () => { mounted = false; };
   }, [user?.id, isDemoMode]);
 
+  // ─── Handlers ───
+
   const handleProfileChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setProfile((prev) => ({ ...prev, [name]: value }));
@@ -88,23 +131,93 @@ export default function ConfiguracionPage() {
     setPassword((prev) => ({ ...prev, [name]: value }));
   };
 
+  const toggleNotification = (key: keyof NotificationSettings) => {
+    setNotifications((prev) => {
+      const updated = { ...prev, [key]: !prev[key] };
+      // Auto-save notification preference changes
+      if (!isDemoMode && user?.id) {
+        saveNotificationPreferences(updated).then((result) => {
+          setNotifSaved(true);
+          setTimeout(() => setNotifSaved(false), 2000);
+        }).catch(() => {
+          useToastStore.getState().error('Error al guardar preferencias');
+          // Revert on error
+          setNotifications(prev);
+        });
+      }
+      return updated;
+    });
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setPasswordError(null);
 
-    if (!user?.id) {
-      setError('Debes iniciar sesión para guardar cambios');
-      return;
-    }
+    if (!user?.id || isDemoMode) return;
 
     setIsSaving(true);
 
     try {
-      await updateUser(user.id, {
-        name: profile.name,
-        email: profile.email,
+      // Save profile
+      const updatedUser = await updateMyProfile({
+        name: profile.name || undefined,
         bio: profile.bio || null,
+        userName: profile.userName || null,
+        phone: profile.phone || null,
+        websiteUrl: profile.websiteUrl || null,
+        githubUrl: profile.githubUrl || null,
+        linkedinUrl: profile.linkedinUrl || null,
       });
+
+      // Update auth store with new profile data
+      setUser({
+        ...user,
+        name: updatedUser.name,
+        bio: updatedUser.bio,
+        userName: updatedUser.userName,
+        phone: updatedUser.phone,
+        websiteUrl: updatedUser.websiteUrl,
+        githubUrl: updatedUser.githubUrl,
+        linkedinUrl: updatedUser.linkedinUrl,
+      });
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 2000);
+
+      // Save password if fields are filled
+      if (password.current && password.newPass) {
+        if (password.newPass !== password.confirm) {
+          setPasswordError('Las contraseñas nuevas no coinciden');
+          setIsSaving(false);
+          return;
+        }
+        if (password.newPass.length < 8) {
+          setPasswordError('La contraseña debe tener al menos 8 caracteres');
+          setIsSaving(false);
+          return;
+        }
+        try {
+          await changePassword({
+            currentPassword: password.current,
+            newPassword: password.newPass,
+          });
+          setPasswordSaved(true);
+          setPassword({ current: '', newPass: '', confirm: '' });
+          setTimeout(() => setPasswordSaved(false), 2000);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Error al cambiar contraseña';
+          setPasswordError(msg);
+        }
+      }
+
+      // Save notification preferences if not auto-saved
+      if (notifLoaded) {
+        try {
+          await saveNotificationPreferences(notifications);
+        } catch {
+          useToastStore.getState().error('Error al guardar preferencias');
+        }
+      }
 
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -116,46 +229,267 @@ export default function ConfiguracionPage() {
     }
   };
 
-  const toggleNotification = (key: keyof typeof notifications) => {
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <SkeletonBase width={180} height={28} style={{ marginBottom: 28 }} />
 
-  if (isLoading) return <ConfiguracionSkeleton />;
+        {/* Perfil section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={80} height={16} />
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+            </div>
+            <div className={styles.field}>
+              <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.field}>
+              <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.field}>
+              <SkeletonBase width={80} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={80} />
+            </div>
+          </div>
+        </div>
+
+        {/* Redes section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={60} height={16} />
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <SkeletonBase width={80} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+              <div className={styles.field}>
+                <SkeletonBase width={60} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contraseña section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={100} height={16} />
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+              <SkeletonBase width="100%" height={40} />
+            </div>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+              <div className={styles.field}>
+                <SkeletonBase width={120} height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBase width="100%" height={40} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Notificaciones section */}
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <SkeletonBase width={18} height={18} />
+            <SkeletonBase width={120} height={16} />
+          </div>
+          <div className={styles.toggles}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={styles.toggleRow}>
+                <SkeletonBase width={180} height={16} />
+                <SkeletonBase width={44} height={24} borderRadius={5} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <SkeletonBase width={150} height={40} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Configuración</h1>
 
-      {error && (
-        <div className={styles.error}>
-          {error}
+      {error && <div className={styles.error}>{error}</div>}
+
+      {/* Email verification badge */}
+      {!emailVerified && !isDemoMode && (
+        <div className={styles.warning}>
+          <AlertTriangle size={16} />
+          <span>Tu correo electrónico no está verificado. Revisa tu bandeja de entrada.</span>
         </div>
       )}
 
       <form onSubmit={handleSave} className={styles.form}>
-        <ProfileSection profile={profile} onChange={handleProfileChange} />
-        <PasswordSection
-          password={password}
-          showPasswords={showPasswords}
-          onToggleShow={() => setShowPasswords(!showPasswords)}
-          onChange={handlePasswordChange}
-        />
-        <NotificationPreferences
-          notifications={notifications}
-          onToggle={toggleNotification}
-        />
+        {/* ─── Profile Section ─── */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <User size={18} />
+            <h2 className={styles.sectionTitle}>Perfil</h2>
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="name">Nombre</label>
+                <input id="name" name="name" type="text" className={styles.input} value={profile.name} onChange={handleProfileChange} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="userName">
+                  <AtSign size={12} /> Usuario
+                </label>
+                <input id="userName" name="userName" type="text" className={styles.input} value={profile.userName} onChange={handleProfileChange} placeholder="@usuario" />
+              </div>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="email">Correo electrónico</label>
+              <div className={styles.inputWithBadge}>
+                <input id="email" name="email" type="email" className={styles.input} value={profile.email} disabled />
+                {emailVerified && (
+                  <span className={styles.verifiedBadge}>
+                    <CheckCircle size={14} /> Verificado
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="phone"><Phone size={12} /> Teléfono</label>
+              <input id="phone" name="phone" type="tel" className={styles.input} value={profile.phone} onChange={handleProfileChange} placeholder="+1 234 567 890" />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="bio">Biografía</label>
+              <textarea id="bio" name="bio" className={styles.textarea} rows={3} value={profile.bio} onChange={handleProfileChange} placeholder="Cuéntanos sobre ti..." />
+            </div>
+          </div>
+        </section>
 
-        <button
-          type="submit"
-          className={styles.saveBtn}
-          disabled={isSaving}
-        >
+        {/* ─── Social Links Section ─── */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <Globe size={18} />
+            <h2 className={styles.sectionTitle}>Redes</h2>
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="websiteUrl"><Globe size={12} /> Sitio web</label>
+              <input id="websiteUrl" name="websiteUrl" type="url" className={styles.input} value={profile.websiteUrl} onChange={handleProfileChange} placeholder="https://tusitio.com" />
+            </div>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="githubUrl"><Code2 size={12} /> GitHub</label>
+                <input id="githubUrl" name="githubUrl" type="url" className={styles.input} value={profile.githubUrl} onChange={handleProfileChange} placeholder="https://github.com/usuario" />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="linkedinUrl"><ExternalLink size={12} /> LinkedIn</label>
+                <input id="linkedinUrl" name="linkedinUrl" type="url" className={styles.input} value={profile.linkedinUrl} onChange={handleProfileChange} placeholder="https://linkedin.com/in/usuario" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Password Section ─── */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <Lock size={18} />
+            <h2 className={styles.sectionTitle}>Contraseña</h2>
+          </div>
+          {passwordError && <div className={styles.error}>{passwordError}</div>}
+          {passwordSaved && <div className={styles.success}>Contraseña actualizada correctamente ✓</div>}
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="current">Contraseña actual</label>
+              <div className={styles.inputWrap}>
+                <input
+                  id="current" name="current"
+                  type={showPasswords ? 'text' : 'password'}
+                  className={styles.input}
+                  value={password.current}
+                  onChange={handlePasswordChange}
+                />
+                <button type="button" className={styles.eyeBtn} onClick={() => setShowPasswords(!showPasswords)} aria-label={showPasswords ? 'Ocultar' : 'Mostrar'}>
+                  {showPasswords ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+            <div className={styles.fieldRow}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="newPass">Nueva contraseña</label>
+                <input id="newPass" name="newPass" type={showPasswords ? 'text' : 'password'} className={styles.input} value={password.newPass} onChange={handlePasswordChange} />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="confirm">Confirmar contraseña</label>
+                <input id="confirm" name="confirm" type={showPasswords ? 'text' : 'password'} className={styles.input} value={password.confirm} onChange={handlePasswordChange} />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ─── Notification Preferences ─── */}
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <Bell size={18} />
+            <h2 className={styles.sectionTitle}>Notificaciones</h2>
+            {notifSaved && <span className={styles.savedHint}>Guardado</span>}
+          </div>
+          <div className={styles.toggles}>
+            {([
+              { key: 'courseUpdates' as const, label: 'Actualizaciones de cursos' },
+              { key: 'newContent' as const, label: 'Nuevo contenido disponible' },
+              { key: 'comments' as const, label: 'Comentarios y respuestas' },
+              { key: 'marketing' as const, label: 'Ofertas y marketing' },
+            ]).map(({ key, label }) => (
+              <label key={key} className={styles.toggleRow}>
+                <span className={styles.toggleLabel}>{label}</span>
+                <div className={styles.toggleTrack}>
+                  <input
+                    type="checkbox"
+                    checked={notifications[key]}
+                    onChange={() => toggleNotification(key)}
+                    className={styles.toggleInput}
+                  />
+                  <div className={`${styles.toggleSlider} ${notifications[key] ? styles.toggleOn : ''}`} />
+                </div>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Save Button ─── */}
+        <button type="submit" className={styles.saveBtn} disabled={isSaving || isDemoMode}>
           {isSaving ? (
             <Spinner size="sm" className={styles.spinner} />
           ) : (
             <Save size={16} />
           )}
-          {isSaving ? 'Guardando...' : saved ? 'Guardado ✓' : 'Guardar cambios'}
+          {isSaving ? 'Guardando...' : profileSaved ? 'Perfil guardado ✓' : passwordSaved ? 'Contraseña actualizada ✓' : saved ? 'Guardado ✓' : 'Guardar cambios'}
         </button>
       </form>
     </div>

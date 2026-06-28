@@ -5,7 +5,7 @@ import { Star, Trash2, Pencil, X, Check } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
-import * as reviewsApi from '@/src/shared/api/reviews';
+import * as reviewsApi from '@/src/shared/api/student';
 import type { Review } from '@/src/shared/types';
 import styles from './ReviewSection.module.css';
 

@@ -6,7 +6,7 @@ import { Spinner } from '@/src/shared/components/Spinner';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { forgotPasswordSchema } from '@/src/shared/validations';
-import { useAuthForm } from '@/src/shared/hooks/useAuthForm';
+import { useAsyncAction } from '@/src/shared/hooks/useAsyncAction';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -14,7 +14,7 @@ export default function OlvidoContrasenaPage() {
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState<{ message: string } | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const { isLoading, error, execute, clearError } = useAuthForm();
+  const { isLoading, error, execute, clearError } = useAsyncAction();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

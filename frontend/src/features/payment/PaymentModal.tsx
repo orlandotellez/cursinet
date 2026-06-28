@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { CheckCircle2, AlertCircle, X, Shield } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
-import { createPayment, confirmPayment } from '@/src/shared/api/payments';
+import { createPayment, confirmPayment } from '@/src/shared/api/billing';
 import styles from './PaymentModal.module.css';
 
 interface PaymentModalProps {

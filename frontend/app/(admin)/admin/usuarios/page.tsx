@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { Search, Edit, Trash2, Plus, RotateCw, Ghost, AlertCircle } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
 import { useUserCrud, type RoleFilter } from '@/src/features/admin/hooks/useUserCrud';
-import { createUser, updateUser, type CreateUserPayload, type UpdateUserPayload } from '@/src/shared/api/users';
+import { createUser, updateUser, type CreateUserPayload, type UpdateUserPayload } from '@/src/shared/api/auth';
 import { ConfirmDialog } from '@/src/shared/components/ConfirmDialog';
 import UserDetailModal from './UserDetailModal';
 import UserFormModal from './UserFormModal';
 import styles from './page.module.css';
-import type { UserDTO } from '@/src/shared/api/users';
+import type { UserDTO } from '@/src/shared/api/auth';
 
 const roleTabs: { key: RoleFilter; label: string }[] = [
   { key: 'all', label: 'Todos' },

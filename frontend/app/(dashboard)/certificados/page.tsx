@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Award } from 'lucide-react';
-import { getMyCertificates } from '@/src/shared/api/certificates';
+import { SkeletonBase } from '@/src/shared/skeleton';
+import { getMyCertificates } from '@/src/shared/api/student';
 import { CertificateCard } from '@/src/features/courses/certificates/CertificateCard';
 import type { Certificate } from '@/src/shared/types';
-import { CertificadosSkeleton } from './loading';
 import styles from './page.module.css';
 
 export default function CertificadosPage() {
@@ -19,18 +19,31 @@ export default function CertificadosPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <CertificadosSkeleton />;
-
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Certificados</h1>
-        <span className={styles.count}>
-          {certificates.length} certificado{certificates.length !== 1 ? 's' : ''}
-        </span>
+        {loading ? (
+          <>
+            <SkeletonBase width={140} height={28} />
+            <SkeletonBase width={100} height={16} />
+          </>
+        ) : (
+          <>
+            <h1 className={styles.title}>Certificados</h1>
+            <span className={styles.count}>
+              {certificates.length} certificado{certificates.length !== 1 ? 's' : ''}
+            </span>
+          </>
+        )}
       </div>
 
-      {certificates.length === 0 ? (
+      {loading ? (
+        <div className={styles.list}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CertificateCard key={i} loading />
+          ))}
+        </div>
+      ) : certificates.length === 0 ? (
         <div className={styles.empty}>
           <Award size={48} className={styles.emptyIcon} />
           <h3 className={styles.emptyTitle}>Sin certificados aún</h3>

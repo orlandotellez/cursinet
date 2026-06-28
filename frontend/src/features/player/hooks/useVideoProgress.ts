@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import type { CurriculumLesson } from '@/src/shared/api/curriculum';
-import { upsertProgress } from '@/src/shared/api/lessons';
+import type { CurriculumLesson } from '@/src/shared/api/courses';
+import { upsertProgress } from '@/src/shared/api/courses';
 
 const VIDEO_PROGRESS_INTERVAL_MS = 30_000;
 const VIDEO_PROGRESS_INCREMENT_S = 30;

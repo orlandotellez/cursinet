@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
-import type { UserDTO, CreateUserPayload, UpdateUserPayload } from '@/src/shared/api/users';
+import type { UserDTO, UserRoleDTO, CreateUserPayload, UpdateUserPayload } from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
 interface Props {
@@ -40,13 +40,14 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
   const [name, setName] = useState(user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState(user?.role ?? 'Student');
+  const [role, setRole] = useState<UserRoleDTO>(user?.role ?? 'Student');
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [bio, setBio] = useState(user?.bio ?? '');
   const [userName, setUserName] = useState(user?.userName ?? '');
   const [websiteUrl, setWebsiteUrl] = useState(user?.websiteUrl ?? '');
   const [githubUrl, setGithubUrl] = useState(user?.githubUrl ?? '');
   const [linkedinUrl, setLinkedinUrl] = useState(user?.linkedinUrl ?? '');
+  const [isActive, setIsActive] = useState(user?.isActive ?? true);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +70,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
           websiteUrl: websiteUrl || null,
           githubUrl: githubUrl || null,
           linkedinUrl: linkedinUrl || null,
+          isActive,
         };
         await onSave(payload);
       } else {
@@ -119,7 +121,7 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
 
             <div className={styles.formField}>
               <label htmlFor="role">Rol</label>
-              <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
+              <select id="role" value={role} onChange={(e) => setRole(e.target.value as UserRoleDTO)}>
                 {roles.map((r) => (
                   <option key={r.value} value={r.value}>{r.label}</option>
                 ))}
@@ -155,6 +157,23 @@ export default function UserFormModal({ user, onClose, onSave }: Props) {
               <label htmlFor="linkedin">LinkedIn</label>
               <input id="linkedin" value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/..." />
             </div>
+
+            {isEdit && (
+              <div className={styles.formFieldFull}>
+                <label className={styles.toggleLabel}>
+                  <input
+                    type="checkbox"
+                    checked={isActive}
+                    onChange={(e) => setIsActive(e.target.checked)}
+                    style={{ marginRight: 8 }}
+                  />
+                  Usuario activo
+                </label>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                  {isActive ? 'El usuario puede acceder a la plataforma' : 'El usuario no podrá iniciar sesión'}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className={styles.formActions}>
