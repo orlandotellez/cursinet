@@ -47,7 +47,10 @@ public class ModuleController : ControllerBase
     public async Task<ActionResult<CurriculumResponse>> GetCurriculum(Guid courseId)
     {
         var userId = HttpContext.GetCurrentUserId();
-        var role = HttpContext.GetCurrentUserRole();
+        // Curriculum is a public read endpoint; use the non-throwing helper so an
+        // anonymous caller (no Role claim) flows through with role=null and the
+        // service can decide what to expose.
+        var role = HttpContext.GetCurrentUserRoleOrDefault();
 
         var curriculum = await _moduleService.GetCurriculumAsync(courseId, userId, role);
         return Ok(curriculum);

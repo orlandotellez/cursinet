@@ -26,7 +26,7 @@ public class TokenHelper
     public ClaimsPrincipal? ValidateRefreshToken(string token)
         => _tokenService.ValidateRefreshToken(token);
 
-    public string GetRefreshToken(string? bodyRefreshToken = null)
+    public virtual string GetRefreshToken(string? bodyRefreshToken = null)
     {
         var context = _httpContextAccessor.HttpContext;
         if (context == null) return string.Empty;
