@@ -1,9 +1,8 @@
 import type { CourseCardData, Category, Stat } from '@/src/shared/types';
-import type { CourseDTO } from './courses';
-import type { CategoryDTO } from './categories';
+import type { CourseDTO, CategoryDTO } from '../types';
 import { API_URL } from '@/src/shared/lib/constants';
-import { handleJsonResponse } from './helpers';
-import { coursesToCards, categoryToMock } from './mappers';
+import { handleJsonResponse } from '@/src/shared/api/lib/helpers';
+import { coursesToCards, categoryToMock } from '@/src/shared/api/lib/mappers';
 
 async function fetchPublicJson<T>(endpoint: string): Promise<T | null> {
   try {
@@ -37,7 +36,6 @@ export async function getPublicCategories(): Promise<Category[]> {
   ]);
   if (!categoriesData) return [];
 
-  // Count published courses per category
   const counts = new Map<string, number>();
   if (coursesData) {
     for (const course of coursesData) {

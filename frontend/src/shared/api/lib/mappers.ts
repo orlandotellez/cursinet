@@ -1,8 +1,6 @@
 import type { CourseCardData, Category as MockCategory } from '@/src/shared/types';
-import type { CourseDTO } from './courses';
-import type { CategoryDTO } from './categories';
+import type { CourseDTO, CategoryDTO } from '../types';
 
-/** Map a CourseDTO from the API to the CourseCardData type the UI components expect */
 export function courseToCard(dto: CourseDTO): CourseCardData {
   return {
     id: dto.id,
@@ -19,7 +17,7 @@ export function courseToCard(dto: CourseDTO): CourseCardData {
     },
     level: mapLevel(dto.level),
     duration: dto.durationMinutes,
-    lessonsCount: 0, // Will be populated when curriculum is fetched
+    lessonsCount: dto.lessonsCount,
     price: dto.price,
     rating: dto.averageRating,
     reviewsCount: dto.reviewsCount,
@@ -29,7 +27,6 @@ export function courseToCard(dto: CourseDTO): CourseCardData {
   };
 }
 
-/** Map CategoryDTO to the mock Category type */
 export function categoryToMock(dto: CategoryDTO, coursesCount = 0): MockCategory {
   return {
     id: dto.id,
@@ -40,7 +37,6 @@ export function categoryToMock(dto: CategoryDTO, coursesCount = 0): MockCategory
   };
 }
 
-/** Normalize level strings from backend (PascalCase) to frontend (lowercase) */
 function mapLevel(level: string): 'beginner' | 'intermediate' | 'advanced' {
   const lower = level.toLowerCase();
   if (lower === 'beginner' || lower === 'principiante') return 'beginner';
@@ -50,12 +46,10 @@ function mapLevel(level: string): 'beginner' | 'intermediate' | 'advanced' {
   return 'beginner';
 }
 
-/** Map CourseDTO array to CourseCardData array */
 export function coursesToCards(dtos: CourseDTO[]): CourseCardData[] {
   return dtos.map(courseToCard);
 }
 
-/** Map CategoryDTO array to mock Category array */
 export function categoriesToMock(dtos: CategoryDTO[]): MockCategory[] {
   return dtos.filter((d) => d.isActive).map(categoryToMock);
 }

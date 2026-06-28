@@ -1,6 +1,7 @@
-import { refresh as refreshTokens } from '../api/auth';
 import { useAuthStore } from '../store/useAuthStore';
 import { clearAllStorage } from './authUtils';
+import { API_URL } from './constants';
+import { handleJsonResponse } from '../api/lib/helpers';
 
 let refreshInFlight: Promise<void> | null = null;
 
@@ -34,9 +35,17 @@ function handleRefreshFailure(): never {
   throw new Error('Session expired');
 }
 
+export async function refresh(): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/refresh`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return handleJsonResponse<void>(res);
+}
+
 async function performRefresh(): Promise<void> {
   if (!refreshInFlight) {
-    refreshInFlight = refreshTokens()
+    refreshInFlight = refresh()
       .catch(() => {
         handleRefreshFailure();
       })
