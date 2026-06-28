@@ -72,7 +72,7 @@ public class ErrorHandlingMiddleware
                 type = "https://tools.ietf.org/html/rfc7807",
                 title = "Internal Server Error",
                 status = 500,
-                detail = exception.Message,
+                detail = "An unexpected error occurred. Please try again later.",
                 code = "internal.error"
             };
         }

@@ -13,6 +13,8 @@ public class TokenService : ITokenService
 {
     private readonly string _secret;
     private readonly string _refreshSecret;
+    private readonly string _issuer;
+    private readonly string _audience;
     private readonly TimeSpan _accessTokenExpiry;
     private readonly TimeSpan _refreshTokenExpiry;
 
@@ -22,6 +24,8 @@ public class TokenService : ITokenService
             ?? throw new InvalidOperationException("JWT Secret is not configured");
         _refreshSecret = configuration["Jwt:RefreshSecret"] 
             ?? throw new InvalidOperationException("JWT RefreshSecret is not configured");
+        _issuer = configuration["Jwt:Issuer"] ?? "cursinet-api";
+        _audience = configuration["Jwt:Audience"] ?? "cursinet-app";
         _accessTokenExpiry = TimeSpan.Parse(
             configuration["Jwt:AccessTokenExpiry"] ?? "00:15:00");
         _refreshTokenExpiry = TimeSpan.Parse(
@@ -65,6 +69,8 @@ public class TokenService : ITokenService
         claims.AddRange(permissions.Select(p => new Claim("permission", p)));
 
         var token = new JwtSecurityToken(
+            issuer: _issuer,
+            audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(_accessTokenExpiry),
             signingCredentials: credentials
@@ -85,6 +91,8 @@ public class TokenService : ITokenService
         };
 
         var token = new JwtSecurityToken(
+            issuer: _issuer,
+            audience: _audience,
             claims: claims,
             expires: DateTime.UtcNow.Add(_refreshTokenExpiry),
             signingCredentials: credentials
@@ -93,7 +101,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static ClaimsPrincipal? ValidateToken(string token, string secret)
+    private ClaimsPrincipal? ValidateToken(string token, string secret)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
@@ -105,8 +113,10 @@ public class TokenService : ITokenService
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = key,
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidIssuer = _issuer,
+                ValidAudience = _audience,
+                ValidateIssuer = true,
+                ValidateAudience = true,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
             }, out _);
