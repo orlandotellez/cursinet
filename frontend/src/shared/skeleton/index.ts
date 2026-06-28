@@ -17,4 +17,4 @@ export { SkeletonTableSkeleton } from './blocks/TableSkeleton';
 export { SkeletonContinueCard, SkeletonCertCard } from './blocks/Cards';
 
 // ── Layouts ──
-export { DashboardSkeleton } from './layouts/DashboardSkeleton';
+// (none currently) -- all pages use their own CSS module + SkeletonBase

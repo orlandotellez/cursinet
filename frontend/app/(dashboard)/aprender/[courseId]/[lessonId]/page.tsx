@@ -17,6 +17,14 @@ import { NotesTab } from '@/src/features/player/components/NotesTab';
 import type { Lesson } from '@/src/shared/types';
 import styles from './page.module.css';
 
+export default function LessonViewerPage() {
+  return (
+    <Suspense fallback={<LessonSkeleton />}>
+      <LessonViewerContent />
+    </Suspense>
+  );
+}
+
 function LessonSkeleton() {
   return (
     <div className={styles.pageSkeleton}>
@@ -48,14 +56,6 @@ function LessonSkeleton() {
         ))}
       </div>
     </div>
-  );
-}
-
-export default function LessonViewerPage() {
-  return (
-    <Suspense fallback={<LessonSkeleton />}>
-      <LessonViewerContent />
-    </Suspense>
   );
 }
 
