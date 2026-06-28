@@ -1,5 +1,5 @@
 .hero {
-  padding: 120px 24px 80px;
+  padding: 150px 24px 80px;
   overflow: hidden;
   background-color: var(--bg-base);
   background-image:
@@ -93,5 +93,3 @@
 .heroBtnPrimary:hover {
   background: var(--accent-hover);
 }
-
-
