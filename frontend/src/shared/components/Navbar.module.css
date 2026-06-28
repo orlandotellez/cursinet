@@ -90,6 +90,18 @@
   gap: 12px;
 }
 
+.githubLink {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+  margin-left: 10px;
+}
+
+.githubLink:hover {
+  color: var(--text-primary);
+}
+
 .loginBtn {
   font-size: 14px;
   font-weight: 500;
@@ -179,7 +191,7 @@
   flex-direction: column;
   gap: 24px;
   animation: fadeIn 200ms ease;
-  height: 300px;
+  height: 400px;
   z-index: 99;
   background: color-mix(in srgb, var(--bg-base) 100%, transparent);
 }
@@ -253,6 +265,25 @@
   background: var(--accent);
   border-radius: var(--radius-input);
   text-decoration: none;
+}
+
+.mobileGithubLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  text-decoration: none;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.mobileGithubLink:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
 }
 
 .mobileDashboardBtn {
