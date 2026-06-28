@@ -21,30 +21,8 @@ public class CourseService : ICourseService
 
     public async Task<List<CourseResponse>> GetAllAsync(CourseFilter? filter = null)
     {
-        var includeDeleted = filter?.IncludeDeleted == true;
-        var courses = includeDeleted
-            ? await _courseRepository.GetAllIncludingDeletedAsync()
-            : await _courseRepository.GetAllAsync();
-
-        if (filter != null)
-        {
-            if (filter.CategoryId.HasValue)
-                courses = courses.Where(c => c.CategoryId == filter.CategoryId.Value).ToList();
-            if (filter.Level.HasValue)
-                courses = courses.Where(c => c.Level == filter.Level.Value).ToList();
-            if (filter.IsPublished.HasValue)
-                courses = courses.Where(c => c.IsPublished == filter.IsPublished.Value).ToList();
-            if (filter.IsFeatured.HasValue)
-                courses = courses.Where(c => c.IsFeatured == filter.IsFeatured.Value).ToList();
-            if (filter.InstructorId.HasValue)
-                courses = courses.Where(c => c.InstructorId == filter.InstructorId.Value).ToList();
-            if (!string.IsNullOrWhiteSpace(filter.Search))
-                courses = courses.Where(c =>
-                    c.Title.Contains(filter.Search, StringComparison.OrdinalIgnoreCase) ||
-                    (c.ShortDescription != null && c.ShortDescription.Contains(filter.Search, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
-        }
-
+        filter ??= new CourseFilter();
+        var courses = await _courseRepository.GetFilteredAsync(filter);
         return courses.Select(c => c.MapToDto()).ToList();
     }
 

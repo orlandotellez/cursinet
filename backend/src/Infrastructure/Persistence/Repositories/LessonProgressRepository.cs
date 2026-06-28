@@ -28,6 +28,15 @@ public class LessonProgressRepository : ILessonProgressRepository
             .ToListAsync();
     }
 
+    public async Task<Dictionary<Guid, int>> GetCompletedCountByCourseIdsAsync(Guid userId, List<Guid> courseIds)
+    {
+        return await _context.LessonProgress
+            .Where(lp => lp.UserId == userId && lp.IsCompleted && lp.Lesson != null && courseIds.Contains(lp.Lesson.CourseId))
+            .GroupBy(lp => lp.Lesson.CourseId)
+            .Select(g => new { CourseId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.CourseId, x => x.Count);
+    }
+
     public async Task<LessonProgress> UpsertAsync(LessonProgress progress)
     {
         var existing = await _context.LessonProgress

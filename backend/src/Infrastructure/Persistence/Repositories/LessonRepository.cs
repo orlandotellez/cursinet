@@ -49,6 +49,15 @@ public class LessonRepository : ILessonRepository
         return await _context.Lessons.AnyAsync(l => l.Slug == slug && l.DeletedAt == null);
     }
 
+    public async Task<Dictionary<Guid, int>> GetPublishedCountByCourseIdsAsync(List<Guid> courseIds)
+    {
+        return await _context.Lessons
+            .Where(l => courseIds.Contains(l.CourseId) && l.IsPublished && l.DeletedAt == null)
+            .GroupBy(l => l.CourseId)
+            .Select(g => new { CourseId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.CourseId, x => x.Count);
+    }
+
     public async Task<Lesson> CreateAsync(Lesson lesson)
     {
         await _context.Lessons.AddAsync(lesson);

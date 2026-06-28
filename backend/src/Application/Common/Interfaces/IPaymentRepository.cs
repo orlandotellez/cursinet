@@ -8,6 +8,7 @@ public interface IPaymentRepository
     Task<List<Payment>> GetByUserAsync(Guid userId);
     Task<Payment?> GetByStripePaymentIntentAsync(string stripePaymentIntentId);
     Task<List<Payment>> GetAllCompletedAsync();
+    Task<List<Payment>> GetCompletedSinceAsync(DateTime since);
     Task<Payment> CreateAsync(Payment payment);
     Task<Payment> UpdateAsync(Payment payment);
 }

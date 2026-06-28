@@ -40,6 +40,14 @@ public class PaymentRepository : IPaymentRepository
             .ToListAsync();
     }
 
+    public async Task<List<Payment>> GetCompletedSinceAsync(DateTime since)
+    {
+        return await _context.Payments
+            .Where(p => p.Status == PaymentStatus.Completed && p.PaidAt >= since)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<Payment?> GetByStripePaymentIntentAsync(string stripePaymentIntentId)
     {
         return await _context.Payments

@@ -30,11 +30,6 @@ public class AnalyticsService : IAnalyticsService
 
     public async Task<DashboardResponse> GetDashboardAsync(string? range = "30d")
     {
-        var users = await _userRepository.GetAllAsync();
-        var courses = await _courseRepository.GetAllIncludingDeletedAsync();
-        var enrollments = await _enrollmentRepository.GetAllAsync();
-        var payments = await _paymentRepository.GetAllCompletedAsync();
-
         var now = DateTime.UtcNow;
         var rangeDays = range switch
         {
@@ -44,6 +39,11 @@ public class AnalyticsService : IAnalyticsService
             "1a" => 365,
             _ => 30,
         };
+
+        var users = await _userRepository.GetAllAsync(new UserFilter());
+        var courses = await _courseRepository.GetAllIncludingDeletedAsync();
+        var enrollments = await _enrollmentRepository.GetSinceAsync(now.AddDays(-rangeDays * 2));
+        var payments = await _paymentRepository.GetCompletedSinceAsync(now.AddDays(-Math.Max(rangeDays * 2, 60)));
 
         var totalUsers = users.Count;
         var usersPreviousPeriod = users.Count(u => u.CreatedAt < now.AddDays(-rangeDays));
@@ -99,12 +99,21 @@ public class AnalyticsService : IAnalyticsService
 
     public async Task<AnalyticsResponse> GetAnalyticsAsync(string? range = "1a")
     {
-        var users = await _userRepository.GetAllAsync(true);
-        var courses = await _courseRepository.GetAllIncludingDeletedAsync();
-        var payments = await _paymentRepository.GetAllCompletedAsync();
-        var categories = await _categoryRepository.GetAllAsync();
-
         var now = DateTime.UtcNow;
+
+        var rangeDays = range switch
+        {
+            "7d" => 7,
+            "30d" => 30,
+            "12s" => 84,
+            "1a" => 365,
+            _ => 365,
+        };
+
+        var users = await _userRepository.GetAllAsync(new UserFilter { IncludeDeleted = true });
+        var courses = await _courseRepository.GetAllIncludingDeletedAsync();
+        var payments = await _paymentRepository.GetCompletedSinceAsync(now.AddDays(-Math.Max(60, rangeDays)));
+        var categories = await _categoryRepository.GetAllAsync();
 
         var mrr = payments
             .Where(p => p.PaidAt >= now.AddDays(-30))
@@ -117,14 +126,6 @@ public class AnalyticsService : IAnalyticsService
             ? Math.Round((mrr - previousMonth) / previousMonth * 100, 1)
             : 0;
 
-        var rangeDays = range switch
-        {
-            "7d" => 7,
-            "30d" => 30,
-            "12s" => 84,
-            "1a" => 365,
-            _ => 365,
-        };
         var (revenuePoints, _) = GetChartData(payments, [], rangeDays);
 
         var usersByRole = new UsersByRoleDto

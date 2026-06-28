@@ -1,4 +1,5 @@
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,12 +14,26 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
-    public async Task<List<User>> GetAllAsync(bool includeDeleted = false)
+    public async Task<List<User>> GetAllAsync(UserFilter filter)
     {
-        var query = _context.Users.AsQueryable();
+        IQueryable<User> query = _context.Users.AsQueryable();
 
-        if (!includeDeleted)
+        if (filter.IncludeDeleted != true)
             query = query.Where(u => u.DeletedAt == null);
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            var search = filter.Search;
+            query = query.Where(u =>
+                EF.Functions.ILike(u.Name, $"%{search}%") ||
+                EF.Functions.ILike(u.Email, $"%{search}%"));
+        }
+
+        if (filter.Role.HasValue)
+            query = query.Where(u => u.Role == filter.Role.Value);
+
+        if (filter.IsActive.HasValue)
+            query = query.Where(u => u.IsActive == filter.IsActive.Value);
 
         return await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
     }
