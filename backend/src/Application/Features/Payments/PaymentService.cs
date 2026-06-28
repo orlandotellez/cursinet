@@ -1,3 +1,4 @@
+using Cursinet.Application.Common.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
@@ -28,19 +29,19 @@ public class PaymentService : IPaymentService
         // 1. Validate course exists and is published
         var course = await _courseRepository.GetByIdAsync(request.CourseId);
         if (course == null)
-            throw new AppException("Course not found", 404, "course.not-found");
+            throw AppExceptions.NotFound("Course not found");
 
         if (!course.IsPublished)
-            throw new AppException("Course is not published", 400, "enrollment.not-published");
+            throw AppExceptions.BadRequest("Course is not published");
 
         // 2. Free courses don't need payment
         if (course.IsFree)
-            throw new AppException("Course is free — enroll directly", 400, "payment.free-course");
+            throw AppExceptions.BadRequest("Course is free — enroll directly");
 
         // 3. Check for duplicate enrollment
         var existing = await _enrollmentRepository.GetByCourseAndUserAsync(request.CourseId, userId);
         if (existing != null)
-            throw new AppException("Already enrolled in this course", 409, "enrollment.duplicate");
+            throw AppExceptions.Conflict("Already enrolled in this course");
 
         // 4. Check for existing pending payment for this course+user
         //    (In production, we'd also check Stripe for incomplete PaymentIntents)
@@ -77,16 +78,15 @@ public class PaymentService : IPaymentService
         // 1. Get payment
         var payment = await _paymentRepository.GetByIdAsync(request.PaymentId);
         if (payment == null)
-            throw new AppException("Payment not found", 404, "payment.not-found");
+            throw AppExceptions.NotFound("Payment not found");
 
-        if (payment.UserId != userId)
-            throw new AppException("Payment does not belong to this user", 403, "payment.forbidden");
+        Guard.AgainstNotOwner(payment.UserId, userId, UserRole.Admin, "payment");
 
         if (payment.Status != PaymentStatus.Pending)
-            throw new AppException("Payment is not pending", 400, "payment.not-pending");
+            throw AppExceptions.BadRequest("Payment is not pending");
 
         if (payment.CourseId == null)
-            throw new AppException("Payment has no associated course", 400, "payment.no-course");
+            throw AppExceptions.BadRequest("Payment has no associated course");
 
         // 2. Mark payment as completed (dev mode — instant confirm)
         //    In production, we'd verify Stripe PaymentIntent status here
@@ -123,8 +123,10 @@ public class PaymentService : IPaymentService
     public async Task<PaymentResponse?> GetPaymentAsync(Guid userId, Guid paymentId)
     {
         var payment = await _paymentRepository.GetByIdAsync(paymentId);
-        if (payment == null || payment.UserId != userId)
+        if (payment == null)
             return null;
+
+        Guard.AgainstNotOwner(payment.UserId, userId, UserRole.Admin, "payment");
 
         return payment.MapToDto();
     }

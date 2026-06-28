@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using Cursinet.Application.Common.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
@@ -68,15 +68,7 @@ public class CourseService : ICourseService
 
     public async Task<CourseResponse> CreateAsync(CreateCourseRequest request, Guid userId)
     {
-
-        var slug = GenerateSlug(request.Title);
-        var baseSlug = slug;
-        var counter = 1;
-        while (await _courseRepository.SlugExistsAsync(slug))
-        {
-            slug = $"{baseSlug}-{counter}";
-            counter++;
-        }
+        var slug = await SlugHelper.GenerateUniqueSlugAsync(request.Title, s => _courseRepository.SlugExistsAsync(s));
 
         var course = new Course
         {
@@ -111,24 +103,16 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, currentUserRole, "course");
 
         if (request.Title != null)
         {
             course.Title = request.Title;
 
-            var newSlug = GenerateSlug(request.Title);
+            var newSlug = SlugHelper.GenerateSlug(request.Title);
             if (newSlug != course.Slug)
             {
-                var baseSlug = newSlug;
-                var counter = 1;
-                while (await _courseRepository.SlugExistsAsync(newSlug))
-                {
-                    newSlug = $"{baseSlug}-{counter}";
-                    counter++;
-                }
-                course.Slug = newSlug;
+                course.Slug = await SlugHelper.GenerateUniqueSlugAsync(request.Title, s => _courseRepository.SlugExistsAsync(s));
             }
         }
 
@@ -158,8 +142,7 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, currentUserRole, "course");
 
         await _courseRepository.SoftDeleteAsync(course, userId);
     }
@@ -170,8 +153,7 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, currentUserRole, "course");
 
         if (course.IsPublished)
             throw AppExceptions.Conflict("Course is already published");
@@ -190,8 +172,7 @@ public class CourseService : ICourseService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && currentUserRole != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, currentUserRole, "course");
 
         if (!course.IsPublished)
             throw AppExceptions.Conflict("Course is not published");
@@ -202,21 +183,5 @@ public class CourseService : ICourseService
 
         var updated = await _courseRepository.UpdateAsync(course);
         return updated.MapToDto();
-    }
-
-    private static string GenerateSlug(string title)
-    {
-        var slug = title.ToLowerInvariant()
-            .Replace("ñ", "n")
-            .Replace("á", "a").Replace("é", "e")
-            .Replace("í", "i").Replace("ó", "o")
-            .Replace("ú", "u").Replace("ü", "u");
-
-        slug = Regex.Replace(slug, @"[^a-z0-9\-\s]", "");
-        slug = Regex.Replace(slug, @"\s+", "-");
-        slug = Regex.Replace(slug, @"-{2,}", "-");
-        slug = slug.Trim('-');
-
-        return slug;
     }
 }

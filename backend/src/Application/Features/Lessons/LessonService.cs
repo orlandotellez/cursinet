@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using Cursinet.Application.Common.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Mapping;
 using Cursinet.Application.Common.Models;
@@ -72,17 +72,9 @@ public class LessonService : ILessonService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
-        var slug = GenerateSlug(request.Title);
-        var baseSlug = slug;
-        var counter = 1;
-        while (await _lessonRepository.SlugExistsAsync(slug))
-        {
-            slug = $"{baseSlug}-{counter}";
-            counter++;
-        }
+        var slug = await SlugHelper.GenerateUniqueSlugAsync(request.Title, s => _lessonRepository.SlugExistsAsync(s));
 
         var existingLessons = await _lessonRepository.GetByModuleAsync(moduleId);
         var maxSortOrder = existingLessons.Any() ? existingLessons.Max(l => l.SortOrder) : 0;
@@ -123,24 +115,16 @@ public class LessonService : ILessonService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         if (request.Title != null)
         {
             lesson.Title = request.Title;
 
-            var newSlug = GenerateSlug(request.Title);
+            var newSlug = SlugHelper.GenerateSlug(request.Title);
             if (newSlug != lesson.Slug)
             {
-                var baseSlug = newSlug;
-                var counter = 1;
-                while (await _lessonRepository.SlugExistsAsync(newSlug))
-                {
-                    newSlug = $"{baseSlug}-{counter}";
-                    counter++;
-                }
-                lesson.Slug = newSlug;
+                lesson.Slug = await SlugHelper.GenerateUniqueSlugAsync(request.Title, s => _lessonRepository.SlugExistsAsync(s));
             }
         }
 
@@ -185,8 +169,7 @@ public class LessonService : ILessonService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         await _lessonRepository.SoftDeleteAsync(id);
     }
@@ -201,8 +184,7 @@ public class LessonService : ILessonService
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
 
-        if (course.InstructorId != userId && role != UserRole.Admin)
-            throw AppExceptions.Forbidden("You are not the owner of this course");
+        Guard.AgainstNotOwner(course.InstructorId, userId, role, "course");
 
         await _lessonRepository.UpdateSortOrderAsync(
             request.Items.Select(i => (i.Id, i.SortOrder)).ToList());
@@ -273,21 +255,5 @@ public class LessonService : ILessonService
             enrollment.CompletedAt ??= DateTime.UtcNow;
 
         await _enrollmentRepository.UpdateAsync(enrollment);
-    }
-
-    private static string GenerateSlug(string title)
-    {
-        var slug = title.ToLowerInvariant()
-            .Replace("ñ", "n")
-            .Replace("á", "a").Replace("é", "e")
-            .Replace("í", "i").Replace("ó", "o")
-            .Replace("ú", "u").Replace("ü", "u");
-
-        slug = Regex.Replace(slug, @"[^a-z0-9\-\s]", "");
-        slug = Regex.Replace(slug, @"\s+", "-");
-        slug = Regex.Replace(slug, @"-{2,}", "-");
-        slug = slug.Trim('-');
-
-        return slug;
     }
 }
