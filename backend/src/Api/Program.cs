@@ -65,6 +65,7 @@ builder.Services.AddControllers()
     });
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddScoped<CookieHelper>();
 builder.Services.AddScoped<TokenHelper>();
