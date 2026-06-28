@@ -1,6 +1,11 @@
 .hero {
   padding: 120px 24px 80px;
   overflow: hidden;
+  background-color: var(--bg-base);
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
 .heroInner {
@@ -15,6 +20,7 @@
 @media (min-width: 1024px) {
   .hero {
     padding: 160px 24px 100px;
+    background-size: 80px 80px;
   }
 }
 
