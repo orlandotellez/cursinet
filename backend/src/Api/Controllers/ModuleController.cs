@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Domain.Exceptions;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -14,20 +14,18 @@ namespace Cursinet.Api.Controllers;
 public class ModuleController : ControllerBase
 {
     private readonly IModuleService _moduleService;
-    private readonly AuthHelper _authHelper;
 
-    public ModuleController(IModuleService moduleService, AuthHelper authHelper)
+    public ModuleController(IModuleService moduleService)
     {
         _moduleService = moduleService;
-        _authHelper = authHelper;
     }
 
     [HttpGet]
     [RequirePermission(Permissions.ModuleRead)]
     public async Task<ActionResult<List<ModuleResponse>>> GetAll(Guid courseId)
     {
-        var userId = await GetCurrentUserIdAsync();
-        var role = GetCurrentUserRole();
+        var userId = HttpContext.GetCurrentUserId();
+        var role = HttpContext.GetCurrentUserRole();
 
         var modules = await _moduleService.GetAllAsync(courseId, userId, role);
         return Ok(modules);
@@ -37,8 +35,8 @@ public class ModuleController : ControllerBase
     [RequirePermission(Permissions.ModuleRead)]
     public async Task<ActionResult<ModuleResponse>> GetById(Guid courseId, Guid id)
     {
-        var userId = await GetCurrentUserIdAsync();
-        var role = GetCurrentUserRole();
+        var userId = HttpContext.GetCurrentUserId();
+        var role = HttpContext.GetCurrentUserRole();
 
         var module = await _moduleService.GetByIdAsync(id, userId, role);
         return Ok(module);
@@ -48,8 +46,8 @@ public class ModuleController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<CurriculumResponse>> GetCurriculum(Guid courseId)
     {
-        var userId = await GetCurrentUserIdAsync();
-        var role = GetCurrentUserRole();
+        var userId = HttpContext.GetCurrentUserId();
+        var role = HttpContext.GetCurrentUserRole();
 
         var curriculum = await _moduleService.GetCurriculumAsync(courseId, userId, role);
         return Ok(curriculum);
@@ -59,12 +57,10 @@ public class ModuleController : ControllerBase
     [RequirePermission(Permissions.ModuleCreate)]
     public async Task<ActionResult<ModuleResponse>> Create(Guid courseId, [FromBody] CreateModuleRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var role = GetCurrentUserRole();
-        var module = await _moduleService.CreateAsync(courseId, request, userId.Value, role);
+        var role = HttpContext.GetCurrentUserRole();
+        var module = await _moduleService.CreateAsync(courseId, request, userId, role);
         return CreatedAtAction(nameof(GetById), new { courseId, id = module.Id }, module);
     }
 
@@ -72,12 +68,10 @@ public class ModuleController : ControllerBase
     [RequirePermission(Permissions.ModuleUpdate)]
     public async Task<ActionResult<ModuleResponse>> Update(Guid courseId, Guid id, [FromBody] UpdateModuleRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var role = GetCurrentUserRole();
-        var module = await _moduleService.UpdateAsync(id, request, userId.Value, role);
+        var role = HttpContext.GetCurrentUserRole();
+        var module = await _moduleService.UpdateAsync(id, request, userId, role);
         return Ok(module);
     }
 
@@ -85,12 +79,10 @@ public class ModuleController : ControllerBase
     [RequirePermission(Permissions.ModuleDelete)]
     public async Task<ActionResult> Delete(Guid courseId, Guid id)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var role = GetCurrentUserRole();
-        await _moduleService.DeleteAsync(id, userId.Value, role);
+        var role = HttpContext.GetCurrentUserRole();
+        await _moduleService.DeleteAsync(id, userId, role);
         return Ok(new { message = "Module deleted successfully" });
     }
 
@@ -98,24 +90,11 @@ public class ModuleController : ControllerBase
     [RequirePermission(Permissions.ModuleUpdate)]
     public async Task<ActionResult> Reorder(Guid courseId, [FromBody] ReorderRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var role = GetCurrentUserRole();
-        await _moduleService.ReorderAsync(courseId, request, userId.Value, role);
+        var role = HttpContext.GetCurrentUserRole();
+        await _moduleService.ReorderAsync(courseId, request, userId, role);
         return Ok(new { message = "Modules reordered successfully" });
     }
 
-    private async Task<Guid?> GetCurrentUserIdAsync()
-        => await _authHelper.ResolveCurrentUserId();
-
-    private UserRole GetCurrentUserRole()
-    {
-        var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (Enum.TryParse<UserRole>(roleClaim, out var role))
-            return role;
-
-        return UserRole.Student;
-    }
 }

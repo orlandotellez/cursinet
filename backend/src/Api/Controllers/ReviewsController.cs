@@ -12,12 +12,10 @@ namespace Cursinet.Api.Controllers;
 public class ReviewsController : ControllerBase
 {
     private readonly IReviewService _reviewService;
-    private readonly AuthHelper _authHelper;
 
-    public ReviewsController(IReviewService reviewService, AuthHelper authHelper)
+    public ReviewsController(IReviewService reviewService)
     {
         _reviewService = reviewService;
-        _authHelper = authHelper;
     }
 
     /// <summary>Public: get all reviews for a course.</summary>
@@ -35,7 +33,7 @@ public class ReviewsController : ControllerBase
         Guid courseId,
         [FromBody] CreateReviewRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _reviewService.CreateReviewAsync(courseId, userId, request.Rating, request.Comment);
         return CreatedAtAction(null, result);
@@ -49,7 +47,7 @@ public class ReviewsController : ControllerBase
         Guid reviewId,
         [FromBody] UpdateReviewRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _reviewService.UpdateReviewAsync(reviewId, userId, request.Rating, request.Comment);
         return Ok(result);
@@ -60,7 +58,7 @@ public class ReviewsController : ControllerBase
     [Authorize]
     public async Task<ActionResult> DeleteReview(Guid courseId, Guid reviewId)
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         await _reviewService.DeleteReviewAsync(reviewId, userId);
         return Ok(new { message = "Review deleted successfully." });

@@ -1,6 +1,7 @@
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Common.Models;
+using Cursinet.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,6 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
-    private readonly AuthHelper _authHelper;
     private readonly CookieHelper _cookieHelper;
     private readonly TokenHelper _tokenHelper;
     private readonly IUserCrudService _userCrudService;
@@ -22,7 +22,6 @@ public class AuthController : ControllerBase
         IAuthService authService,
         IConfiguration configuration,
         IWebHostEnvironment environment,
-        AuthHelper authHelper,
         CookieHelper cookieHelper,
         TokenHelper tokenHelper,
         IUserCrudService userCrudService)
@@ -30,7 +29,6 @@ public class AuthController : ControllerBase
         _authService = authService;
         _configuration = configuration;
         _environment = environment;
-        _authHelper = authHelper;
         _cookieHelper = cookieHelper;
         _tokenHelper = tokenHelper;
         _userCrudService = userCrudService;
@@ -39,7 +37,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
-        var currentUserId = await _authHelper.ResolveCurrentUserId();
+        var currentUserId = HttpContext.GetCurrentUserId();
 
         if (currentUserId.HasValue)
         {
@@ -61,7 +59,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
-        var currentUserId = await _authHelper.ResolveCurrentUserId();
+        var currentUserId = HttpContext.GetCurrentUserId();
 
         var result = await _authService.LoginAsync(request);
 
@@ -125,11 +123,9 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<UserDto>> Me()
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var user = await _userCrudService.GetByIdAsync(userId.Value);
+        var user = await _userCrudService.GetByIdAsync(userId);
         return Ok(user);
     }
 
@@ -137,11 +133,9 @@ public class AuthController : ControllerBase
     [HttpPut("me")]
     public async Task<ActionResult<UserDto>> UpdateMyProfile([FromBody] UpdateMyProfileRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _authService.UpdateMyProfileAsync(userId.Value, request);
+        var result = await _authService.UpdateMyProfileAsync(userId, request);
         return Ok(result);
     }
 
@@ -149,11 +143,9 @@ public class AuthController : ControllerBase
     [HttpPost("change-password")]
     public async Task<ActionResult<UserDto>> ChangePassword([FromBody] ChangePasswordRequest request)
     {
-        var userId = await _authHelper.ResolveCurrentUserId();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var result = await _authService.ChangePasswordAsync(userId.Value, request);
+        var result = await _authService.ChangePasswordAsync(userId, request);
         return Ok(new { message = "Password changed successfully", user = result });
     }
 

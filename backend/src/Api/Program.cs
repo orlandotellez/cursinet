@@ -66,7 +66,6 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<AuthHelper>();
 builder.Services.AddScoped<CookieHelper>();
 builder.Services.AddScoped<TokenHelper>();
 

@@ -12,21 +12,18 @@ namespace Cursinet.Api.Controllers;
 public class SubscriptionsController : ControllerBase
 {
     private readonly ISubscriptionService _subscriptionService;
-    private readonly AuthHelper _authHelper;
 
     public SubscriptionsController(
-        ISubscriptionService subscriptionService,
-        AuthHelper authHelper)
+        ISubscriptionService subscriptionService)
     {
         _subscriptionService = subscriptionService;
-        _authHelper = authHelper;
     }
 
     [HttpGet("mine")]
     [Authorize]
     public async Task<ActionResult<SubscriptionResponse>> GetMySubscription()
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _subscriptionService.GetMySubscriptionAsync(userId);
         return Ok(result);
@@ -36,7 +33,7 @@ public class SubscriptionsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<SubscriptionResponse>> Cancel()
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _subscriptionService.CancelMySubscriptionAsync(userId);
         return Ok(result);
@@ -46,7 +43,7 @@ public class SubscriptionsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<SubscriptionResponse>> Reactivate()
     {
-        var userId = await _authHelper.ResolveCurrentUserId()
+        var userId = HttpContext.GetCurrentUserId()
             ?? throw AppExceptions.Unauthorized();
         var result = await _subscriptionService.ReactivateMySubscriptionAsync(userId);
         return Ok(result);

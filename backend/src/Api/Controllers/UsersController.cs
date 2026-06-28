@@ -1,7 +1,7 @@
-using System.Security.Claims;
 using Cursinet.Api.Authorization;
 using Cursinet.Api.Helpers;
 using Cursinet.Application.Common.Interfaces;
+using Cursinet.Domain.Exceptions;
 using Cursinet.Application.Common.Models;
 using Cursinet.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +13,10 @@ namespace Cursinet.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserCrudService _userCrudService;
-    private readonly AuthHelper _authHelper;
 
-    public UsersController(IUserCrudService userCrudService, AuthHelper authHelper)
+    public UsersController(IUserCrudService userCrudService)
     {
         _userCrudService = userCrudService;
-        _authHelper = authHelper;
     }
 
     [HttpGet]
@@ -53,11 +51,9 @@ public class UsersController : ControllerBase
     [RequirePermission(Permissions.UserUpdate)]
     public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var user = await _userCrudService.CreateAsync(request, userId.Value);
+        var user = await _userCrudService.CreateAsync(request, userId);
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
     }
 
@@ -65,11 +61,9 @@ public class UsersController : ControllerBase
     [RequirePermission(Permissions.UserUpdate)]
     public async Task<ActionResult<UserDto>> Update(Guid id, [FromBody] UpdateUserRequest request)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var user = await _userCrudService.UpdateAsync(id, request, userId.Value);
+        var user = await _userCrudService.UpdateAsync(id, request, userId);
         return Ok(user);
     }
 
@@ -77,12 +71,10 @@ public class UsersController : ControllerBase
     [RequirePermission(Permissions.UserDelete)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        var userId = await GetCurrentUserIdAsync();
-        if (userId == null)
-            return Unauthorized(new { error = "User not authenticated" });
+        var userId = HttpContext.GetCurrentUserId() ?? throw AppExceptions.Unauthorized();
 
-        var currentUser = await _userCrudService.GetByIdAsync(userId.Value);
-        await _userCrudService.DeleteAsync(id, userId.Value, currentUser.Name);
+        var currentUser = await _userCrudService.GetByIdAsync(userId);
+        await _userCrudService.DeleteAsync(id, userId, currentUser.Name);
         return NoContent();
     }
 
@@ -94,15 +86,4 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    private async Task<Guid?> GetCurrentUserIdAsync()
-        => await _authHelper.ResolveCurrentUserId();
-
-    private UserRole GetCurrentUserRole()
-    {
-        var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-        if (Enum.TryParse<UserRole>(roleClaim, out var role))
-            return role;
-
-        return UserRole.Student;
-    }
 }
