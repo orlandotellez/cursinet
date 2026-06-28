@@ -13,7 +13,7 @@ public class Subscription
 
 	public string? StripeSubscriptionId {get; set;} // ID de Subscription en Stripe
 
-	public SubcriptionPlan Plan {get; set;} // Plan contratado
+	public SubscriptionPlan Plan {get; set;} // Plan contratado
 
 	public string Status {get; set;} = null!; // Estado (active, past_due, canceled, etc.)
 

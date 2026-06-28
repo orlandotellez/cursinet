@@ -76,12 +76,14 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 		builder.Property(c => c.SearchVector)
 			.HasColumnName("search_vector")
 			.HasColumnType("tsvector")
+#pragma warning disable CS0618 // NpgsqlTsVector.Parse is obsolete — client-side parsing is unreliable but needed here as a ValueConverter
 			.HasConversion(
 				new ValueConverter<string?, NpgsqlTsVector?>(
 					v => v == null ? null : NpgsqlTsVector.Parse(v),
 					v => v == null ? null : v.ToString()
 				)
 			);
+#pragma warning restore CS0618
 
 		builder.Property(c => c.PublishedAt).HasColumnName("published_at");
 

@@ -1654,6 +1654,9 @@ namespace Cursinet.Infrastructure.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("email_verified");
 
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("integer");
+
                     b.Property<string>("GithubUrl")
                         .HasColumnType("text")
                         .HasColumnName("github_url");
@@ -1675,6 +1678,9 @@ namespace Cursinet.Infrastructure.Migrations
                     b.Property<string>("LinkedinUrl")
                         .HasColumnType("text")
                         .HasColumnName("linkedin_url");
+
+                    b.Property<DateTime?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()

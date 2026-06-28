@@ -6,14 +6,10 @@ using NpgsqlTypes;
 
 namespace Cursinet.Infrastructure.Migrations
 {
-    /// <summary>
-    /// Initial migration.
-    /// </summary>
+    /// <inheritdoc />
     public partial class Init : Migration
     {
-        /// <summary>
-        /// Applies the migration.
-        /// </summary>
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
@@ -85,7 +81,9 @@ namespace Cursinet.Infrastructure.Migrations
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     deleted_by_user_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    deleted_by_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                    deleted_by_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    FailedLoginAttempts = table.Column<int>(type: "integer", nullable: false),
+                    LockoutEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -377,6 +375,30 @@ namespace Cursinet.Infrastructure.Migrations
                     table.PrimaryKey("PK_user_two_factor", x => x.id);
                     table.ForeignKey(
                         name: "FK_user_two_factor_Users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserNotificationPreferences",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    course_updates = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    new_content = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
+                    comments = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    marketing = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserNotificationPreferences", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_UserNotificationPreferences_Users_user_id",
                         column: x => x.user_id,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -1248,6 +1270,12 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserNotificationPreferences_user_id",
+                table: "UserNotificationPreferences",
+                column: "user_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "idx_users_created_at",
                 table: "Users",
                 column: "created_at");
@@ -1289,9 +1317,8 @@ namespace Cursinet.Infrastructure.Migrations
                 table: "Verification",
                 column: "value");
         }
-        /// <summary>
-        /// Reverts the migration.
-        /// </summary>
+
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
@@ -1347,6 +1374,9 @@ namespace Cursinet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_two_factor");
+
+            migrationBuilder.DropTable(
+                name: "UserNotificationPreferences");
 
             migrationBuilder.DropTable(
                 name: "Verification");
