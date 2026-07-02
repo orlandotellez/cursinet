@@ -8,7 +8,6 @@ export { certificates } from './certificates.data';
 export { mockReviews } from './reviews.data';
 export { mockNotifications } from './notifications.data';
 export { stats, studentStats } from './stats.data';
-export { pricingPlans } from './pricing.data';
 export { instructorKpis, instructorRevenue, adminKpis, adminRevenue } from './revenue.data';
 export { activityData } from './activity.data';
 export { mockUsers } from './users.data';

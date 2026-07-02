@@ -137,38 +137,6 @@ export function PageSkeleton() {
       </section>
 
       {/* ============================================
-           Pricing Section
-      ============================================ */}
-      <section className={styles.section}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionHeader}>
-            <div className={`${styles.skeleton} ${styles.sectionTitle}`} />
-            <div className={`${styles.skeleton} ${styles.sectionSubtitle}`} />
-          </div>
-
-          <div className={styles.pricingGrid}>
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className={styles.pricingCard}>
-                <div className={`${styles.skeleton} ${styles.pricingNameLine}`} />
-                <div className={`${styles.skeleton} ${styles.pricingDescLine}`} />
-                <div className={`${styles.skeleton} ${styles.pricingAmountLine}`} />
-                <div className={styles.pricingDivider} />
-                <div className={styles.pricingFeatureList}>
-                  {[1, 2, 3, 4].map((j) => (
-                    <div key={j} className={styles.pricingFeature}>
-                      <div className={`${styles.skeleton} ${styles.featureCheck}`} />
-                      <div className={`${styles.skeleton} ${styles.featureText}`} />
-                    </div>
-                  ))}
-                </div>
-                <div className={`${styles.skeleton} ${styles.pricingCtaLine}`} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================
            Final CTA
       ============================================ */}
       <section className={styles.ctaSection}>

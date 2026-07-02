@@ -11,7 +11,6 @@ import { validateShape } from '@/src/shared/lib/validation';
 import { loginSchema } from '@/src/shared/validations';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
-import { useSubscriptionStore } from '@/src/shared/store/useSubscriptionStore';
 
 export default function IniciarSesionPage() {
   const router = useRouter();
@@ -45,8 +44,6 @@ export default function IniciarSesionPage() {
 
   function redirectAfterLogin() {
     const role = useAuthStore.getState().user?.role;
-    const sub = useSubscriptionStore.getState().subscription;
-    if (!sub) useSubscriptionStore.getState().setFreePlan();
     redirectByRole(role, router.replace);
   }
 

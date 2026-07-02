@@ -8,7 +8,6 @@ import {
   Bell,
   Settings,
   Compass,
-  Crown,
 } from 'lucide-react';
 import styles from './layout.module.css';
 import { Sidebar } from '@/src/shared/components/Sidebar';
@@ -23,7 +22,6 @@ const sidebarItems = [
   { label: 'Certificados', href: '/certificados', icon: Award },
   { label: 'Favoritos', href: '/favoritos', icon: Heart },
   { label: 'Notificaciones', href: '/notificaciones', icon: Bell },
-  { label: 'Suscripción', href: '/suscripcion', icon: Crown },
   { label: 'Configuración', href: '/configuracion', icon: Settings },
 ];
 

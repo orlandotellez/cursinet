@@ -30,8 +30,6 @@ export type {
   NoteDTO,
 } from './student.types';
 
-export type { SubscriptionDTO } from './billing.types';
-
 export type {
   KpiDto,
   ChartPointDto,

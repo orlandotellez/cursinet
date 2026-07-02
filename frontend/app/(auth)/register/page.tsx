@@ -11,7 +11,6 @@ import { validateShape } from '@/src/shared/lib/validation';
 import { registerSchema } from '@/src/shared/validations';
 import styles from './page.module.css';
 import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
-import { useSubscriptionStore } from '@/src/shared/store/useSubscriptionStore';
 
 export default function RegistrarsePage() {
   const router = useRouter();
@@ -52,8 +51,6 @@ export default function RegistrarsePage() {
         email: form.email.trim(),
         password: form.password,
       });
-
-      useSubscriptionStore.getState().setFreePlan();
 
       const role = useAuthStore.getState().user?.role;
       redirectByRole(role, router.replace);
