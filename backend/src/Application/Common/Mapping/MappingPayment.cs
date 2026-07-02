@@ -18,7 +18,10 @@ public static class MappingPayment
             Status = payment.Status.ToString(),
             Type = payment.Type,
             PaidAt = payment.PaidAt,
+            RefundedAt = payment.RefundedAt,
             CreatedAt = payment.CreatedAt,
+            PayPalOrderId = payment.PayPalOrderId,
+            PayPalCaptureId = payment.PayPalCaptureId,
         };
     }
 }
