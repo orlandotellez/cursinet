@@ -54,9 +54,6 @@ export function Footer() {
                 <Link href="/categorias">Categorías</Link>
               </li>
               <li>
-                <Link href="#pricing">Precios</Link>
-              </li>
-              <li>
                 <Link href="/instructores">Instructores</Link>
               </li>
             </ul>
