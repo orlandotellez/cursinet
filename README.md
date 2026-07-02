@@ -1,8 +1,15 @@
-# CURSINET 🎓
-
-> Plataforma de educación técnica premium para ingenieros de software
+# CURSINET 
 
 **CURSINET** es una plataforma de aprendizaje online full-stack construida con **Next.js 16** en el frontend y **ASP.NET Core (.NET 10)** en el backend, con persistencia en **PostgreSQL**. Pensada para ofrecer una experiencia técnica, oscura y precisa, con todo el feature-set de una plataforma educativa moderna.
+
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![.NET 10](https://img.shields.io/badge/.NET_10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)
 
 ---
 
