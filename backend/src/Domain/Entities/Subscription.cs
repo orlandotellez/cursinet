@@ -11,7 +11,7 @@ public class Subscription
 	public Guid UserId {get; set;} // Suscriptor
 	public User User {get; set;} = null!; // Navegación a usuario
 
-	public string? StripeSubscriptionId {get; set;} // ID de Subscription en Stripe
+	public string? PayPalSubscriptionId {get; set;} // ID de Subscription en PayPal (Billing API)
 
 	public SubscriptionPlan Plan {get; set;} // Plan contratado
 

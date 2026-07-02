@@ -69,7 +69,7 @@ public class PaymentsControllerTests : ControllerTestBase
         var request = new ConfirmPaymentRequest
         {
             PaymentId = paymentId,
-            StripePaymentIntentId = "pi_test_123",
+            PayPalOrderId = "8MC12345",
         };
         var response = new PaymentResponse
         {

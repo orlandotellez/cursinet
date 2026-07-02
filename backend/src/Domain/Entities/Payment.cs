@@ -15,7 +15,9 @@ public class Payment
 	public Guid? CourseId {get; set;} // Curso comprado (nullable si es otro concepto)
 	public Course? Course {get; set;} // Navegación a curso
 
-	public string? StripePaymentIntentId {get; set;} // ID de PaymentIntent en Stripe
+	public string? PayPalOrderId {get; set;} // ID de Order en PayPal (creado por Orders v2 API)
+
+	public string? PayPalCaptureId {get; set;} // ID de Capture en PayPal (asignado tras PAYMENT.CAPTURE.COMPLETED)
 
 	public decimal Amount {get; set;} // Monto pagado
 

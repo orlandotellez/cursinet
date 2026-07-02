@@ -28,8 +28,6 @@ public class User
 
 	public string? LinkedinUrl {get; set;}
 
-	public string? StripeCustomerId {get; set;}
-
 	public bool IsActive {get; set;}
 
 	public DateTime? LastSeenAt {get; set;}

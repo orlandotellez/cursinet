@@ -24,7 +24,10 @@ using Cursinet.Domain.Enums;
 using Cursinet.Api.Middleware;
 using Cursinet.Infrastructure.Persistence;
 using Cursinet.Infrastructure.Persistence.Repositories;
+using Cursinet.Infrastructure.Adapters.Payments;
+using Cursinet.Infrastructure.Adapters.PayPal;
 using Cursinet.Infrastructure.Services;
+using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -163,6 +166,50 @@ builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 
 builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
+
+// PayPal adapter wiring. Token cache + auth handler + signature-validating HttpClient are registered
+// up-front so the typed clients for PayPalPaymentProvider and PayPalWebhookSignatureValidator can
+// attach the handler in their respective pipelines. IPaymentProvider resolution switches between
+// the live PayPal adapter and MockPaymentProvider based on the PayPal:Enabled config toggle — no
+// branching lives inside the application services.
+builder.Services.AddMemoryCache();
+builder.Services.AddTransient<PayPalAuthenticationHandler>();
+builder.Services.Configure<PayPalOptions>(builder.Configuration.GetSection(PayPalOptions.SectionName));
+
+builder.Services.AddHttpClient<PayPalWebhookSignatureValidator>()
+    .AddHttpMessageHandler<PayPalAuthenticationHandler>()
+    .ConfigureHttpClient((sp, c) =>
+    {
+        var opts = sp.GetRequiredService<IOptions<PayPalOptions>>().Value;
+        c.BaseAddress = new Uri(opts.BaseUrl);
+        c.Timeout = TimeSpan.FromSeconds(15);
+    });
+builder.Services.AddScoped<IPayPalWebhookSignatureValidator>(sp =>
+    sp.GetRequiredService<PayPalWebhookSignatureValidator>());
+builder.Services.AddScoped<IPayPalWebhookEventRepository, PayPalWebhookEventRepository>();
+
+var paypalEnabled = builder.Configuration.GetSection("PayPal").GetValue<bool>("Enabled");
+if (paypalEnabled)
+{
+    builder.Services.AddHttpClient<PayPalPaymentProvider>()
+        .AddHttpMessageHandler<PayPalAuthenticationHandler>()
+        .ConfigureHttpClient((sp, c) =>
+        {
+            var opts = sp.GetRequiredService<IOptions<PayPalOptions>>().Value;
+            c.BaseAddress = new Uri(opts.BaseUrl);
+            c.Timeout = TimeSpan.FromSeconds(30);
+        });
+    // IMPORTANTE: IPaymentProvider resuelve a través del typed client registrado arriba
+    // (AddHttpClient<PayPalPaymentProvider>) para que el HttpClient inyectado tenga el
+    // PayPalAuthenticationHandler en su pipeline. Usar AddScoped<IPaymentProvider, PayPalPaymentProvider>
+    // directamente crearía una instancia con un HttpClient default SIN el handler.
+    builder.Services.AddScoped<IPaymentProvider>(sp =>
+        sp.GetRequiredService<PayPalPaymentProvider>());
+}
+else
+{
+    builder.Services.AddScoped<IPaymentProvider, MockPaymentProvider>();
+}
 
 builder.Services.AddScoped<DataSeeder>();
 

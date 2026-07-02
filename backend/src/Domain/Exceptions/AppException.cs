@@ -31,5 +31,13 @@ public static class AppExceptions
     public static AppException TooManyRequests(string message = "Too Many Requests") => new(message, 429, "TOO_MANY_REQUESTS");
 
     public static AppException InternalError(string message = "Internal Server Error") => new(message, 500, "INTERNAL_SERVER_ERROR");
+
+    /// <summary>
+    /// Builds a 4xx <see cref="AppException"/> for a payment provider request that was rejected by
+    /// the upstream gateway (PayPal/Stripe/etc.). The caller passes through the upstream HTTP status
+    /// so the client can distinguish between 400 (malformed), 402 (declined), 422 (validation), etc.
+    /// </summary>
+    public static AppException PaymentProviderRejected(string message, int upstreamStatusCode)
+        => new(message, upstreamStatusCode, "PAYMENT_PROVIDER_REJECTED");
 }
 

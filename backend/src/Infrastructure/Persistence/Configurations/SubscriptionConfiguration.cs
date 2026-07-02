@@ -23,8 +23,8 @@ public class SubscriptionConfiguration : IEntityTypeConfiguration<Subscription>
 			.HasForeignKey(s => s.UserId)
 			.OnDelete(DeleteBehavior.Restrict);
 
-		builder.Property(s => s.StripeSubscriptionId).HasColumnName("stripe_subscription_id").HasMaxLength(255);
-		builder.HasIndex(s => s.StripeSubscriptionId);
+		builder.Property(s => s.PayPalSubscriptionId).HasColumnName("paypal_subscription_id").HasMaxLength(255);
+		builder.HasIndex(s => s.PayPalSubscriptionId);
 
 		builder.Property(s => s.Plan).IsRequired().HasColumnName("plan");
 
