@@ -14,7 +14,6 @@ import { WhatYouLearn } from '@/src/features/courses/detail/WhatYouLearn';
 import { CurriculumAccordion } from '@/src/features/courses/detail/CurriculumAccordion';
 import { InstructorCard } from '@/src/features/courses/detail/InstructorCard';
 import { ReviewSection } from '@/src/features/courses/detail/ReviewSection';
-import { PaymentModal } from '@/src/features/payment/PaymentModal';
 import type { Course, Instructor, Category, CourseModule, Lesson } from '@/src/shared/types';
 import { SkeletonBase } from '@/src/shared/skeleton';
 import styles from './page.module.css';
@@ -172,7 +171,6 @@ export default function CourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showPayment, setShowPayment] = useState(false);
   const { enroll, isEnrolled } = useEnrollmentStore();
   const { isAuthenticated } = useAuthStore();
   const enrolled = course ? isEnrolled(course.id) : false;
@@ -240,7 +238,7 @@ export default function CourseDetailPage() {
         router.push(`/login?redirect=/cursos/${course.slug}`);
         return;
       }
-      setShowPayment(true);
+      router.push(`/checkout/${course.slug}`);
       return;
     }
 
@@ -250,16 +248,6 @@ export default function CourseDetailPage() {
     } catch {
       // Error is already set in the store — UI can show a toast/notification
     }
-  };
-
-  const handlePaymentSuccess = async () => {
-    setShowPayment(false);
-    try {
-      await enroll(course!.id);
-    } catch {
-      // Error is already set in the store
-    }
-    router.push(firstLessonHref);
   };
 
   return (
@@ -308,16 +296,6 @@ export default function CourseDetailPage() {
           <ReviewSection courseId={course.id} enrolled={enrolled} />
         </section>
       </div>
-
-      {showPayment && (
-        <PaymentModal
-          courseId={course.id}
-          courseTitle={course.title}
-          price={course.price}
-          onSuccess={handlePaymentSuccess}
-          onClose={() => setShowPayment(false)}
-        />
-      )}
     </div>
   );
 }
