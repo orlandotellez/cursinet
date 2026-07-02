@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Cursinet.Api</RootNamespace>
+    <UserSecretsId>4a7aae8c-ed5b-46c0-be0c-ce995d9f9242</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
