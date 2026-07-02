@@ -6,6 +6,7 @@ public interface IEnrollmentRepository
 {
     Task<List<Enrollment>> GetAllAsync();
     Task<List<Enrollment>> GetSinceAsync(DateTime since);
+    Task<List<Enrollment>> GetSinceWithUserAsync(DateTime since);
     Task<Enrollment?> GetByCourseAndUserAsync(Guid courseId, Guid userId);
     Task<List<Enrollment>> GetByUserAsync(Guid userId);
     Task<Enrollment> CreateAsync(Enrollment enrollment, Guid courseId);
