@@ -35,6 +35,7 @@ export interface UsersByRoleDto {
 }
 
 export interface CategoryCourseCountDto {
+  categoryId: string;
   categoryName: string;
   courseCount: number;
 }
@@ -44,6 +45,7 @@ export interface AnalyticsRaw {
   arr: number;
   growthPercent: number;
   revenuePoints: ChartPointDto[];
+  studentPoints?: ChartPointDto[];
   usersByRole: UsersByRoleDto;
   coursesByCategory: CategoryCourseCountDto[];
 }
@@ -72,8 +74,9 @@ export interface AnalyticsData {
   arr: number;
   growth: number;
   monthlyRevenue: { month: string; revenue: number }[];
+  monthlyStudents: { month: string; count: number }[];
   usersByRole: { role: string; count: number }[];
-  coursesByCategory: { categoryName: string; count: number }[];
+  coursesByCategory: { categoryId: string; categoryName: string; count: number }[];
 }
 
 export interface NotificationPreferenceDTO {

@@ -41,8 +41,13 @@ function toAnalyticsData(raw: AnalyticsRaw): AnalyticsData {
       month: m.label,
       revenue: m.value,
     })),
+    monthlyStudents: (raw.studentPoints ?? []).map((m) => ({
+      month: m.label,
+      count: m.value,
+    })),
     usersByRole: roles,
     coursesByCategory: raw.coursesByCategory.map((c) => ({
+      categoryId: c.categoryId,
       categoryName: c.categoryName,
       count: c.courseCount,
     })),
@@ -54,7 +59,10 @@ export async function getDashboard(range = '30d'): Promise<DashboardData> {
   return toDashboardData(raw);
 }
 
-export async function getAnalytics(range = '1a'): Promise<AnalyticsData> {
-  const raw = await api.get<AnalyticsRaw>(`/admin/analytics?range=${range}`);
+export async function getAnalytics(range = '1a', categoryId?: string, revenueCategoryId?: string): Promise<AnalyticsData> {
+  const params = new URLSearchParams({ range });
+  if (categoryId) params.set('categoryId', categoryId);
+  if (revenueCategoryId) params.set('revenueCategoryId', revenueCategoryId);
+  const raw = await api.get<AnalyticsRaw>(`/admin/analytics?${params}`);
   return toAnalyticsData(raw);
 }

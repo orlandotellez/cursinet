@@ -27,9 +27,12 @@ public class AnalyticsController : ControllerBase
 
     [HttpGet("analytics")]
     [RequirePermission(Permissions.AdminPanel)]
-    public async Task<ActionResult<AnalyticsResponse>> GetAnalytics([FromQuery] string? range = "1a")
+    public async Task<ActionResult<AnalyticsResponse>> GetAnalytics(
+        [FromQuery] string? range = "1a",
+        [FromQuery] Guid? categoryId = null,
+        [FromQuery] Guid? revenueCategoryId = null)
     {
-        var data = await _analyticsService.GetAnalyticsAsync(range);
+        var data = await _analyticsService.GetAnalyticsAsync(range, categoryId, revenueCategoryId);
         return Ok(data);
     }
 }
