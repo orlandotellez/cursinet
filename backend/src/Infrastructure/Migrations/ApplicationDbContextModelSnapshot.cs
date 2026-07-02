@@ -1083,6 +1083,79 @@ namespace Cursinet.Infrastructure.Migrations
                     b.ToTable("PasswordResetLogs", (string)null);
                 });
 
+            modelBuilder.Entity("Cursinet.Domain.Entities.PayPalWebhookEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("event_id");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("event_type");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)")
+                        .HasColumnName("notes");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("payload");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_at");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("received_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("ResourceId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("resource_id");
+
+                    b.Property<string>("ResourceType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("resource_type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_paypal_webhook_events_event_id");
+
+                    b.HasIndex("EventType")
+                        .HasDatabaseName("ix_paypal_webhook_events_event_type");
+
+                    b.HasIndex("ProcessedAt")
+                        .HasDatabaseName("ix_paypal_webhook_events_processed_at");
+
+                    b.HasIndex("ReceivedAt")
+                        .HasDatabaseName("ix_paypal_webhook_events_received_at");
+
+                    b.HasIndex("ResourceId")
+                        .HasDatabaseName("ix_paypal_webhook_events_resource_id");
+
+                    b.ToTable("PayPalWebhookEvents", (string)null);
+                });
+
             modelBuilder.Entity("Cursinet.Domain.Entities.Payment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1117,6 +1190,16 @@ namespace Cursinet.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("paid_at");
 
+                    b.Property<string>("PayPalCaptureId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("paypal_capture_id");
+
+                    b.Property<string>("PayPalOrderId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("paypal_order_id");
+
                     b.Property<DateTime?>("RefundedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("refunded_at");
@@ -1124,11 +1207,6 @@ namespace Cursinet.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer")
                         .HasColumnName("status");
-
-                    b.Property<string>("StripePaymentIntentId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("stripe_payment_intent_id");
 
                     b.Property<string>("Type")
                         .HasMaxLength(50)
@@ -1149,9 +1227,9 @@ namespace Cursinet.Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("Status");
+                    b.HasIndex("PayPalOrderId");
 
-                    b.HasIndex("StripePaymentIntentId");
+                    b.HasIndex("Status");
 
                     b.HasIndex("UserId");
 
@@ -1536,6 +1614,11 @@ namespace Cursinet.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("current_period_start");
 
+                    b.Property<string>("PayPalSubscriptionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("paypal_subscription_id");
+
                     b.Property<int>("Plan")
                         .HasColumnType("integer")
                         .HasColumnName("plan");
@@ -1545,11 +1628,6 @@ namespace Cursinet.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
                         .HasColumnName("status");
-
-                    b.Property<string>("StripeSubscriptionId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("stripe_subscription_id");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -1563,9 +1641,9 @@ namespace Cursinet.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Status");
+                    b.HasIndex("PayPalSubscriptionId");
 
-                    b.HasIndex("StripeSubscriptionId");
+                    b.HasIndex("Status");
 
                     b.HasIndex("UserId");
 
@@ -1698,11 +1776,6 @@ namespace Cursinet.Infrastructure.Migrations
                         .HasDefaultValue(0)
                         .HasColumnName("role");
 
-                    b.Property<string>("StripeCustomerId")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("stripe_customer_id");
-
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -1727,8 +1800,6 @@ namespace Cursinet.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("Role");
-
-                    b.HasIndex("StripeCustomerId");
 
                     b.HasIndex("UserName")
                         .IsUnique();

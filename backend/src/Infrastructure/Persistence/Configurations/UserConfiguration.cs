@@ -38,9 +38,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
 		builder.Property(u => u.LinkedinUrl).HasColumnName("linkedin_url");
 
-		builder.Property(u => u.StripeCustomerId).HasColumnName("stripe_customer_id").HasMaxLength(100);
-		builder.HasIndex(u => u.StripeCustomerId);
-
 		builder.Property(u => u.IsActive).HasColumnName("is_active").IsRequired().HasDefaultValue(true);
 
 		builder.Property(u => u.LastSeenAt).HasColumnName("last_seen_at");

@@ -48,12 +48,20 @@ public class PaymentRepository : IPaymentRepository
             .ToListAsync();
     }
 
-    public async Task<Payment?> GetByStripePaymentIntentAsync(string stripePaymentIntentId)
+    public async Task<Payment?> GetByPayPalOrderIdAsync(string paypalOrderId)
     {
         return await _context.Payments
             .Include(p => p.Course)
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.StripePaymentIntentId == stripePaymentIntentId);
+            .FirstOrDefaultAsync(p => p.PayPalOrderId == paypalOrderId);
+    }
+
+    public async Task<Payment?> GetByPayPalCaptureIdAsync(string payPalCaptureId)
+    {
+        return await _context.Payments
+            .Include(p => p.Course)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.PayPalCaptureId == payPalCaptureId);
     }
 
     public async Task<Payment> CreateAsync(Payment payment)

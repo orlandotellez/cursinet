@@ -31,8 +31,10 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
 			.HasForeignKey(p => p.CourseId)
 			.OnDelete(DeleteBehavior.Restrict);
 
-		builder.Property(p => p.StripePaymentIntentId).HasColumnName("stripe_payment_intent_id").HasMaxLength(255);
-		builder.HasIndex(p => p.StripePaymentIntentId);
+		builder.Property(p => p.PayPalOrderId).HasColumnName("paypal_order_id").HasMaxLength(255);
+		builder.HasIndex(p => p.PayPalOrderId);
+
+		builder.Property(p => p.PayPalCaptureId).HasColumnName("paypal_capture_id").HasMaxLength(255);
 
 		builder.Property(p => p.Amount).IsRequired().HasColumnName("amount").HasColumnType("decimal(10,2)");
 

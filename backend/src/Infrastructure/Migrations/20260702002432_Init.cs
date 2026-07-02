@@ -44,6 +44,25 @@ namespace Cursinet.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PayPalWebhookEvents",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    event_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    event_type = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    resource_type = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    resource_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    received_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    processed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    notes = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: true),
+                    payload = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PayPalWebhookEvents", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
                 {
@@ -74,7 +93,6 @@ namespace Cursinet.Infrastructure.Migrations
                     website_url = table.Column<string>(type: "text", nullable: true),
                     github_url = table.Column<string>(type: "text", nullable: true),
                     linkedin_url = table.Column<string>(type: "text", nullable: true),
-                    stripe_customer_id = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     last_seen_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
@@ -338,7 +356,7 @@ namespace Cursinet.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    stripe_subscription_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    paypal_subscription_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     plan = table.Column<int>(type: "integer", nullable: false),
                     status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     current_period_start = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -516,7 +534,8 @@ namespace Cursinet.Infrastructure.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     course_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    stripe_payment_intent_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    paypal_order_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    paypal_capture_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     amount = table.Column<decimal>(type: "numeric(10,2)", nullable: false),
                     currency = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false, defaultValue: "USD"),
                     status = table.Column<int>(type: "integer", nullable: false),
@@ -1162,19 +1181,45 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "course_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Payments_paypal_order_id",
+                table: "Payments",
+                column: "paypal_order_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Payments_status",
                 table: "Payments",
                 column: "status");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_stripe_payment_intent_id",
-                table: "Payments",
-                column: "stripe_payment_intent_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Payments_user_id",
                 table: "Payments",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_paypal_webhook_events_event_type",
+                table: "PayPalWebhookEvents",
+                column: "event_type");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_paypal_webhook_events_processed_at",
+                table: "PayPalWebhookEvents",
+                column: "processed_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_paypal_webhook_events_received_at",
+                table: "PayPalWebhookEvents",
+                column: "received_at");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_paypal_webhook_events_resource_id",
+                table: "PayPalWebhookEvents",
+                column: "resource_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ux_paypal_webhook_events_event_id",
+                table: "PayPalWebhookEvents",
+                column: "event_id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuizAttemptAnswers_attempt_id",
@@ -1244,14 +1289,14 @@ namespace Cursinet.Infrastructure.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_paypal_subscription_id",
+                table: "Subscriptions",
+                column: "paypal_subscription_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_status",
                 table: "Subscriptions",
                 column: "status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Subscriptions_stripe_subscription_id",
-                table: "Subscriptions",
-                column: "stripe_subscription_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subscriptions_user_id",
@@ -1290,11 +1335,6 @@ namespace Cursinet.Infrastructure.Migrations
                 name: "IX_Users_role",
                 table: "Users",
                 column: "role");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_stripe_customer_id",
-                table: "Users",
-                column: "stripe_customer_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_username",
@@ -1359,6 +1399,9 @@ namespace Cursinet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PasswordResetLogs");
+
+            migrationBuilder.DropTable(
+                name: "PayPalWebhookEvents");
 
             migrationBuilder.DropTable(
                 name: "QuizAttemptAnswers");
