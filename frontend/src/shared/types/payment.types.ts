@@ -1,5 +1,9 @@
 export interface CreatePaymentRequest {
   courseId: string;
+  /** URL a la que PayPal redirige después de aprobar el pago */
+  returnUrl?: string;
+  /** URL a la que PayPal redirige si el usuario cancela */
+  cancelUrl?: string;
 }
 
 export interface CreatePaymentResponse {
@@ -7,12 +11,16 @@ export interface CreatePaymentResponse {
   amount: number;
   currency: string;
   status: string;
-  clientSecret?: string;
+  /** PayPal Order ID devuelto por la API Orders v2 */
+  payPalOrderId: string;
+  /** URL de aprobación para flujos basados en redirect */
+  approvalUrl?: string;
 }
 
 export interface ConfirmPaymentRequest {
   paymentId: string;
-  stripePaymentIntentId?: string;
+  /** PayPal Order ID opcional (eco). El server ya lo tiene del Payment record. */
+  payPalOrderId?: string;
 }
 
 export interface PaymentResponse {
@@ -25,5 +33,8 @@ export interface PaymentResponse {
   status: string;
   type?: string;
   paidAt?: string;
+  refundedAt?: string;
   createdAt: string;
+  payPalOrderId?: string;
+  payPalCaptureId?: string;
 }
