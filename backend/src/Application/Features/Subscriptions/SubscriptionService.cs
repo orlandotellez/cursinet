@@ -10,16 +10,21 @@ public class SubscriptionService : ISubscriptionService
 {
     private readonly ISubscriptionRepository _subscriptionRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IPaymentProvider _paymentProvider;
 
     public SubscriptionService(
         ISubscriptionRepository subscriptionRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IPaymentProvider paymentProvider)
     {
         _subscriptionRepository = subscriptionRepository;
         _userRepository = userRepository;
+        _paymentProvider = paymentProvider;
     }
 
-    public async Task<SubscriptionResponse> GetMySubscriptionAsync(Guid userId)
+    public async Task<SubscriptionResponse> GetMySubscriptionAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
@@ -38,7 +43,9 @@ public class SubscriptionService : ISubscriptionService
         return Map(subscription);
     }
 
-    public async Task<SubscriptionResponse> CancelMySubscriptionAsync(Guid userId)
+    public async Task<SubscriptionResponse> CancelMySubscriptionAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var subscription = await _subscriptionRepository.GetByUserIdAsync(userId);
         if (subscription == null)
@@ -46,6 +53,14 @@ public class SubscriptionService : ISubscriptionService
 
         if (subscription.Status != "active")
             throw AppExceptions.BadRequest("Subscription is not active");
+
+        // Cancel at the upstream provider first — if PayPal rejects the cancellation we want the
+        // surface error here, not a half-applied DB mutation. Skip when there's no provider-side
+        // subscription (mock / pre-integration rows).
+        if (!string.IsNullOrEmpty(subscription.PayPalSubscriptionId))
+        {
+            await _paymentProvider.CancelSubscriptionAsync(subscription.PayPalSubscriptionId, cancellationToken);
+        }
 
         subscription.Status = "cancelled";
         subscription.CancelAtPeriodEnd = true;
@@ -55,12 +70,17 @@ public class SubscriptionService : ISubscriptionService
         return Map(updated);
     }
 
-    public async Task<SubscriptionResponse> ReactivateMySubscriptionAsync(Guid userId)
+    public async Task<SubscriptionResponse> ReactivateMySubscriptionAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var subscription = await _subscriptionRepository.GetByUserIdAsync(userId);
         if (subscription == null)
             throw AppExceptions.NotFound("No subscription found");
 
+        // PayPal does not support re-activating a cancelled subscription; the user must resubscribe
+        // through the create flow. Local DB row flips back to "active" so we don't have a stranded
+        // record, but the provider-side state stays cancelled after this method returns.
         subscription.Status = "active";
         subscription.CancelAtPeriodEnd = false;
         subscription.UpdatedAt = DateTime.UtcNow;

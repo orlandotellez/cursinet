@@ -13,20 +13,26 @@ public class PaymentService : IPaymentService
     private readonly IPaymentRepository _paymentRepository;
     private readonly ICourseRepository _courseRepository;
     private readonly IEnrollmentRepository _enrollmentRepository;
+    private readonly IPaymentProvider _paymentProvider;
 
     public PaymentService(
         IPaymentRepository paymentRepository,
         ICourseRepository courseRepository,
-        IEnrollmentRepository enrollmentRepository)
+        IEnrollmentRepository enrollmentRepository,
+        IPaymentProvider paymentProvider)
     {
         _paymentRepository = paymentRepository;
         _courseRepository = courseRepository;
         _enrollmentRepository = enrollmentRepository;
+        _paymentProvider = paymentProvider;
     }
 
-    public async Task<CreatePaymentResponse> CreatePaymentAsync(Guid userId, CreatePaymentRequest request)
+    public async Task<CreatePaymentResponse> CreatePaymentAsync(
+        Guid userId,
+        CreatePaymentRequest request,
+        CancellationToken cancellationToken = default)
     {
-        // 1. Validate course exists and is published
+        // 1. Validamos que el curso exista y esté publicado
         var course = await _courseRepository.GetByIdAsync(request.CourseId);
         if (course == null)
             throw AppExceptions.NotFound("Course not found");
@@ -34,20 +40,28 @@ public class PaymentService : IPaymentService
         if (!course.IsPublished)
             throw AppExceptions.BadRequest("Course is not published");
 
-        // 2. Free courses don't need payment
+        // 2. Los cursos gratuitos no necesitan pago
         if (course.IsFree)
             throw AppExceptions.BadRequest("Course is free — enroll directly");
 
-        // 3. Check for duplicate enrollment
+        // 3. Verificamos que no haya inscripción duplicada
         var existing = await _enrollmentRepository.GetByCourseAndUserAsync(request.CourseId, userId);
         if (existing != null)
             throw AppExceptions.Conflict("Already enrolled in this course");
 
-        // 4. Check for existing pending payment for this course+user
-        //    (In production, we'd also check Stripe for incomplete PaymentIntents)
-        //    For now, we allow creating a new one — duplicates are handled by idempotency
+        // 4. Creamos la orden en el proveedor upstream. PayPal devuelve el order id que le pasamos
+        // al SDK del frontend; MockPaymentProvider devuelve un id sintético para tests.
+        var providerResult = await _paymentProvider.CreateOrderAsync(
+            new ProviderOrderRequest(
+                UserId: userId,
+                CourseId: request.CourseId,
+                Amount: course.Price,
+                Currency: "USD",
+                Description: $"Course: {course.Title}",
+                ReturnUrl: request.ReturnUrl,
+                CancelUrl: request.CancelUrl),
+            cancellationToken);
 
-        // 5. Create payment record
         var payment = new Payment
         {
             Id = Guid.NewGuid(),
@@ -57,6 +71,7 @@ public class PaymentService : IPaymentService
             Currency = "USD",
             Status = PaymentStatus.Pending,
             Type = "course_purchase",
+            PayPalOrderId = providerResult.ProviderOrderId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -69,13 +84,17 @@ public class PaymentService : IPaymentService
             Amount = created.Amount,
             Currency = created.Currency,
             Status = created.Status.ToString(),
-            ClientSecret = null, // No Stripe in dev mode
+            PayPalOrderId = providerResult.ProviderOrderId,
+            ApprovalUrl = providerResult.ApprovalUrl,
         };
     }
 
-    public async Task<PaymentResponse> ConfirmPaymentAsync(Guid userId, ConfirmPaymentRequest request)
+    public async Task<PaymentResponse> ConfirmPaymentAsync(
+        Guid userId,
+        ConfirmPaymentRequest request,
+        CancellationToken cancellationToken = default)
     {
-        // 1. Get payment
+        // 1. Obtenemos el pago
         var payment = await _paymentRepository.GetByIdAsync(request.PaymentId);
         if (payment == null)
             throw AppExceptions.NotFound("Payment not found");
@@ -88,28 +107,50 @@ public class PaymentService : IPaymentService
         if (payment.CourseId == null)
             throw AppExceptions.BadRequest("Payment has no associated course");
 
-        // 2. Mark payment as completed (dev mode — instant confirm)
-        //    In production, we'd verify Stripe PaymentIntent status here
+        // 2. Capturamos en el proveedor upstream cuando tenemos un order id. El webhook handler es
+        // la fuente de verdad definitiva, así que este path es la confirmación optimista pre-webhook;
+        // el guard de status del capture dentro del provider rechaza DECLINED/FAILED incluso si
+        // PayPal devuelve un capture id con status no-COMPLETED.
+        ProviderCaptureResult capture;
+        if (!string.IsNullOrEmpty(payment.PayPalOrderId))
+        {
+            capture = await _paymentProvider.CaptureOrderAsync(payment.PayPalOrderId, cancellationToken);
+        }
+        else
+        {
+            // Path de desarrollo / mock sin order id upstream (datos viejos o filas pre-provider).
+            capture = new ProviderCaptureResult(
+                ProviderCaptureId: $"MOCK-{Guid.NewGuid():N}",
+                Status: "COMPLETED",
+                Amount: payment.Amount,
+                Currency: payment.Currency);
+        }
+
         payment.Status = PaymentStatus.Completed;
         payment.PaidAt = DateTime.UtcNow;
+        payment.PayPalCaptureId = capture.ProviderCaptureId;
         payment.UpdatedAt = DateTime.UtcNow;
 
         var updated = await _paymentRepository.UpdateAsync(payment);
 
-        // 3. Create enrollment atomically with the payment reference
-        var enrollment = new Enrollment
+        // 3. Creación idempotente de enrollment — si el webhook ya lo creó, esto es un no-op.
+        var alreadyEnrolled = await _enrollmentRepository.GetByCourseAndUserAsync(payment.CourseId.Value, userId);
+        if (alreadyEnrolled == null)
         {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            CourseId = payment.CourseId.Value,
-            PaymentId = payment.Id,
-            EnrolledAt = DateTime.UtcNow,
-            ProgressPercentage = 0,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
+            var enrollment = new Enrollment
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                CourseId = payment.CourseId.Value,
+                PaymentId = payment.Id,
+                EnrolledAt = DateTime.UtcNow,
+                ProgressPercentage = 0,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            };
 
-        await _enrollmentRepository.CreateAsync(enrollment, payment.CourseId.Value);
+            await _enrollmentRepository.CreateAsync(enrollment, payment.CourseId.Value);
+        }
 
         return updated.MapToDto();
     }
