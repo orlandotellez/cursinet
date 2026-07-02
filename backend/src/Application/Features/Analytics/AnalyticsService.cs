@@ -87,7 +87,7 @@ public class AnalyticsService : IAnalyticsService
             Kpis =
             [
                 new() { Label = "Usuarios totales", Value = totalUsers.ToString("N0"), ChangePercent = usersChange, Trend = usersChange >= 0 ? "up" : "down" },
-                new() { Label = "MRR", Value = $"${mrr:N0}", ChangePercent = mrrChange, Trend = mrrChange >= 0 ? "up" : "down" },
+                new() { Label = "MRR", Value = $"${mrr:N2}", ChangePercent = mrrChange, Trend = mrrChange >= 0 ? "up" : "down" },
                 new() { Label = "Cursos activos", Value = activeCourses.ToString("N0"), ChangePercent = coursesChange, Trend = coursesChange >= 0 ? "up" : "down" },
                 new() { Label = "Ventas del mes", Value = currentEnrollments.ToString("N0"), ChangePercent = enrollmentsChange, Trend = enrollmentsChange >= 0 ? "up" : "down" },
             ],
@@ -97,7 +97,7 @@ public class AnalyticsService : IAnalyticsService
         };
     }
 
-    public async Task<AnalyticsResponse> GetAnalyticsAsync(string? range = "1a")
+    public async Task<AnalyticsResponse> GetAnalyticsAsync(string? range = "1a", Guid? categoryId = null, Guid? revenueCategoryId = null)
     {
         var now = DateTime.UtcNow;
 
@@ -113,6 +113,7 @@ public class AnalyticsService : IAnalyticsService
         var users = await _userRepository.GetAllAsync(new UserFilter { IncludeDeleted = true });
         var courses = await _courseRepository.GetAllIncludingDeletedAsync();
         var payments = await _paymentRepository.GetCompletedSinceAsync(now.AddDays(-Math.Max(60, rangeDays)));
+        var enrollments = await _enrollmentRepository.GetSinceAsync(now.AddDays(-Math.Max(60, rangeDays)));
         var categories = await _categoryRepository.GetAllAsync();
 
         var mrr = payments
@@ -126,7 +127,31 @@ public class AnalyticsService : IAnalyticsService
             ? Math.Round((mrr - previousMonth) / previousMonth * 100, 1)
             : 0;
 
-        var (revenuePoints, _) = GetChartData(payments, [], rangeDays);
+        // Filtrar enrollments por categoría (gráfico de estudiantes)
+        var filteredEnrollments = enrollments;
+        if (categoryId.HasValue)
+        {
+            var courseIdsInCategory = courses
+                .Where(c => c.CategoryId == categoryId.Value && !c.DeletedAt.HasValue)
+                .Select(c => c.Id)
+                .ToHashSet();
+
+            filteredEnrollments = enrollments.Where(e => courseIdsInCategory.Contains(e.CourseId)).ToList();
+        }
+
+        // Filtrar payments por categoría (gráfico de ingresos)
+        var filteredPayments = payments;
+        if (revenueCategoryId.HasValue)
+        {
+            var courseIdsInCategory = courses
+                .Where(c => c.CategoryId == revenueCategoryId.Value && !c.DeletedAt.HasValue)
+                .Select(c => c.Id)
+                .ToHashSet();
+
+            filteredPayments = payments.Where(p => p.CourseId.HasValue && courseIdsInCategory.Contains(p.CourseId.Value)).ToList();
+        }
+
+        var (revenuePoints, studentPoints) = GetChartData(filteredPayments, filteredEnrollments, rangeDays);
 
         var usersByRole = new UsersByRoleDto
         {
@@ -139,6 +164,7 @@ public class AnalyticsService : IAnalyticsService
         var coursesByCategory = categories
             .Select(c => new CategoryCourseCountDto
             {
+                CategoryId = c.Id,
                 CategoryName = c.Name,
                 CourseCount = courses.Count(course => course.CategoryId == c.Id && !course.DeletedAt.HasValue),
             })
@@ -151,6 +177,7 @@ public class AnalyticsService : IAnalyticsService
             Arr = arr,
             GrowthPercent = growth,
             RevenuePoints = revenuePoints,
+            StudentPoints = studentPoints,
             UsersByRole = usersByRole,
             CoursesByCategory = coursesByCategory,
         };
@@ -208,6 +235,30 @@ public class AnalyticsService : IAnalyticsService
 
                 revenue.Add(new ChartPointDto { Label = weekStart.ToString("d MMM"), Value = weekRev });
                 students.Add(new ChartPointDto { Label = weekStart.ToString("d MMM"), Value = weekStudents });
+            }
+        }
+        else if (rangeDays <= 90)
+        {
+            // 12 semanas (~84 días): 12 puntos semanales
+            var points = 12;
+            var daysPerPoint = rangeDays / points;
+            for (int i = points - 1; i >= 0; i--)
+            {
+                var start = now.AddDays(-(i + 1) * daysPerPoint).Date;
+                var end = i == 0
+                    ? now.AddDays(1).Date
+                    : now.AddDays(-i * daysPerPoint).Date;
+
+                revenue.Add(new ChartPointDto
+                {
+                    Label = start.ToString("d MMM"),
+                    Value = payments.Where(p => p.PaidAt >= start && p.PaidAt < end).Sum(p => p.Amount),
+                });
+                students.Add(new ChartPointDto
+                {
+                    Label = start.ToString("d MMM"),
+                    Value = enrollments.Count(e => e.CreatedAt >= start && e.CreatedAt < end),
+                });
             }
         }
         else

@@ -14,6 +14,7 @@ public record AnalyticsResponse
     public decimal Arr { get; init; }
     public decimal GrowthPercent { get; init; }
     public List<ChartPointDto> RevenuePoints { get; init; } = [];
+    public List<ChartPointDto> StudentPoints { get; init; } = [];
     public UsersByRoleDto UsersByRole { get; init; } = new();
     public List<CategoryCourseCountDto> CoursesByCategory { get; init; } = [];
 }
@@ -43,6 +44,7 @@ public record UsersByRoleDto
 
 public record CategoryCourseCountDto
 {
+    public Guid CategoryId { get; init; }
     public string CategoryName { get; init; } = string.Empty;
     public int CourseCount { get; init; }
 }

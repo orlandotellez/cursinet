@@ -41,8 +41,7 @@ export default function AdminUsuarios() {
 
   useEffect(() => {
     crud.fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [crud.fetchData]);
 
   async function handleSave(payload: CreateUserPayload | UpdateUserPayload) {
     if (editUser) {
