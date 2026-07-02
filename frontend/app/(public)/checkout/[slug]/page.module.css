@@ -1,0 +1,500 @@
+/* ──────────────────────────────────────────────
+   Checkout Page — Styles
+   ────────────────────────────────────────────── */
+
+.page {
+  padding: 100px 24px 80px;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── Breadcrumb ── */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 32px;
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb a:hover {
+  color: var(--accent);
+}
+
+.breadcrumbSep {
+  color: var(--text-muted);
+}
+
+.breadcrumbCurrent {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ── Layout grid ── */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 3fr 2fr;
+    gap: 48px;
+  }
+}
+
+/* ── Left column ── */
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ── Thumbnail ── */
+
+.thumbnail {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.thumbnail img {
+  object-fit: cover;
+}
+
+.thumbnailPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+}
+
+/* ── Course header ── */
+
+.courseHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.levelBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-text);
+}
+
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 34px;
+  }
+}
+
+.shortDescription {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* ── Stats row ── */
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.statIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.statIconStar {
+  color: #eab308;
+}
+
+.statValue {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ── Instructor card ── */
+
+.instructorCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  transition: border-color var(--transition-fast);
+}
+
+.instructorCard:hover {
+  border-color: var(--border-strong);
+}
+
+.instructorAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  flex-shrink: 0;
+}
+
+.instructorAvatarIcon {
+  color: var(--accent-text);
+}
+
+.instructorLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.instructorName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ── Description section ── */
+
+.descriptionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.descriptionText {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
+/* ── Right column ── */
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stickyWrapper {
+  position: sticky;
+  top: 100px;
+}
+
+/* ── Payment sidebar ── */
+
+.paymentCard {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.priceSection {
+  text-align: center;
+}
+
+.priceLabel {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.priceValue {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.priceCurrency {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: 0;
+}
+
+/* ── Includes list ── */
+
+.includesTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.includesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.includesItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.includesIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--success);
+}
+
+/* ── Security note ── */
+
+.securityNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-top: 8px;
+}
+
+/* ── Enrolled state ── */
+
+.enrolledCard {
+  border-radius: var(--radius-xl);
+  border: 1px solid color-mix(in srgb, var(--success) 25%, transparent);
+  background: color-mix(in srgb, var(--success-bg) 60%, transparent);
+  padding: 32px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.enrolledIcon {
+  width: 44px;
+  height: 44px;
+  color: var(--success);
+}
+
+.enrolledTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.enrolledText {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 260px;
+}
+
+.enrolledBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.enrolledBtn:hover {
+  background: var(--accent-hover);
+}
+
+/* ── Skeleton ── */
+
+.skeletonPage {
+  padding: 100px 24px 80px;
+}
+
+.skeletonContainer {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 1024px) {
+  .skeletonGrid {
+    grid-template-columns: 3fr 2fr;
+    gap: 48px;
+  }
+}
+
+.skeleton {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.skeletonThumb {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+  width: 100%;
+}
+
+.skeletonTitle {
+  height: 34px;
+  width: 75%;
+  margin-top: 24px;
+}
+
+.skeletonLine {
+  height: 16px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.skeletonLineShort {
+  height: 16px;
+  width: 60%;
+  margin-top: 12px;
+}
+
+.skeletonSidebar {
+  height: 400px;
+  border-radius: var(--radius-xl);
+  margin-top: 24px;
+}
+
+@media (min-width: 1024px) {
+  .skeletonSidebar {
+    margin-top: 0;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ── States ── */
+
+.centerState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* ── Error state ── */
+
+.errorWrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 100px 24px 80px;
+}
+
+.buttonPay {
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,190 @@
+/* ──────────────────────────────────────────────
+   PayPalCheckoutButton — Estados y layout
+   ────────────────────────────────────────────── */
+
+/* ── SDK loading ── */
+
+.sdkLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0;
+}
+
+.sdkLoadingText {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ── Card de estado (success / error / SDK rejected) ── */
+
+.stateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+}
+
+.stateCardDanger {
+  composes: stateCard;
+  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
+  background: var(--danger-bg);
+}
+
+.stateCardSuccess {
+  composes: stateCard;
+  border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);
+  background: var(--success-bg);
+}
+
+/* Íconos de estado */
+
+.stateIconDanger {
+  color: var(--danger);
+}
+
+.stateIconSuccess {
+  color: var(--success);
+}
+
+/* Texto del estado */
+
+.stateTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.stateTitleDanger {
+  composes: stateTitle;
+  color: var(--danger);
+}
+
+.stateTitleSuccess {
+  composes: stateTitle;
+  color: var(--success);
+}
+
+.stateSubtext {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Botón de reintentar ── */
+
+.retryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.retryBtn:hover {
+  background: var(--accent-hover);
+}
+
+/* ── Botón PayPal ── */
+
+.paypalButton {
+  width: 100%;
+}
+
+/* ── Mock container ── */
+
+.mockContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Error banner en mock ── */
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
+  background: var(--danger-bg);
+  padding: 12px;
+  font-size: 14px;
+  color: var(--danger);
+}
+
+/* ── Mock card ── */
+
+.mockCard {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 16px;
+}
+
+.mockLabel {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.mockHint {
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.mockCode {
+  display: inline;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  padding: 2px 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+/* ── Mock pay button ── */
+
+.mockPayBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.mockPayBtn:hover {
+  background: var(--accent-hover);
+}
+
+.mockPayBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Botón inner (spinner + texto) ── */
+
+.btnInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

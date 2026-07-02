@@ -35,8 +35,8 @@
   /* Radii — jerarquía */
   --radius-sm: 3px;
   --radius-md: 5px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-lg: 5px;
+  --radius-xl: 5px;
   --radius-full: 9999px;
 
   /* Radii — alias semánticos (mapean a la jerarquía) */
