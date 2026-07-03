@@ -5,6 +5,7 @@ import { Sidebar } from '@/src/shared/components/Sidebar';
 import { AuthLoadingScreen } from '@/src/shared/components/AuthLoadingScreen';
 import { useSidebarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
+import { VerificationBanner } from '@/src/shared/components/VerificationBanner';
 import styles from './layout.module.css';
 
 const adminSidebarItems = [
@@ -28,7 +29,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       className={`${styles.container} ${collapsed ? styles.collapsed : styles.expanded}`}
     >
       <Sidebar title="Panel Admin" items={adminSidebarItems} />
-      <main className={styles.content}>{children}</main>
+      <main className={styles.content}>
+        <VerificationBanner />
+        {children}
+      </main>
     </div>
   );
 }

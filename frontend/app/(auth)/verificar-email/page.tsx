@@ -8,6 +8,7 @@ import { ErrorBanner } from '@/src/shared/components/ErrorBanner';
 import { validateShape } from '@/src/shared/lib/validation';
 import { verifyEmailSchema, resendVerificationSchema } from '@/src/shared/validations';
 import { useAsyncAction } from '@/src/shared/hooks/useAsyncAction';
+import { useAuthStore } from '@/src/shared/store/useAuthStore';
 import * as authApi from '@/src/shared/api/auth';
 import styles from './page.module.css';
 
@@ -50,6 +51,11 @@ function VerificarEmailForm() {
 
     const result = await execute(() => authApi.verifyEmail(email.trim(), code.trim()));
     if (result !== null) {
+      // Actualizar el store local para que el banner desaparezca
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser) {
+        useAuthStore.getState().setUser({ ...currentUser, emailVerified: true });
+      }
       setSuccess(true);
     }
   }
@@ -77,8 +83,8 @@ function VerificarEmailForm() {
         </div>
 
         <div className={styles.footer}>
-          <Link href="/login" className={styles.footerLink}>
-            Iniciar sesión
+          <Link href="/dashboard" className={styles.footerLink}>
+            Ir al Dashboard
           </Link>
         </div>
       </div>

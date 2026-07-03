@@ -14,6 +14,7 @@ import { Sidebar } from '@/src/shared/components/Sidebar';
 import { AuthLoadingScreen } from '@/src/shared/components/AuthLoadingScreen';
 import { useSidebarStore } from '@/src/shared/store/useSidebarStore';
 import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
+import { VerificationBanner } from '@/src/shared/components/VerificationBanner';
 
 const sidebarItems = [
   { label: 'Explorar Cursos', href: '/cursos', icon: Compass },
@@ -38,7 +39,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       className={`${styles.container} ${collapsed ? styles.collapsed : styles.expanded}`}
     >
       <Sidebar title="Menú" items={sidebarItems} />
-      <main className={styles.content}>{children}</main>
+      <main className={styles.content}>
+        <VerificationBanner />
+        {children}
+      </main>
     </div>
   );
 }
