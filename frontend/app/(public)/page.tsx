@@ -5,7 +5,7 @@ import { FinalCta } from '@/src/features/home/components/FinalCta';
 import { HeroSection } from '@/src/features/home/components/Hero';
 import { StatsBar } from '@/src/features/home/components/StatsBar';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const [featured, categories, stats] = await Promise.all([

@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cursinet-db
+    environment:
+      POSTGRES_DB: cursinet
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cursinet"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cursinet-api
+    ports:
+      - "5000:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=cursinet;Username=postgres;Password=postgres"
+      Jwt__Secret: "CHANGE_ME_min_32_chars_long_secret_key!!"
+      Jwt__RefreshSecret: "CHANGE_ME_refresh_secret_32_chars_long!!"
+      SendGrid__ApiKey: ""
+      SendGrid__FromEmail: "noreply@cursinet.com"
+      SendGrid__FromName: "Cursinet"
+      SendGrid__BaseUrl: "http://localhost:3000"
+      PayPal__Enabled: "false"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "http://localhost:5000/api/v1"
+    container_name: cursinet-web
+    ports:
+      - "3006:3000"
+    environment:
+      # Para Server Components (adentro del contenedor Docker)
+      API_URL: "http://cursinet-api:8080/api/v1"
+      # Para Client Components (desde el navegador)
+      NEXT_PUBLIC_API_URL: "http://localhost:5000/api/v1"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
