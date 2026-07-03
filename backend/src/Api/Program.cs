@@ -80,6 +80,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Infrastructure")));
 
+builder.Services.Configure<SendGridOptions>(
+    builder.Configuration.GetSection(SendGridOptions.SectionName));
+
 var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("JWT Secret is not configured");
 
@@ -141,7 +144,16 @@ builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 builder.Services.AddScoped<IInstructorDashboardService, InstructorDashboardService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IEmailService, DevEmailService>();
+// Email service: SendGrid si hay API key configurada, DevEmailService como fallback
+var sendGridApiKey = builder.Configuration["SendGrid:ApiKey"];
+if (!string.IsNullOrEmpty(sendGridApiKey))
+{
+    builder.Services.AddScoped<IEmailService, SendGridEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, DevEmailService>();
+}
 builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
