@@ -209,7 +209,3 @@ docker run -d --name cursinet-db \
 ```
 
 ---
-
-## Licencia
-
-Este proyecto está bajo la licencia MIT. Ver [LICENSE](./LICENSE) para más detalles.

@@ -26,6 +26,7 @@ packages/
 .env
 appsettings.*.local.*
 appsettings.development.json
+appsettings.Development.json
 
 # Test results
 **/TestResults/
