@@ -3,7 +3,7 @@ import { SkeletonBase } from '@/src/shared/skeleton';
 import { getPublishedCourses, getPublicCategories } from '@/src/shared/api/public';
 import { CatalogClient } from './CatalogClient';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export default function CatalogPage() {
   return (
