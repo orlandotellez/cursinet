@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Spinner } from '@/src/shared/components/Spinner';
 import { useAuthStore } from '@/src/shared/store/useAuthStore';
-import { redirectByRole } from '@/src/shared/lib/authUtils';
 import { useAuthGuard } from '@/src/shared/hooks/useAuthGuard';
 import { validateShape } from '@/src/shared/lib/validation';
 import { registerSchema } from '@/src/shared/validations';
@@ -52,8 +51,8 @@ export default function RegistrarsePage() {
         password: form.password,
       });
 
-      const role = useAuthStore.getState().user?.role;
-      redirectByRole(role, router.replace);
+      const registeredEmail = form.email.trim();
+      router.replace(`/verificar-email?identifier=${encodeURIComponent(registeredEmail)}`);
     } catch {
       // error ya está en el store
     }
