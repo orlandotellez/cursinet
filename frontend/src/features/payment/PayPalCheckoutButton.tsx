@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   PayPalProvider,
   PayPalOneTimePaymentButton,
+  PayPalGuestPaymentButton,
   usePayPal,
   INSTANCE_LOADING_STATE,
 } from '@paypal/react-paypal-js/sdk-v6';
@@ -177,17 +178,32 @@ function PayPalButtonInner({
     );
   }
 
-  // ── Idle: PayPal button ──
+  // ── Idle: PayPal + Guest card buttons ──
 
   return (
-    <PayPalOneTimePaymentButton
-      createOrder={handleCreateOrder}
-      onApprove={handleApprove}
-      onCancel={handleCancel}
-      onError={handleError}
-      type="pay"
-      className={styles.paypalButton}
-    />
+    <div className={styles.paymentButtons}>
+      <PayPalOneTimePaymentButton
+        createOrder={handleCreateOrder}
+        onApprove={handleApprove}
+        onCancel={handleCancel}
+        onError={handleError}
+        type="pay"
+        className={styles.paypalButton}
+      />
+
+      <div className={styles.divider}>
+        <span className={styles.dividerText}>O paga con tarjeta</span>
+      </div>
+
+      <div className={styles.guestButton}>
+        <PayPalGuestPaymentButton
+          createOrder={handleCreateOrder}
+          onApprove={handleApprove}
+          onCancel={handleCancel}
+          onError={handleError}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -211,7 +227,7 @@ export function PayPalCheckoutButton(props: PayPalCheckoutButtonProps) {
     <PayPalProvider
       clientId={clientIdPromise}
       environment="sandbox"
-      components={['paypal-payments']}
+      components={['paypal-payments', 'paypal-guest-payments']}
       pageType="checkout"
     >
       <PayPalButtonInner
