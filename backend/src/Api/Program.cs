@@ -14,6 +14,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
+builder.Services.AddResponseCaching();
 builder.Services.AddRateLimiterConfiguration();
 builder.Services.AddCorsConfiguration(builder.Configuration);
 builder.Services.AddDatabase(builder.Configuration);

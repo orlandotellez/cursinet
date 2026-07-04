@@ -7,7 +7,7 @@ import { coursesToCards, categoryToMock } from '@/src/shared/api/lib/mappers';
 async function fetchPublicJson<T>(endpoint: string): Promise<T | null> {
   try {
     const res = await fetch(`${API_URL}${endpoint}`, {
-      next: { revalidate: 300 },
+      cache: 'no-store',
     });
     return handleJsonResponse<T>(res);
   } catch {

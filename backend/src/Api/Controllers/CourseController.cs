@@ -25,6 +25,7 @@ public class CourseController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
+    [ResponseCache(Duration = 30, VaryByQueryKeys = new[] { "categoryId", "level", "isPublished", "isFeatured", "search", "includeDeleted", "instructorId" })]
     public async Task<ActionResult<List<CourseResponse>>> GetAll(
         [FromQuery] Guid? categoryId,
         [FromQuery] CourseLevel? level,

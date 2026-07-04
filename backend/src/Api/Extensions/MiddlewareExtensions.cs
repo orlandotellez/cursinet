@@ -28,6 +28,8 @@ public static class MiddlewareExtensions
 
         app.UseCors();
 
+        app.UseResponseCaching();
+
         app.UseMiddleware<ErrorHandlingMiddleware>();
 
         app.UseAuthentication();
