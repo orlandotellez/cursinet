@@ -35,6 +35,14 @@ public class CourseController : ControllerBase
         [FromQuery] bool? includeDeleted,
         [FromQuery] Guid? instructorId)
     {
+        // Skip response caching for admin requests (includeDeleted=true) so the admin panel
+        // always sees fresh data immediately after publishing/unpublishing/deleting courses.
+        if (includeDeleted == true)
+        {
+            Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+            Response.Headers.Pragma = "no-cache";
+        }
+
         var filter = new CourseFilter(categoryId, level, isPublished, isFeatured, search, includeDeleted, instructorId);
         var courses = await _courseService.GetAllAsync(filter);
         return Ok(courses);

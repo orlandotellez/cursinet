@@ -42,7 +42,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: "http://localhost:5000/api/v1"
+        NEXT_PUBLIC_API_URL: "http://localhost:5001/api/v1"
     container_name: cursinet-web
     ports:
       - "3006:3000"
@@ -50,7 +50,7 @@ services:
       # Para Server Components (adentro del contenedor Docker)
       API_URL: "http://cursinet-api:8080/api/v1"
       # Para Client Components (desde el navegador)
-      NEXT_PUBLIC_API_URL: "http://localhost:5000/api/v1"
+      NEXT_PUBLIC_API_URL: "http://localhost:5001/api/v1"
     depends_on:
       - backend
 
