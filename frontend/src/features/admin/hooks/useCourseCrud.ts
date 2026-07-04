@@ -24,7 +24,9 @@ export function useCourseCrud() {
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [publishTarget, setPublishTarget] = useState<DeleteTarget | null>(null);
   const deleteIdRef = useRef<string | null>(null);
+  const publishIdRef = useRef<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -59,16 +61,29 @@ export function useCourseCrud() {
     }
   }
 
-  async function handlePublish(id: string) {
+  async function handleConfirmPublish() {
+    const id = publishIdRef.current;
+    if (!id) return;
     setPublishingId(id);
     try {
       await publishCourse(id);
       await fetchData();
+      setPublishTarget(null);
     } catch (err) {
       useToastStore.getState().error(err instanceof Error ? err.message : 'Error al publicar');
     } finally {
       setPublishingId(null);
     }
+  }
+
+  function confirmPublish(id: string, title: string) {
+    publishIdRef.current = id;
+    setPublishTarget({ id, title });
+  }
+
+  function cancelPublish() {
+    setPublishTarget(null);
+    setPublishingId(null);
   }
 
   async function handleUnpublish(id: string) {
@@ -106,13 +121,16 @@ export function useCourseCrud() {
     deleteTarget,
     deletingId,
     publishingId,
+    publishTarget,
 
     // Actions
     fetchData,
     handleConfirmDelete,
-    handlePublish,
+    handleConfirmPublish,
     handleUnpublish,
     confirmDelete,
     cancelDelete,
+    confirmPublish,
+    cancelPublish,
   };
 }

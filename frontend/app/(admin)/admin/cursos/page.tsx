@@ -208,7 +208,7 @@ export default function AdminCursos() {
                               <a className={styles.actionBtn} title="Currículum" href={`/instructor/cursos/${course.id}/curriculum`} onClick={(e) => e.stopPropagation()}><BookOpen size={15} /></a>
                               <button className={styles.actionBtn} title="Editar" onClick={(e) => { e.stopPropagation(); openEdit(course); }}><Edit size={15} /></button>
                               {!course.isPublished && (
-                                <button className={styles.actionBtn} title="Publicar" disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handlePublish(course.id); }}><Send size={15} /></button>
+                                <button className={styles.actionBtn} title="Publicar" disabled={crud.publishingId === course.id} onClick={(e) => { e.stopPropagation(); crud.confirmPublish(course.id, course.title); }}><Send size={15} /></button>
                               )}
                               {course.isPublished && (
                                 <button className={styles.actionBtn} title="Despublicar" disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handleUnpublish(course.id); }}><EyeOff size={15} /></button>
@@ -245,7 +245,7 @@ export default function AdminCursos() {
                         <>
                           <a className={styles.actionBtn} href={`/instructor/cursos/${course.id}/curriculum`} onClick={(e) => e.stopPropagation()}><BookOpen size={14} /> Currículum</a>
                           <button className={styles.actionBtn} onClick={(e) => { e.stopPropagation(); openEdit(course); }}><Edit size={14} /> Editar</button>
-                          {!course.isPublished && <button className={styles.actionBtn} disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handlePublish(course.id); }}><Send size={14} /> Publicar</button>}
+                          {!course.isPublished && <button className={styles.actionBtn} disabled={crud.publishingId === course.id} onClick={(e) => { e.stopPropagation(); crud.confirmPublish(course.id, course.title); }}><Send size={14} /> Publicar</button>}
                           {course.isPublished && <button className={styles.actionBtn} disabled={crud.publishingId === course.id} onClick={async (e) => { e.stopPropagation(); await crud.handleUnpublish(course.id); }}><EyeOff size={14} /> Despublicar</button>}
                           <button className={`${styles.actionBtn} ${styles.actionDelete}`} onClick={(e) => { e.stopPropagation(); crud.confirmDelete(course.id, course.title); }}><Trash2 size={14} /> Eliminar</button>
                         </>
@@ -269,11 +269,22 @@ export default function AdminCursos() {
         onCancel={crud.cancelDelete}
       />
 
+      <ConfirmDialog
+        open={!!crud.publishTarget}
+        title="Publicar curso"
+        message={crud.publishTarget ? `¿Estás seguro de que querés publicar "${crud.publishTarget.title}"? El curso estará visible para todos los usuarios.` : ''}
+        confirmLabel={crud.publishingId === crud.publishTarget?.id ? 'Publicando...' : 'Publicar'}
+        variant="warning"
+        loading={crud.publishingId === crud.publishTarget?.id}
+        onConfirm={crud.handleConfirmPublish}
+        onCancel={crud.cancelPublish}
+      />
+
       <CourseDetailModal
         course={detailCourse}
         onClose={() => setDetailCourse(null)}
         onEdit={openEdit}
-        onPublish={crud.handlePublish}
+        onPublish={(course) => { crud.confirmPublish(course.id, course.title); }}
         onUnpublish={crud.handleUnpublish}
         onDelete={(course) => { setDetailCourse(null); crud.confirmDelete(course.id, course.title); }}
         publishingId={crud.publishingId}

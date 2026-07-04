@@ -8,7 +8,7 @@ interface Props {
   course: CourseDTO | null;
   onClose: () => void;
   onEdit?: (course: CourseDTO) => void;
-  onPublish?: (id: string) => void;
+  onPublish?: (course: CourseDTO) => void;
   onUnpublish?: (id: string) => void;
   onDelete?: (course: CourseDTO) => void;
   publishingId?: string | null;
@@ -54,7 +54,7 @@ export default function CourseDetailModal({ course, onClose, onEdit, onPublish, 
                 className={styles.detailActionBtn}
                 title="Publicar curso"
                 disabled={publishingId === course.id}
-                onClick={() => onPublish(course.id)}
+                onClick={() => onPublish(course)}
               >
                 <Send size={16} />
               </button>
