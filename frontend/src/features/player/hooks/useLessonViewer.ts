@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useLessonData } from './useLessonData';
 import { useLessonNavigation } from './useLessonNavigation';
@@ -68,8 +69,17 @@ export function useLessonViewer(): UseLessonViewer {
 
   // ── Delegar a hooks especializados ──
   const data = useLessonData(courseId, lessonId);
-  const ui = useLessonUI(lessonId);
+
+  // Calcular qué módulo expandir por defecto según la lección actual
+  const defaultExpanded = useMemo(() => {
+    if (!data.curriculum || !data.lesson) return [];
+    const moduleId = data.lesson.moduleId;
+    return moduleId ? [moduleId] : [];
+  }, [data.curriculum, data.lesson]);
+
+  const ui = useLessonUI(lessonId, defaultExpanded);
   const navigation = useLessonNavigation(
+    courseId,
     lessonId,
     data.curriculum,
     data.lesson,
