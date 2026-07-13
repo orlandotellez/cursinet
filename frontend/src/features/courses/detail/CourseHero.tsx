@@ -91,6 +91,7 @@ export function CourseHero({ course, enrolled, firstLessonHref, onEnroll }: Cour
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className={styles.heroThumbImg}
+              loading="eager"
             />
           ) : (
             <span className={styles.heroThumbText}>{course.title.charAt(0)}</span>
