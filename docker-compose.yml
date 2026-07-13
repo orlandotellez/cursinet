@@ -31,7 +31,16 @@ services:
       SendGrid__FromEmail: ${SendGrid__FromEmail}
       SendGrid__FromName: ${SendGrid__FromName}
       SendGrid__BaseUrl: ${SendGrid__BaseUrl}
-      PayPal__Enabled: true
+      PayPal__Enabled: ${PayPal__Enabled}
+      PayPal__IsSandbox: ${PayPal__IsSandbox}
+      PayPal__ClientId: ${PayPal__ClientId}
+      PayPal__ClientSecret: ${PayPal__ClientSecret}
+      PayPal__WebhookId: ${PayPal__WebhookId}
+      R2__Endpoint: ${R2__Endpoint}
+      R2__AccessKeyId: ${R2__AccessKeyId}
+      R2__SecretAccessKey: ${R2__SecretAccessKey}
+      R2__BucketName: ${R2__BucketName}
+      R2__PublicUrl: ${R2__PublicUrl}
       ASPNETCORE_ENVIRONMENT: "Development"
     depends_on:
       postgres:
@@ -43,6 +52,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: "http://localhost:5001/api/v1"
+        NEXT_PUBLIC_PAYPAL_CLIENT_ID: ${NEXT_PUBLIC_PAYPAL_CLIENT_ID}
     container_name: cursinet-web
     ports:
       - "3006:3000"
