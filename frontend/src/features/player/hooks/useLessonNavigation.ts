@@ -5,6 +5,7 @@ import type { CurriculumLesson } from '@/src/shared/api/courses';
 import type { CurriculumResponse } from '@/src/shared/api/courses';
 import type { LessonProgressResponse } from '@/src/shared/api/courses';
 import { upsertProgress } from '@/src/shared/api/courses';
+import { issueCertificate } from '@/src/shared/api/student';
 import { toLesson } from '@/src/features/player/utils/mappers';
 import type { Lesson } from '@/src/shared/types';
 import { useToastStore } from '@/src/shared/store/useToastStore';
@@ -18,6 +19,7 @@ export interface LessonNavigationResult {
 }
 
 export function useLessonNavigation(
+  courseId: string,
   lessonId: string,
   curriculum: CurriculumResponse | null,
   lesson: CurriculumLesson | null,
@@ -53,12 +55,22 @@ export function useLessonNavigation(
     try {
       await upsertProgress(lesson.moduleId, lesson.id, { isCompleted: true });
       setCompleted(true);
+
+      // Si es la última lección del curso, emitir certificado automáticamente
+      if (!nextLesson) {
+        try {
+          await issueCertificate(courseId);
+          useToastStore.getState().success('🎉 ¡Felicidades! Has completado el curso. Tu certificado está listo.');
+        } catch {
+          // El certificado ya existe o hubo un error — no bloquear al usuario
+        }
+      }
     } catch {
       useToastStore.getState().error('Error al marcar lección como completada');
     } finally {
       setSavingProgress(false);
     }
-  }, [lesson]);
+  }, [lesson, nextLesson, courseId]);
 
   return {
     prevLesson,
