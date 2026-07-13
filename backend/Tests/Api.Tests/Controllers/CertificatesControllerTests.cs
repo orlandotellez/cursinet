@@ -12,13 +12,15 @@ namespace Cursinet.Api.Tests.Controllers;
 public class CertificatesControllerTests : ControllerTestBase
 {
     private readonly ICertificateService _certificateService;
+    private readonly ICertificatePdfService _certificatePdfService;
     private readonly CertificatesController _controller;
     private readonly Guid _userId;
 
     public CertificatesControllerTests()
     {
         _certificateService = Substitute.For<ICertificateService>();
-        _controller = new CertificatesController(_certificateService);
+        _certificatePdfService = Substitute.For<ICertificatePdfService>();
+        _controller = new CertificatesController(_certificateService, _certificatePdfService);
         _userId = Guid.NewGuid();
     }
 

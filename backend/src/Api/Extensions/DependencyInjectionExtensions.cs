@@ -50,6 +50,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<ILessonService, LessonService>();
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<ICertificateService, CertificateService>();
+        services.AddScoped<ICertificatePdfService, CertificatePdfService>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
         services.AddScoped<IInstructorDashboardService, InstructorDashboardService>();

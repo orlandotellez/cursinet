@@ -11,6 +11,7 @@ public static class MappingCertificate
         {
             Id = certificate.Id,
             CourseId = certificate.CourseId,
+            StudentName = certificate.StudentName,
             CourseName = certificate.CourseName,
             InstructorName = certificate.InstructorName,
             IssuedAt = certificate.IssuedAt,

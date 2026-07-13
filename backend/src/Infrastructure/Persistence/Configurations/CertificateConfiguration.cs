@@ -28,6 +28,7 @@ public class CertificateConfiguration : IEntityTypeConfiguration<Certificate>
         builder.Property(c => c.IssuedAt).IsRequired().HasColumnName("issued_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
         builder.Property(c => c.CertificateNumber).IsRequired().HasColumnName("certificate_number").HasMaxLength(64);
         builder.HasIndex(c => c.CertificateNumber).IsUnique();
+        builder.Property(c => c.StudentName).IsRequired().HasColumnName("student_name").HasMaxLength(255);
         builder.Property(c => c.CourseName).IsRequired().HasColumnName("course_name").HasMaxLength(255);
         builder.Property(c => c.InstructorName).IsRequired().HasColumnName("instructor_name").HasMaxLength(255);
         builder.Property(c => c.CreatedAt).IsRequired().HasColumnName("created_at").HasDefaultValueSql("CURRENT_TIMESTAMP");
