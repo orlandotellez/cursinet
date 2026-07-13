@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Star, Users, Clock, CheckCircle2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { Course } from '@/src/shared/types';
@@ -83,7 +84,17 @@ export function CourseHero({ course, enrolled, firstLessonHref, onEnroll }: Cour
 
       <div className={styles.heroVisual}>
         <div className={styles.heroThumb}>
-          <span className={styles.heroThumbText}>{course.title.charAt(0)}</span>
+          {course.thumbnail ? (
+            <Image
+              src={course.thumbnail}
+              alt={course.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className={styles.heroThumbImg}
+            />
+          ) : (
+            <span className={styles.heroThumbText}>{course.title.charAt(0)}</span>
+          )}
         </div>
       </div>
     </section>

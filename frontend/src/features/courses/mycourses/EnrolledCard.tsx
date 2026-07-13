@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Play, Heart } from 'lucide-react';
 import { SkeletonBase } from '@/src/shared/skeleton';
-import { CourseThumbnail } from '@/src/features/courses/components/CourseThumbnail';
 import { CourseLevelBadge } from '@/src/features/courses/components/CourseLevelBadge';
 import type { Enrollment } from '@/src/shared/types';
 import type { CurriculumResponse } from '@/src/shared/api/courses';
@@ -119,9 +119,19 @@ export function EnrolledCard({ enrollment, loading }: EnrolledCardProps) {
   return (
     <article className={styles.card}>
       <div className={styles.thumbnail}>
-        <span className={styles.letter}>
-          {enrollment.course.title.charAt(0)}
-        </span>
+        {enrollment.course.thumbnail ? (
+          <Image
+            src={enrollment.course.thumbnail}
+            alt={enrollment.course.title}
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            className={styles.thumbImg}
+          />
+        ) : (
+          <span className={styles.letter}>
+            {enrollment.course.title.charAt(0)}
+          </span>
+        )}
         <button
           className={`${styles.favBtn} ${isBookmarked ? styles.favActive : ''}`}
           onClick={handleToggleFav}

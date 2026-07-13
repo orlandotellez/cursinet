@@ -17,9 +17,22 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return handleJsonResponse<T>(res);
 }
 
+async function uploadRequest<T>(method: string, path: string, formData: FormData): Promise<T> {
+  const url = `${API_URL}${path}`;
+  const init: RequestInit = {
+    method,
+    credentials: 'include' as RequestCredentials,
+    // Don't set Content-Type — browser sets it with boundary for multipart/form-data
+    body: formData,
+  };
+  const res = await authedFetch(url, init);
+  return handleJsonResponse<T>(res);
+}
+
 export const api = {
   get: <T>(path: string) => request<T>('GET', path),
   post: <T>(path: string, body?: unknown) => request<T>('POST', path, body),
   put: <T>(path: string, body?: unknown) => request<T>('PUT', path, body),
   delete: <T>(path: string) => request<T>('DELETE', path),
+  upload: <T>(path: string, formData: FormData) => uploadRequest<T>('POST', path, formData),
 };

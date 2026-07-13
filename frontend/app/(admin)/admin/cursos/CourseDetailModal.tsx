@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Edit, Send, EyeOff, Trash2 } from 'lucide-react';
+import { X, Edit, Send, EyeOff, Trash2, ImageIcon } from 'lucide-react';
 import type { CourseDTO } from '@/src/shared/api/courses';
 import styles from './page.module.css';
 
@@ -8,6 +8,7 @@ interface Props {
   course: CourseDTO | null;
   onClose: () => void;
   onEdit?: (course: CourseDTO) => void;
+  onImageEdit?: (course: CourseDTO) => void;
   onPublish?: (course: CourseDTO) => void;
   onUnpublish?: (id: string) => void;
   onDelete?: (course: CourseDTO) => void;
@@ -35,7 +36,7 @@ function mapLevel(level: string): string {
   return map[level] || level;
 }
 
-export default function CourseDetailModal({ course, onClose, onEdit, onPublish, onUnpublish, onDelete, publishingId }: Props) {
+export default function CourseDetailModal({ course, onClose, onEdit, onImageEdit, onPublish, onUnpublish, onDelete, publishingId }: Props) {
   if (!course) return null;
 
   return (
@@ -47,6 +48,11 @@ export default function CourseDetailModal({ course, onClose, onEdit, onPublish, 
             {!course.deletedAt && onEdit && (
               <button className={styles.detailActionBtn} title="Editar curso" onClick={() => onEdit(course)}>
                 <Edit size={16} />
+              </button>
+            )}
+            {!course.deletedAt && onImageEdit && (
+              <button className={styles.detailActionBtn} title="Cambiar imagen" onClick={() => onImageEdit(course)}>
+                <ImageIcon size={16} />
               </button>
             )}
             {!course.deletedAt && !course.isPublished && onPublish && (

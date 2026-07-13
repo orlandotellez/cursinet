@@ -50,6 +50,35 @@
   color: var(--text-muted);
 }
 
+.titleGroup {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.imageBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.imageBtn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
 .createBtn {
   display: inline-flex;
   align-items: center;

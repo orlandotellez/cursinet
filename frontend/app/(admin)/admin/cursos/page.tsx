@@ -8,6 +8,7 @@ import { ConfirmDialog } from '@/src/shared/components/ConfirmDialog';
 import CourseFormModal from '@/src/features/courses/components/CourseFormModal';
 import { courseToFormData } from '@/src/features/courses/utils/courseToFormData';
 import CourseDetailModal from './CourseDetailModal';
+import CourseImageUploadModal from '@/src/features/courses/components/CourseImageUploadModal';
 import styles from './page.module.css';
 import type { CourseDTO } from '@/src/shared/api/courses';
 import type { CourseFormData } from '@/src/features/courses/components/CourseFormModal';
@@ -28,6 +29,7 @@ const statusTabs: { key: StatusFilter; label: string }[] = [
 export default function AdminCursos() {
   const crud = useCourseCrud();
   const [detailCourse, setDetailCourse] = useState<CourseDTO | null>(null);
+  const [imageUploadCourse, setImageUploadCourse] = useState<CourseDTO | null>(null);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [formModalMode, setFormModalMode] = useState<'create' | 'edit'>('create');
   const [editingCourseId, setEditingCourseId] = useState<string | undefined>();
@@ -284,11 +286,24 @@ export default function AdminCursos() {
         course={detailCourse}
         onClose={() => setDetailCourse(null)}
         onEdit={openEdit}
+        onImageEdit={(course) => setImageUploadCourse(course)}
         onPublish={(course) => { crud.confirmPublish(course.id, course.title); }}
         onUnpublish={crud.handleUnpublish}
         onDelete={(course) => { setDetailCourse(null); crud.confirmDelete(course.id, course.title); }}
         publishingId={crud.publishingId}
       />
+
+      {imageUploadCourse && (
+        <CourseImageUploadModal
+          isOpen={true}
+          course={imageUploadCourse}
+          onClose={() => setImageUploadCourse(null)}
+          onSaved={(updated) => {
+            crud.fetchData();
+            setDetailCourse((prev) => prev?.id === updated.id ? updated : prev);
+          }}
+        />
+      )}
 
       <CourseFormModal
         isOpen={formModalOpen}

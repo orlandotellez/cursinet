@@ -13,7 +13,11 @@ export function CourseCard({ course }: CourseCardProps) {
   return (
     <article className={styles.card}>
       <Link href={`/cursos/${course.slug}`} className={styles.link}>
-        <CourseThumbnail title={course.title} badge={course.badge} />
+        <CourseThumbnail
+          title={course.title}
+          thumbnailUrl={course.thumbnail || undefined}
+          badge={course.badge}
+        />
 
         <div className={styles.content}>
           <div className={styles.meta}>

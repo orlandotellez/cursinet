@@ -1,3 +1,4 @@
+using Cursinet.Infrastructure.Adapters.Cloudinary;
 using Cursinet.Infrastructure.Services;
 using Cursinet.Application.Common.Interfaces;
 using Cursinet.Application.Features.Analytics;
@@ -34,6 +35,11 @@ public static class DependencyInjectionExtensions
         // SendGrid options
         services.Configure<SendGridOptions>(
             configuration.GetSection(SendGridOptions.SectionName));
+
+        // Cloudflare R2 options + service
+        services.Configure<R2Options>(
+            configuration.GetSection(R2Options.SectionName));
+        services.AddScoped<IFileStorageService, R2StorageService>();
 
         // Services
         services.AddScoped<IAuthService, AuthService>();
