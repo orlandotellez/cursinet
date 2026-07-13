@@ -12,9 +12,10 @@ interface SidebarItem {
 interface SidebarNavProps {
   items: SidebarItem[];
   collapsed: boolean;
+  onItemClick?: () => void;
 }
 
-export function SidebarNav({ items, collapsed }: SidebarNavProps) {
+export function SidebarNav({ items, collapsed, onItemClick }: SidebarNavProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,7 +28,10 @@ export function SidebarNav({ items, collapsed }: SidebarNavProps) {
         return (
           <button
             key={item.href}
-            onClick={() => router.push(item.href)}
+            onClick={() => {
+              router.push(item.href);
+              onItemClick?.();
+            }}
             className={`${styles.navItem} ${isActive ? styles.active : ''} ${collapsed ? styles.isCollapsedIcon : ''}`}
             title={collapsed ? item.label : undefined}
           >
