@@ -82,6 +82,7 @@ public class CertificateService : ICertificateService
             UserId = userId,
             IssuedAt = DateTime.UtcNow,
             CertificateNumber = certificateNumber,
+            StudentName = user.Name,
             CourseName = course.Title,
             InstructorName = course.Instructor?.Name ?? "Instructor",
             CreatedAt = DateTime.UtcNow,

@@ -12,6 +12,7 @@ public class Certificate
     public string CertificateNumber { get; set; } = string.Empty; // unique hash
 
     // Denormalized display data (safe from renames)
+    public string StudentName { get; set; } = string.Empty;
     public string CourseName { get; set; } = string.Empty;
     public string InstructorName { get; set; } = string.Empty;
 

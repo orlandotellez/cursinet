@@ -13,10 +13,14 @@ namespace Cursinet.Api.Controllers;
 public class CertificatesController : ControllerBase
 {
     private readonly ICertificateService _certificateService;
+    private readonly ICertificatePdfService _certificatePdfService;
 
-    public CertificatesController(ICertificateService certificateService)
+    public CertificatesController(
+        ICertificateService certificateService,
+        ICertificatePdfService certificatePdfService)
     {
         _certificateService = certificateService;
+        _certificatePdfService = certificatePdfService;
     }
 
     /// <summary>Get all certificates for the authenticated user.</summary>
@@ -37,5 +41,16 @@ public class CertificatesController : ControllerBase
             ?? throw AppExceptions.Unauthorized();
         var certificate = await _certificateService.IssueCertificateAsync(courseId, userId);
         return CreatedAtAction(null, certificate);
+    }
+
+    /// <summary>Download a certificate as PDF.</summary>
+    [HttpGet("{id}/download")]
+    public async Task<IActionResult> DownloadCertificate(Guid id)
+    {
+        var userId = HttpContext.GetCurrentUserId()
+            ?? throw AppExceptions.Unauthorized();
+
+        var pdfBytes = await _certificatePdfService.GenerateCertificatePdfAsync(id, userId);
+        return File(pdfBytes, "application/pdf", $"certificado-{id}.pdf");
     }
 }

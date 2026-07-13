@@ -4,6 +4,7 @@ public record CertificateResponse
 {
     public Guid Id { get; init; }
     public Guid CourseId { get; init; }
+    public string StudentName { get; init; } = string.Empty;
     public string CourseName { get; init; } = string.Empty;
     public string InstructorName { get; init; } = string.Empty;
     public DateTime IssuedAt { get; init; }

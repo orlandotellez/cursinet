@@ -13,6 +13,11 @@ public class CertificateRepository : ICertificateRepository
         _context = context;
     }
 
+    public async Task<Certificate?> GetByIdAsync(Guid id)
+    {
+        return await _context.Set<Certificate>().FindAsync(id);
+    }
+
     public async Task<List<Certificate>> GetByUserAsync(Guid userId)
     {
         return await _context.Set<Certificate>()

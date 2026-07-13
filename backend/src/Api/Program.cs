@@ -1,6 +1,9 @@
 using System.Text.Json.Serialization;
 using Cursinet.Api.Extensions;
 using FluentValidation;
+using QuestPDF.Infrastructure;
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 

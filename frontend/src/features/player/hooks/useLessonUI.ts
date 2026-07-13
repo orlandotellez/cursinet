@@ -34,9 +34,19 @@ export interface LessonUIResult {
   lastSaved: string | null;
 }
 
-export function useLessonUI(lessonId?: string): LessonUIResult {
+export function useLessonUI(lessonId?: string, defaultExpanded?: string[]): LessonUIResult {
   const [activeTab, setActiveTab] = useState<TabKey>('description');
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
+
+  // Auto-expand módulos cuando cambian los defaults (ej: al navegar a otra lección)
+  useEffect(() => {
+    if (defaultExpanded && defaultExpanded.length > 0) {
+      setExpandedModules((prev) => {
+        const missing = defaultExpanded.filter((id) => !prev.includes(id));
+        return missing.length > 0 ? [...prev, ...missing] : prev;
+      });
+    }
+  }, [defaultExpanded]);
   const [commentText, setCommentText] = useState('');
   const [notes, setNotes] = useState('');
   const [lastSaved, setLastSaved] = useState<string | null>(null);
