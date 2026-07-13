@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Plus, ArrowLeft, AlertCircle, BookOpen } from 'lucide-react';
+import { Plus, ArrowLeft, AlertCircle, BookOpen, ImageIcon } from 'lucide-react';
 import { Spinner } from '@/src/shared/components/Spinner';
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent,
@@ -12,6 +12,7 @@ import { getCourseById, type CourseDTO } from '@/src/shared/api/courses';
 import { getModules, type ModuleResponse } from '@/src/shared/api/courses';
 import { useModuleCrud } from '@/src/features/instructor/hooks/useModuleCrud';
 import { useLessonCrud, type LessonFormData } from '@/src/features/instructor/hooks/useLessonCrud';
+import CourseImageUploadModal from '@/src/features/courses/components/CourseImageUploadModal';
 import { ModuleCard } from './components/ModuleCard';
 import { ModuleFormModal, type ModuleFormData } from './components/ModuleFormModal';
 import { LessonFormModal } from './components/LessonFormModal';
@@ -26,6 +27,7 @@ export default function CurriculumEditorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [imageUploadOpen, setImageUploadOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -114,10 +116,17 @@ export default function CurriculumEditorPage() {
             <button className={styles.backBtn} onClick={() => router.push('/instructor/cursos')}>
               <ArrowLeft size={16} /> Mis Cursos
             </button>
-            <div>
+            <div className={styles.titleGroup}>
               <h1 className={styles.title}>{course.title}</h1>
               <p className={styles.subtitle}>Editor de currículum</p>
             </div>
+            <button
+              className={styles.imageBtn}
+              onClick={() => setImageUploadOpen(true)}
+              title="Cambiar imagen del curso"
+            >
+              <ImageIcon size={16} /> Imagen
+            </button>
           </div>
           <button onClick={moduleCrud.handleOpenCreateModule} className={styles.createBtn}>
             <Plus size={16} /> Añadir Módulo
@@ -175,6 +184,15 @@ export default function CurriculumEditorPage() {
         initialData={lessonCrud.getLessonInitialData()}
         onSave={handleSaveLesson}
       />
+
+      {course && (
+        <CourseImageUploadModal
+          isOpen={imageUploadOpen}
+          course={course}
+          onClose={() => setImageUploadOpen(false)}
+          onSaved={(updated) => setCourse(updated)}
+        />
+      )}
     </>
   );
 }

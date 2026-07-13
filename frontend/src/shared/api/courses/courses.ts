@@ -54,3 +54,9 @@ export async function publishCourse(id: string): Promise<CourseDTO> {
 export async function unpublishCourse(id: string): Promise<CourseDTO> {
   return api.post<CourseDTO>(`/courses/${id}/unpublish`);
 }
+
+export async function uploadCourseImage(file: File): Promise<{ url: string }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return api.upload<{ url: string }>('/upload', formData);
+}

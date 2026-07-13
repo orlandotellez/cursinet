@@ -1,4 +1,4 @@
-export { getCourses, getCourseById, getCourseBySlug, createCourse, updateCourse, deleteCourse, publishCourse, unpublishCourse } from './courses';
+export { getCourses, getCourseById, getCourseBySlug, createCourse, updateCourse, deleteCourse, publishCourse, unpublishCourse, uploadCourseImage } from './courses';
 export { getModules, getModule, createModule, updateModule, deleteModule, reorderModules } from './modules';
 export { getLessons, getLesson, createLesson, updateLesson, deleteLesson, reorderLessons, getProgress, upsertProgress } from './lessons';
 export { getCurriculum } from './curriculum';
