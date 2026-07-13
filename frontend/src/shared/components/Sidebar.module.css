@@ -92,19 +92,90 @@
   font-size: 14px;
 }
 
-/* ── Responsive ── */
+/* ── Hamburger Button (mobile only) ── */
+
+.hamburgerButton {
+  display: none;
+}
 
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
+  .hamburgerButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1001;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
   }
 
-  .expanded {
+  .hamburgerButton:hover {
+    background: var(--bg-hover);
+  }
+
+  .hamburgerButton:active {
+    transform: scale(0.95);
+  }
+}
+
+/* ── Overlay Backdrop (mobile only) ── */
+
+.overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Mobile Sidebar Overlay ── */
+
+@media (max-width: 768px) {
+  .sidebar.isMobile {
+    transform: translateX(-100%);
+    width: 260px;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.isMobile.mobileOpen {
     transform: translateX(0);
+  }
+
+  /* Override desktop expanded/collapsed on mobile — hidden by default */
+  .isMobile.expanded,
+  .isMobile.collapsed {
+    transform: translateX(-100%);
     width: 260px;
   }
 
-  .collapsed {
-    transform: translateX(-100%);
+  .isMobile.mobileOpen.expanded,
+  .isMobile.mobileOpen.collapsed {
+    transform: translateX(0);
+  }
+
+  /* Hide collapse button on mobile (hamburger replaces it) */
+  .isMobile .collapseContainer {
+    display: none;
   }
 }
