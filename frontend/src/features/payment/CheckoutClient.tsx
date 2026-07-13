@@ -290,6 +290,7 @@ export function CheckoutClient() {
                   alt={course.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 60vw"
+                  loading="eager"
                 />
               ) : (
                 <div className={styles.thumbnailPlaceholder}>
