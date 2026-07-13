@@ -1,7 +1,9 @@
 'use client'
 
-import { Award, Download } from 'lucide-react';
+import { useState } from 'react';
+import { Award, Download, Loader2 } from 'lucide-react';
 import { SkeletonBase } from '@/src/shared/skeleton';
+import { downloadCertificate } from '@/src/shared/api/student';
 import type { Certificate } from '@/src/shared/types';
 import styles from './CertificateCard.module.css';
 
@@ -11,6 +13,20 @@ interface CertificateCardProps {
 }
 
 export function CertificateCard({ certificate, loading }: CertificateCardProps) {
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!certificate || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadCertificate(certificate.id);
+    } catch {
+      // Error silencioso — el toast del fetch ya muestra el error
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.card}>
@@ -46,9 +62,17 @@ export function CertificateCard({ certificate, loading }: CertificateCardProps) 
           </p>
         </div>
       </div>
-      <button className={styles.downloadBtn}>
-        <Download size={16} />
-        Descargar
+      <button
+        className={styles.downloadBtn}
+        onClick={handleDownload}
+        disabled={downloading}
+      >
+        {downloading ? (
+          <Loader2 size={16} className={styles.spinner} />
+        ) : (
+          <Download size={16} />
+        )}
+        {downloading ? 'Descargando...' : 'Descargar'}
       </button>
     </div>
   );
