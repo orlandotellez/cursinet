@@ -1,4 +1,4 @@
-# CURSINET 
+# CURSINET
 
 **CURSINET** es una plataforma de aprendizaje online full-stack construida con **Next.js 16** en el frontend y **ASP.NET Core (.NET 10)** en el backend, con persistencia en **PostgreSQL**. Pensada para ofrecer una experiencia técnica, oscura y precisa, con todo el feature-set de una plataforma educativa moderna.
 
@@ -10,6 +10,61 @@
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)
+
+---
+
+## Capturas de Pantalla
+
+<table>
+  <tr>
+    <td><img src="./images/1" alt="Vista general del sistema" width="100%"></td>
+    <td><img src="./images/2.png" alt="Dashboard del sistema" width="100%"></td>
+  </tr>
+  <tr>
+    <td><img src="./images/3.png" alt="Catálogo de cursos" width="100%"></td>
+    <td><img src="./images/4.png" alt="Reproductor de lecciones" width="100%"></td>
+  </tr>
+</table>
+
+---
+
+## Cómo Empezar
+
+### Prerrequisitos
+
+- **Node.js** 20+ y **pnpm**
+- **.NET 10 SDK**
+- **PostgreSQL** 16 (o Docker)
+- **Redis** (opcional, para caché)
+
+### Frontend
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+# → http://localhost:3000
+```
+
+### Backend
+
+```bash
+cd backend/src/Api
+dotnet run
+# → http://localhost:5000
+# → Health check: GET /health
+```
+
+### Base de datos
+
+```bash
+docker run -d --name cursinet-db \
+  -e POSTGRES_DB=cursinet \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16
+```
 
 ---
 
@@ -140,46 +195,6 @@ src/
 
 ---
 
-## Cómo Empezar
-
-### Prerrequisitos
-
-- **Node.js** 20+ y **pnpm**
-- **.NET 10 SDK**
-- **PostgreSQL** 16 (o Docker)
-- **Redis** (opcional, para caché)
-
-### Frontend
-
-```bash
-cd frontend
-pnpm install
-pnpm dev
-# → http://localhost:3000
-```
-
-### Backend
-
-```bash
-cd backend/src/Api
-dotnet run
-# → http://localhost:5000
-# → Health check: GET /health
-```
-
-### Base de datos
-
-```bash
-docker run -d --name cursinet-db \
-  -e POSTGRES_DB=cursinet \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  postgres:16
-```
-
----
-
 ## Estructura del Repositorio
 
 ```
@@ -200,6 +215,7 @@ docker run -d --name cursinet-db \
 │       ├── Application/         # CQRS, Interfaces
 │       ├── Domain/              # Entities, Enums
 │       └── Infrastructure/      # EF Core, Services, Repositories
+├── images/                      # Capturas de pantalla del proyecto
 └── openspec/                    # Especificación completa del proyecto
     ├── modules/
     │   ├── frontend/            # Stack, diseño, arquitectura, páginas
