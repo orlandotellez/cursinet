@@ -1,7 +1,7 @@
 <Solution>
-  <Project Path="src/Api/Api.csproj" />
-  <Project Path="src/Application/Application.csproj" />
-  <Project Path="src/Domain/Domain.csproj" />
-  <Project Path="src/Infrastructure/Infrastructure.csproj" />
+  <Project Path="src/Cursinet.Api/Cursinet.Api.csproj" />
+  <Project Path="src/Cursinet.Application/Cursinet.Application.csproj" />
+  <Project Path="src/Cursinet.Domain/Cursinet.Domain.csproj" />
+  <Project Path="src/Cursinet.Infrastructure/Cursinet.Infrastructure.csproj" />
   <Project Path="Tests/Api.Tests/Api.Tests.csproj" />
 </Solution>

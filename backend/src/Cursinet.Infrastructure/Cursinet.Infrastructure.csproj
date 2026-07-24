@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Cursinet.Domain\Cursinet.Domain.csproj" />
+    <ProjectReference Include="..\Cursinet.Application\Cursinet.Application.csproj" />
   </ItemGroup>
 
 </Project>

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Api/Api.csproj" />
+    <ProjectReference Include="../../src/Cursinet.Api/Cursinet.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
