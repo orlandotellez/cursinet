@@ -12,7 +12,7 @@ public static class DatabaseExtensions
                 "DefaultConnection string is not configured. Set it in appsettings.json, user secrets, or environment variables.");
 
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Infrastructure")));
+            options.UseNpgsql(connectionString, b => b.MigrationsAssembly("Cursinet.Infrastructure")));
 
         return services;
     }
