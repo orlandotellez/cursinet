@@ -41,7 +41,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<QuizAttemptAnswer> QuizAttemptAnswers => Set<QuizAttemptAnswer>();
     public DbSet<UserNotificationPreference> UserNotificationPreferences => Set<UserNotificationPreference>();
     public DbSet<PayPalWebhookEvent> PayPalWebhookEvents => Set<PayPalWebhookEvent>();
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
